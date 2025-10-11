@@ -1,94 +1,603 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shivam-Fullstack Developer</title>
-    <link rel="stylesheet" href="./css/all.min.css" type="text/css">
-    <link rel="stylesheet" href="./css/style.css" type="text/css">
-    <link rel="stylesheet" href="./css/media.css" type="text/css">
-</head>
-<body>
-    <!--::::: Header Starts :::::::-->
-    <header class="header">
-        <div class="container">
-            <div class="navbar">    
-                <nav class="navigation">
-                    <div class="logo">
-                        <h3>
-                            <span>Devloper</span>-Shivu
-                        </h3>
-                    </div>
-                    <ul>
-                        <li>
-                            <a href="">Home</a>
-                        </li>
-                        <li>
-                            <a href="">Pages</a>
-                        </li>
-                        <li>
-                            <a href="">Portfolio</a>
-                        </li>
-                        <li>
-                            <a href="">Blogs</a>
-                        </li>
-                        <li>
-                            <a href="">Contact Us</a>
-                        </li>
-                    </ul>
-                    <div class="menu">
-                        <span>
-                            <img src="./assets/icons/menu-9-dots.svg" alt="">
-                        </span>
-                    </div>
-                </nav>
-                <button class="toggler" type="button">
-                    <i class="fa-regular fa-user"></i>
-                </button>
-            </div>
-        </div>
-    </header>
-    <!--::::: Header Ends :::::::-->
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Smart Tuition Cost Calculator - Realistic Breakdown</title>
+    <meta
+      name="description"
+      content="A dynamic calculator that breaks down website costs for a tuition business based on a total yearly budget."
+    />
+    <link
+      rel="icon"
+      href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4b8.svg"
+      type="image/svg+xml"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Libraries -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --navy: #0f172a;
+        --emerald: #10b981;
+        --bg: #f1f5f9;
+        --surface: #ffffff;
+        --text: #0f172a;
+        --muted: #475569;
+        --card: #ffffff;
+        --border: #e2e8f0;
+        --shadow: 0 6px 18px rgba(15, 23, 42, 0.07);
+        --grad: linear-gradient(120deg, var(--emerald), #34d399);
+        --radius: 12px;
+      }
+      [data-theme="dark"] {
+        --bg: #0f172a;
+        --surface: #1e293b;
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --card: #1e293b;
+        --border: #334155;
+        --shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      }
+      body {
+        font-family: "Poppins", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        overflow-x: hidden;
+      }
+      .navbar {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: saturate(150%) blur(10px);
+        border-bottom: 1px solid var(--border);
+      }
+      [data-theme="dark"] .navbar {
+        background: rgba(30, 41, 59, 0.8);
+      }
+      .navbar-brand {
+        color: var(--navy) !important;
+        font-weight: 700;
+      }
+      [data-theme="dark"] .navbar-brand {
+        color: var(--emerald) !important;
+      }
+      #scrollProgress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 4px;
+        width: 0;
+        background: var(--grad);
+        z-index: 9999;
+      }
+      #preloader {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        z-index: 99999;
+        display: grid;
+        place-items: center;
+        transition: opacity 0.5s ease-in-out;
+      }
+      #preloader.loaded {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .loader {
+        width: 48px;
+        height: 48px;
+        border: 4px solid var(--border);
+        border-top: 4px solid var(--emerald);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .hero {
+        padding: 100px 0 50px 0;
+        text-align: center;
+      }
+      .hero h1 {
+        font-weight: 800;
+        font-size: 2.8rem;
+        background: var(--grad);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: -1.5px;
+      }
+      .hero .lead {
+        max-width: 600px;
+        margin: 1rem auto 0;
+      }
+      .toggle-btns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 24px;
+      }
+      .toggle-btn {
+        padding: 10px 22px;
+        border: 1.5px solid var(--border);
+        background: var(--surface);
+        color: var(--muted);
+        border-radius: var(--radius);
+        font-weight: 500;
+        transition: all 0.25s ease;
+      }
+      .toggle-btn:hover {
+        border-color: var(--emerald);
+        color: var(--emerald);
+      }
+      .toggle-btn.active {
+        background: var(--emerald);
+        color: white;
+        border-color: var(--emerald);
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(16, 185, 129, 0.2);
+      }
+      .expense-table {
+        background: var(--card);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+      }
+      .table th {
+        background: var(--card);
+        color: var(--text);
+        font-weight: 600;
+        padding: 16px 12px;
+        border-bottom: 2px solid var(--border);
+      }
+      .table tbody tr {
+        transition: background-color 0.2s ease;
+        border-left: 4px solid transparent;
+      }
+      .table tbody tr:hover {
+        background-color: rgba(16, 185, 129, 0.05);
+        border-left-color: var(--emerald);
+      }
+      [data-theme="dark"] .table tbody tr:hover {
+        background-color: rgba(16, 185, 129, 0.1);
+      }
+      .summary-card {
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: 24px;
+        text-align: center;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .summary-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
+      }
+      [data-theme="dark"] .summary-card:hover {
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+      }
+      .summary-card h5 {
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .summary-card .total {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-top: 8px;
+      }
+      .summary-card .total-highlight {
+        background: var(--grad);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      #expenseChart {
+        max-width: 380px;
+        margin: 0 auto;
+        display: block;
+      }
+      #themeToggle {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 1.2rem;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        transition: transform 0.3s ease, color 0.3s, border-color 0.3s;
+      }
+      #themeToggle:hover {
+        transform: rotate(180deg);
+        color: var(--emerald);
+        border-color: var(--emerald);
+      }
+      .bg-light-custom {
+        background-color: #f8fafc;
+      }
+      [data-theme="dark"] .bg-light-custom {
+        background-color: var(--navy);
+      }
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2.2rem;
+        }
+        .summary-card .total {
+          font-size: 1.6rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="preloader"><div class="loader"></div></div>
+    <div id="scrollProgress"></div>
+    <nav class="navbar fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="#"
+          ><i class="bi bi-calculator-fill me-2"></i>Smart Tuition Cost
+          Calculator</a
+        >
+        <button id="themeToggle" class="btn" aria-label="Toggle theme">
+          <i class="bi bi-moon-stars-fill"></i>
+        </button>
+      </div>
+    </nav>
     <main>
-        <!--::::: Hero's Section Starts :::::::-->
-        <section class="hero">
-            <div class="container">
-                <div class="row">
-                    <div class="col-7">
-                        <div class="hero-main-content">
-                            <h1 class="my-1">
-                                <span>Imagination</span>
-                                is more important than knowledge
-                            </h1>
-                            <p class="my-1">
-                                Together we the people achieve more than any single person <br>could ever do alone.
-                            </p>
-                            <a href="" class="btn getting-started">Getting started
-                                <i class="fa-solid fa-greater-than"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-5">
-                        <img src="./assets/images/person-1.png" alt="person-1">
-                    </div>
-                </div>
+      <section class="hero">
+        <div class="container">
+          <h1 data-aos="fade-down">Smart Tuition Cost Breakdown</h1>
+          <p class="lead text-muted" data-aos="fade-down" data-aos-delay="100">
+            See where your money goes with a realistic cost breakdown,
+            calculated from your yearly budget.
+          </p>
+          <div class="toggle-btns" data-aos="fade-up" data-aos-delay="200">
+            <button class="toggle-btn active" data-view="minimal">
+              Minimal Plan (₹35k–50k)
+            </button>
+            <button class="toggle-btn" data-view="recommended">
+              Recommended Plan (₹75k–95k)
+            </button>
+          </div>
+        </div>
+      </section>
+      <section class="py-5">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-10" data-aos="fade-up">
+              <div class="expense-table">
+                <table class="table mb-0">
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th>Item/Details</th>
+                      <th>Monthly (INR)</th>
+                      <th>Yearly (INR)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="expenseTable"></tbody>
+                </table>
+              </div>
             </div>
-        </section>
-        <!--::::: Hero's Section Ends :::::::-->
-        
-        <!--::::: About Section Starts :::::::-->
-        <section class="about">
-            <div class="container">
-                <div class="row">
-                    <div class="col-5">
-                        <div class="about-images">
-                            <img src="" alt="">
-                        </div>
-                    </div>
+          </div>
+        </div>
+      </section>
+      <section class="py-5 bg-light-custom">
+        <div class="container">
+          <div class="row g-4">
+            <div class="col-md-6" data-aos="fade-up">
+              <div class="summary-card">
+                <h5>Minimal Plan Total</h5>
+                <div class="total" id="minimalMonthlyTotal">₹0</div>
+                <small class="text-muted">Per Month</small>
+                <div class="total total-highlight mt-2" id="minimalYearlyTotal">
+                  ₹0
                 </div>
+                <small class="text-muted">Per Year</small>
+              </div>
             </div>
-        </section>
-        <!--::::: About Section Ends :::::::-->
+            <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+              <div class="summary-card">
+                <h5>Recommended Plan Total</h5>
+                <div class="total" id="recMonthlyTotal">₹0</div>
+                <small class="text-muted">Per Month</small>
+                <div class="total total-highlight mt-2" id="recYearlyTotal">
+                  ₹0
+                </div>
+                <small class="text-muted">Per Year</small>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-5 pt-3">
+            <div class="col-12 text-center" data-aos="fade-up">
+              <h4 class="mb-4">Recommended Plan Yearly Cost Breakdown</h4>
+              <canvas id="expenseChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
-</body>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const $ = (sel) => document.querySelector(sel);
+        const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+        // --- 1. DEFINE YOUR BUDGETS (The Source of Truth) ---
+        const BUDGETS = {
+          minimal: { yearly: { low: 35000, high: 50000 } },
+          recommended: { yearly: { low: 75000, high: 95000 } },
+        };
+
+        let expenseChartInstance;
+
+        // --- 2. DYNAMIC CALCULATION LOGIC (Corrected & Rebalanced) ---
+        function generateExpenseBreakdown(view) {
+          const totalBudget = BUDGETS[view].yearly;
+
+          // Define the percentage distribution. This MUST add up to 100%.
+          const DIST = {
+            marketing: 0.4, // 40%
+            freelancer: 0.3, // 30%
+            hosting: 0.15, // 15%
+            misc: 0.1, // 10%
+            domain: 0.05, // 5%
+          }; // Total: 1.0 (or 100%)
+
+          const breakdown = [
+            {
+              category: "Marketing & SEO",
+              item: "Google Ads, Social Media Promotion & Content",
+              yearly: {
+                low: totalBudget.low * DIST.marketing,
+                high: totalBudget.high * DIST.marketing,
+              },
+            },
+            {
+              category: "Freelancer Maintenance",
+              item: "Site Updates, Content Changes & Analytics",
+              yearly: {
+                low: totalBudget.low * DIST.freelancer,
+                high: totalBudget.high * DIST.freelancer,
+              },
+            },
+            {
+              category: "Platform & Hosting Costs",
+              item: "Managed Server, CDN, Backups & Premium Plugins",
+              yearly: {
+                low: totalBudget.low * DIST.hosting,
+                high: totalBudget.high * DIST.hosting,
+              },
+            },
+            {
+              category: "Miscellaneous",
+              item: "Software Licenses & Emergency Buffer",
+              yearly: {
+                low: totalBudget.low * DIST.misc,
+                high: totalBudget.high * DIST.misc,
+              },
+            },
+            {
+              category: "Domain Registration",
+              item: "Annual .com Domain Renewal",
+              yearly: {
+                low: totalBudget.low * DIST.domain,
+                high: totalBudget.high * DIST.domain,
+              },
+            },
+          ];
+
+          // Calculate monthly costs and sort by cost for better presentation
+          return breakdown
+            .map((item) => ({
+              ...item,
+              monthly: {
+                low: item.yearly.low / 12,
+                high: item.yearly.high / 12,
+              },
+            }))
+            .sort((a, b) => b.yearly.low - a.yearly.low);
+        }
+
+        // --- 3. UI RENDERING AND ANIMATION ---
+        const formatCurrency = (value) =>
+          `₹${Math.round(value).toLocaleString("en-IN")}`;
+        const formatRange = (costObj) =>
+          `${formatCurrency(costObj.low)} - ${formatCurrency(costObj.high)}`;
+
+        function renderTable(data) {
+          const tableBody = $("#expenseTable");
+          tableBody.innerHTML = "";
+          data.forEach((row) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${row.category}</td>
+              <td>${row.item}</td>
+              <td>${formatRange(row.monthly)}</td>
+              <td>${formatRange(row.yearly)}</td>
+            `;
+            tableBody.appendChild(tr);
+          });
+          gsap.fromTo(
+            tableBody.querySelectorAll("tr"),
+            { y: 20, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.5,
+              stagger: 0.07,
+              ease: "power2.out",
+            }
+          );
+        }
+
+        function animateCounter(selector, low, high) {
+          const el = $(selector);
+          const target = { valLow: 0, valHigh: 0 };
+          gsap.to(target, {
+            duration: 1.8,
+            ease: "power3.out",
+            valLow: low,
+            valHigh: high,
+            onUpdate: () => {
+              el.textContent = `${formatCurrency(
+                target.valLow
+              )} - ${formatCurrency(target.valHigh)}`;
+            },
+          });
+        }
+
+        function updateChart(data) {
+          if (expenseChartInstance) expenseChartInstance.destroy();
+          const labels = data.map((d) => d.category);
+          const values = data.map((d) => d.yearly.low);
+
+          const ctx = $("#expenseChart").getContext("2d");
+          expenseChartInstance = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels,
+              datasets: [
+                {
+                  data: values,
+                  backgroundColor: [
+                    "#10b981",
+                    "#34d399",
+                    "#6ee7b7",
+                    "#a7f3d0",
+                    "#d1fae5",
+                  ],
+                  borderWidth: 0,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              cutout: "60%",
+              animation: { duration: 1800, easing: "easeInOutQuart" },
+              plugins: {
+                legend: {
+                  position: "bottom",
+                  labels: {
+                    color: getComputedStyle(document.body).getPropertyValue(
+                      "--text"
+                    ),
+                    padding: 20,
+                  },
+                },
+              },
+            },
+          });
+        }
+
+        function updateUI(view) {
+          const minimalData = generateExpenseBreakdown("minimal");
+          const recommendedData = generateExpenseBreakdown("recommended");
+
+          animateCounter(
+            "#minimalMonthlyTotal",
+            BUDGETS.minimal.yearly.low / 12,
+            BUDGETS.minimal.yearly.high / 12
+          );
+          animateCounter(
+            "#minimalYearlyTotal",
+            BUDGETS.minimal.yearly.low,
+            BUDGETS.minimal.yearly.high
+          );
+          animateCounter(
+            "#recMonthlyTotal",
+            BUDGETS.recommended.yearly.low / 12,
+            BUDGETS.recommended.yearly.high / 12
+          );
+          animateCounter(
+            "#recYearlyTotal",
+            BUDGETS.recommended.yearly.low,
+            BUDGETS.recommended.yearly.high
+          );
+
+          renderTable(view === "minimal" ? minimalData : recommendedData);
+          updateChart(recommendedData);
+        }
+
+        // --- 4. INITIALIZATION & EVENT LISTENERS ---
+        AOS.init({ once: true, duration: 800, delay: 100 });
+
+        window.addEventListener("load", () => {
+          $("#preloader").classList.add("loaded");
+          gsap.from(".hero h1, .hero .lead", {
+            duration: 1,
+            y: 30,
+            opacity: 0,
+            stagger: 0.2,
+            ease: "power3.out",
+            delay: 0.2,
+          });
+          updateUI("minimal");
+        });
+
+        window.addEventListener("scroll", () => {
+          const scrolled =
+            (window.scrollY /
+              (document.documentElement.scrollHeight - window.innerHeight)) *
+            100;
+          $("#scrollProgress").style.width = `${scrolled}%`;
+        });
+
+        const themeToggle = $("#themeToggle");
+        const setTheme = (theme) => {
+          document.documentElement.setAttribute("data-theme", theme);
+          localStorage.setItem("theme", theme);
+          themeToggle.querySelector("i").className =
+            theme === "dark"
+              ? "bi bi-brightness-high-fill"
+              : "bi bi-moon-stars-fill";
+          if (expenseChartInstance) {
+            updateChart(generateExpenseBreakdown("recommended"));
+          }
+        };
+        const savedTheme = localStorage.getItem("theme") || "light";
+        setTheme(savedTheme);
+        themeToggle.addEventListener("click", () => {
+          const current = document.documentElement.getAttribute("data-theme");
+          setTheme(current === "dark" ? "light" : "dark");
+        });
+
+        $$(".toggle-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            $$(".toggle-btn").forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            renderTable(generateExpenseBreakdown(btn.dataset.view));
+          });
+        });
+      });
+    </script>
+  </body>
 </html>
