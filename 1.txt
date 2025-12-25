@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIVAM | SYSTEM_DESTABILIZER</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;500&family=JetBrains+Mono:wght@100;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-violet: #b967ff;
+            --toxic-green: #43e97b;
+            --blood-red: #ff2a6d;
+            --void-black: #0d021a;
+            --data-cyan: #05d9e8;
+        }
+
+        body {
+            background-color: var(--void-black);
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; }
+
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch-text::before, .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--void-black);
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--blood-red);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--data-cyan);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(31px, 9999px, 94px, 0); }
+            20% { clip: rect(62px, 9999px, 42px, 0); }
+            40% { clip: rect(11px, 9999px, 88px, 0); }
+            60% { clip: rect(1px, 9999px, 64px, 0); }
+            80% { clip: rect(84px, 9999px, 2px, 0); }
+            100% { clip: rect(54px, 9999px, 47px, 0); }
+        }
+
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); }
+            20% { clip: rect(12px, 9999px, 58px, 0); }
+            40% { clip: rect(95px, 9999px, 33px, 0); }
+            60% { clip: rect(25px, 9999px, 81px, 0); }
+            80% { clip: rect(49px, 9999px, 5px, 0); }
+            100% { clip: rect(2px, 9999px, 90px, 0); }
+        }
+
+        .crt-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-violet);
+            border-radius: 50%;
+            position: fixed;
+            top: 0; left: 0;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.1s ease-out, background-color 0.3s, border-color 0.3s;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-dot {
+            width: 4px;
+            height: 4px;
+            background-color: var(--toxic-green);
+            border-radius: 50%;
+            position: fixed;
+            top: 0; left: 0;
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        .card-blur {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mission-card:hover {
+            border-color: var(--neon-violet);
+            box-shadow: 0 0 20px rgba(185, 103, 255, 0.3);
+            transform: translateY(-5px);
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--void-black); }
+        ::-webkit-scrollbar-thumb { background: var(--neon-violet); border-radius: 10px; }
+    </style>
+</head>
+<body class="antialiased selection:bg-purple-500 selection:text-white">
+    <div class="crt-overlay"></div>
+    <div class="scanline"></div>
+    <div class="custom-cursor" id="cursor"></div>
+    <div class="cursor-dot" id="cursor-dot"></div>
+
+    <canvas id="bg-canvas" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 z-50 flex items-center justify-between w-full px-6 py-4 mix-blend-difference">
+        <div class="text-2xl font-black tracking-tighter uppercase glitch-text" data-text="SHIVAM.SYS">SHIVAM.SYS</div>
+        <div class="hidden space-x-8 text-xs font-bold tracking-widest uppercase md:flex">
+            <a href="#home" class="transition-colors hover:text-purple-400">// CORE</a>
+            <a href="#mission" class="transition-colors hover:text-purple-400">// MISSION</a>
+            <a href="#arsenal" class="transition-colors hover:text-purple-400">// ARSENAL</a>
+            <a href="#terminal" class="transition-colors hover:text-purple-400">// TERMINAL</a>
+            <a href="#contact" class="transition-colors hover:text-purple-400">// DEPLOY</a>
+        </div>
+        <button id="chaos-toggle" class="border border-white/20 px-4 py-1 text-[10px] tracking-tighter hover:bg-white hover:text-black transition-all">
+            SANITY_CHECK: <span class="text-green-400">NORMAL</span>
+        </button>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="flex flex-col items-center justify-center min-h-screen px-6 pt-20">
+            <div class="relative group">
+                <div class="absolute transition duration-1000 rounded-full opacity-25 -inset-1 bg-gradient-to-r from-purple-600 to-cyan-400 blur group-hover:opacity-100 group-hover:duration-200"></div>
+                <img src="https://github.com/Dev-Shivam-05.png" alt="Shivam" class="relative object-cover w-48 h-48 transition-all duration-500 border-2 rounded-full md:w-64 md:h-64 border-white/10 grayscale hover:grayscale-0">
+            </div>
+            
+            <div class="max-w-4xl mt-8 text-center">
+                <h2 class="text-sm md:text-base text-purple-400 mb-2 font-bold tracking-[0.5em] uppercase opacity-70">Full-Stack System Destabilizer</h2>
+                <h1 class="mb-6 text-5xl font-black leading-none tracking-tighter md:text-8xl glitch-text" data-text="SHIVAM BHADORIYA">
+                    SHIVAM <br> BHADORIYA
+                </h1>
+                <p class="max-w-2xl mx-auto mb-10 text-lg font-light leading-relaxed text-gray-400 md:text-xl">
+                    I build browsers to break them. I don't follow best practices — I rewrite them. Certified Chaos Engineer weaponizing the web for the next generation of digital dominance.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#contact" class="px-8 py-3 font-bold tracking-widest text-black uppercase transition-all transform bg-white hover:bg-purple-500 hover:text-white hover:scale-105">
+                        [ DEPLOY ME ]
+                    </a>
+                    <a href="https://github.com/Dev-Shivam-05" target="_blank" class="px-8 py-3 font-bold tracking-widest uppercase transition-all transform border border-white/20 hover:border-purple-500 hover:scale-105">
+                        [ SOURCE CODE ]
+                    </a>
+                </div>
+            </div>
+
+            <div class="absolute -translate-x-1/2 bottom-10 left-1/2 animate-bounce opacity-20">
+                <div class="w-1 h-12 bg-white rounded-full"></div>
+            </div>
+
+            <!-- Floating Data HUD -->
+            <div class="absolute flex-col items-end hidden gap-8 -translate-y-1/2 pointer-events-none right-10 top-1/2 lg:flex opacity-40">
+                <div class="text-right">
+                    <p class="text-[10px] font-bold tracking-[0.3em] uppercase mb-1">Packet_Loss</p>
+                    <p class="text-2xl font-black text-purple-500">0.00%</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] font-bold tracking-[0.3em] uppercase mb-1">Neural_Load</p>
+                    <p class="text-2xl font-black text-cyan-400">89.4%</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] font-bold tracking-[0.3em] uppercase mb-1">Uptime</p>
+                    <p class="text-2xl font-black text-green-400">99.9%</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mission Section -->
+        <section id="mission" class="min-h-screen px-6 py-24 mx-auto max-w-7xl">
+            <div class="mb-16">
+                <h2 class="mb-2 text-3xl font-black uppercase">Mission Logs</h2>
+                <div class="w-24 h-1 bg-purple-500"></div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+                <!-- Project 1 -->
+                <div class="relative p-8 overflow-hidden transition-all mission-card card-blur group">
+                    <div class="absolute top-0 right-0 p-4 text-6xl font-black opacity-10">01</div>
+                    <span class="text-[10px] text-purple-400 font-bold tracking-widest uppercase mb-4 block">// CLASSIFIED // ACTIVE</span>
+                    <h3 class="mb-4 text-2xl font-bold">RECIPE ENTITY_JS</h3>
+                    <p class="mb-6 text-sm leading-relaxed text-gray-400">
+                        Built logic so clean, it made senior devs cry. A high-performance recipe book engine utilizing complex Vanilla JS state management.
+                    </p>
+                    <div class="flex gap-2 mb-6">
+                        <span class="px-2 py-1 bg-white/10 text-[10px]">JS_SOURCERY</span>
+                        <span class="px-2 py-1 bg-white/10 text-[10px]">VANILLA_DOM</span>
+                        <span class="px-2 py-1 bg-white/10 text-[10px]">UI_UX</span>
+                    </div>
+                    <a href="https://recipe-book-js-liart.vercel.app/" class="inline-block pb-1 text-xs font-bold transition-all border-b-2 border-purple-500 hover:text-purple-400">ACCESS_FILE.EXE →</a>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="relative p-8 overflow-hidden transition-all mission-card card-blur group">
+                    <div class="absolute top-0 right-0 p-4 text-6xl font-black opacity-10">02</div>
+                    <span class="text-[10px] text-cyan-400 font-bold tracking-widest uppercase mb-4 block">// CLONED // HAUNTING</span>
+                    <h3 class="mb-4 text-2xl font-bold">SNAPFOLIO CLONE</h3>
+                    <p class="mb-6 text-sm leading-relaxed text-gray-400">
+                        Cloned a soul. Improved its DNA. Now it outperforms the original. Logic-heavy portfolio structure using modern Bootstrap patterns.
+                    </p>
+                    <div class="flex gap-2 mb-6">
+                        <span class="px-2 py-1 bg-white/10 text-[10px]">BOOTSTRAP_NECROMANCY</span>
+                        <span class="px-2 py-1 bg-white/10 text-[10px]">RESPONSIVE</span>
+                    </div>
+                    <a href="https://pr-1-bootstrap-shivam-portfolio-01.vercel.app/" class="inline-block pb-1 text-xs font-bold transition-all border-b-2 border-cyan-500 hover:text-cyan-400">ACCESS_FILE.EXE →</a>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="relative p-8 overflow-hidden transition-all mission-card card-blur group">
+                    <div class="absolute top-0 right-0 p-4 text-6xl font-black opacity-10">03</div>
+                    <span class="text-[10px] text-green-400 font-bold tracking-widest uppercase mb-4 block">// DEPLOYED // STEALTH</span>
+                    <h3 class="mb-4 text-2xl font-bold">DAVIS MINIMALIST_OPS</h3>
+                    <p class="mb-6 text-sm leading-relaxed text-gray-400">
+                        Proof I can go silent. Minimalist? No. Surgical. Every pixel has intent. A high-efficiency, vanilla CSS execution.
+                    </p>
+                    <div class="flex gap-2 mb-6">
+                        <span class="px-2 py-1 bg-white/10 text-[10px]">SURGICAL_CSS</span>
+                        <span class="px-2 py-1 bg-white/10 text-[10px]">SEO_WEAPONIZED</span>
+                    </div>
+                    <a href="https://pr-01-davis-porfolio.vercel.app/" class="inline-block pb-1 text-xs font-bold transition-all border-b-2 border-green-500 hover:text-green-400">ACCESS_FILE.EXE →</a>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="flex flex-col items-center justify-center p-8 border-2 border-dashed mission-card border-white/10 group cursor-help">
+                    <span class="mb-4 text-6xl group-hover:animate-pulse">🔒</span>
+                    <h3 class="mb-2 text-xl font-bold">[REDACTED]</h3>
+                    <p class="text-xs tracking-tighter text-center text-gray-500 uppercase">Project codename: PHOENIX. NDA active until heat death.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arsenal Section -->
+        <section id="arsenal" class="py-24 overflow-hidden bg-white/5">
+            <div class="px-6 mx-auto max-w-7xl">
+                <div class="flex flex-col justify-between mb-16 md:flex-row md:items-end">
+                    <div>
+                        <h2 class="mb-2 text-3xl font-black uppercase">Weapon Select</h2>
+                        <div class="w-24 h-1 bg-cyan-500"></div>
+                    </div>
+                    <p class="max-w-xs mt-4 text-xs font-bold tracking-tighter text-gray-500 uppercase md:mt-0">Current tactical capability: Frontend/Backend saturation with high-intensity logical deployment.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8 md:grid-cols-5">
+                    <!-- Tech Item -->
+                    <div class="flex flex-col items-center p-6 transition-all border group border-white/5 hover:border-cyan-500/50 hover:bg-cyan-500/5">
+                        <img src="https://skillicons.dev/icons?i=js" class="w-16 h-16 mb-4 transition-transform group-hover:scale-110 grayscale group-hover:grayscale-0">
+                        <span class="text-[10px] font-bold tracking-widest text-cyan-400 mb-1">JAVASCRIPT</span>
+                        <div class="w-full h-1 bg-white/10">
+                            <div class="bg-cyan-500 h-full w-[95%]"></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center p-6 transition-all border group border-white/5 hover:border-purple-500/50 hover:bg-purple-500/5">
+                        <img src="https://skillicons.dev/icons?i=html,css" class="w-24 h-16 mb-4 transition-transform group-hover:scale-110 grayscale group-hover:grayscale-0">
+                        <span class="text-[10px] font-bold tracking-widest text-purple-400 mb-1">HTML5 / CSS3</span>
+                        <div class="w-full h-1 bg-white/10">
+                            <div class="bg-purple-500 h-full w-[98%]"></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center p-6 transition-all border group border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5">
+                        <img src="https://skillicons.dev/icons?i=tailwind,bootstrap" class="w-24 h-16 mb-4 transition-transform group-hover:scale-110 grayscale group-hover:grayscale-0">
+                        <span class="text-[10px] font-bold tracking-widest text-blue-400 mb-1">STYLING_ENGINES</span>
+                        <div class="w-full h-1 bg-white/10">
+                            <div class="bg-blue-500 h-full w-[90%]"></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center p-6 transition-all border group border-white/5 hover:border-green-500/50 hover:bg-green-500/5">
+                        <img src="https://skillicons.dev/icons?i=cpp,python" class="w-24 h-16 mb-4 transition-transform group-hover:scale-110 grayscale group-hover:grayscale-0">
+                        <span class="text-[10px] font-bold tracking-widest text-green-400 mb-1">LOGIC_CORES</span>
+                        <div class="w-full h-1 bg-white/10">
+                            <div class="bg-green-500 h-full w-[85%]"></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center p-6 transition-all border group border-white/5 hover:border-yellow-500/50 hover:bg-yellow-500/5">
+                        <img src="https://skillicons.dev/icons?i=mysql,git" class="w-24 h-16 mb-4 transition-transform group-hover:scale-110 grayscale group-hover:grayscale-0">
+                        <span class="text-[10px] font-bold tracking-widest text-yellow-400 mb-1">INFRA_DATA</span>
+                        <div class="w-full h-1 bg-white/10">
+                            <div class="bg-yellow-500 h-full w-[80%]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terminal / Stats Section -->
+        <section id="terminal" class="px-6 py-24 mx-auto max-w-7xl">
+            <div class="mb-16">
+                <h2 class="mb-2 text-3xl font-black uppercase">Beast Mode Stats</h2>
+                <div class="w-24 h-1 bg-red-500"></div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                <div class="p-1 lg:col-span-2 card-blur">
+                    <div class="flex items-center justify-between p-4 border-b bg-white/5 border-white/10">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-500 tracking-widest">SHIVAM_ANALYTICS.EXE</span>
+                    </div>
+                    <div class="p-6">
+                        <img src="https://github-readme-activity-graph.vercel.app/graph?username=Dev-Shivam-05&bg_color=0d1117&color=8A2387&line=2575fc&point=8A2387&area=true&hide_border=true&custom_title=Weekly+Code+Intensity&theme=dark&border_radius=20&line_width=3&area_color=2575fc" class="w-full mb-8 filter invert brightness-125">
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <img src="https://github-readme-stats-sigma-five.vercel.app/api?username=Dev-Shivam-05&show_icons=true&hide_border=true&title_color=b967ff&icon_color=b967ff&bg_color=ffffff05&text_color=ffffff&hide_rank=false" class="w-full">
+                            <img src="https://github-readme-streak-stats.herokuapp.com/?user=Dev-Shivam-05&theme=dark&hide_border=true&stroke=0000&background=ffffff05&ring=b967ff&fire=ff2a6d&currStreakLabel=b967ff" class="w-full">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col gap-8">
+                    <div class="flex flex-col items-center justify-center flex-1 p-6 text-center card-blur">
+                        <h4 class="mb-4 text-sm font-bold tracking-widest text-purple-400 uppercase">Global Rank</h4>
+                        <img src="https://github-profile-trophy.vercel.app/?username=Dev-Shivam-05&theme=radical&margin-w=15&margin-h=15&column=2&no-frame=true" class="w-full">
+                    </div>
+                    <div class="relative flex flex-col items-center justify-center p-6 overflow-hidden text-center card-blur group">
+                        <div class="absolute inset-0 transition-opacity opacity-0 bg-red-600/10 group-hover:opacity-100"></div>
+                        <h4 class="mb-2 text-sm font-bold tracking-widest text-red-400 uppercase">Vulnerability Check</h4>
+                        <p class="mb-1 text-2xl font-black">0 CRITICAL</p>
+                        <p class="text-[10px] text-gray-500">SYSTEM STABLE. DEPLOYMENT READY.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="relative flex items-center justify-center min-h-screen px-6 py-24 overflow-hidden">
+            <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] -z-10 text-[20rem] font-black pointer-events-none select-none">
+                HIRE
+            </div>
+            
+            <div class="relative z-10 w-full max-w-2xl text-center">
+                <h2 class="mb-8 text-5xl font-black md:text-7xl glitch-text" data-text="READY TO DEPLOY?">READY TO <br> DEPLOY?</h2>
+                <p class="mb-12 text-lg text-gray-400">
+                    I am currently open to work and high-intensity collaborations. My response time is under 24 hours. Don't wait — your competition isn't.
+                </p>
+                
+                <div class="flex flex-col gap-4">
+                    <a href="mailto:shivambhadoriya1605@gmail.com" class="bg-purple-600 hover:bg-purple-500 text-white py-6 text-xl font-bold uppercase tracking-[0.3em] transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center">
+                        <span class="mr-3">🚀</span> INITIALIZE CONTACT
+                    </a>
+                    
+                    <div class="grid grid-cols-2 gap-4 mt-8 md:grid-cols-4">
+                        <a href="https://github.com/Dev-Shivam-05" target="_blank" class="flex flex-col items-center gap-2 p-4 text-xs font-bold tracking-widest uppercase transition-all border border-white/10 hover:border-white/50">
+                            <img src="https://skillicons.dev/icons?i=github" class="w-6"> GITHUB
+                        </a>
+                        <a href="https://www.linkedin.com/in/shivam-bhadoriya-b82792324/" target="_blank" class="flex flex-col items-center gap-2 p-4 text-xs font-bold tracking-widest uppercase transition-all border border-white/10 hover:border-white/50">
+                            <img src="https://skillicons.dev/icons?i=linkedin" class="w-6"> LINKEDIN
+                        </a>
+                        <a href="https://www.instagram.com/__https.shivu/" target="_blank" class="flex flex-col items-center gap-2 p-4 text-xs font-bold tracking-widest uppercase transition-all border border-white/10 hover:border-white/50">
+                            <img src="https://skillicons.dev/icons?i=instagram" class="w-6"> INSTA
+                        </a>
+                        <a href="https://www.behance.net/shivambhadoriya2/" target="_blank" class="flex flex-col items-center gap-2 p-4 text-xs font-bold tracking-widest uppercase transition-all border border-white/10 hover:border-white/50">
+                            <img src="https://skillicons.dev/icons?i=behance" class="w-6"> BEHANCE
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="px-6 py-12 text-center border-t border-white/5">
+        <p class="text-[10px] text-gray-600 font-bold tracking-[0.5em] uppercase">
+            © 2025 SHIVAM BHADORIYA // ALL RIGHTS RESERVED // BUILT IN THE VOID
+        </p>
+        <div class="flex justify-center mt-4 space-x-4 transition-all opacity-30 grayscale hover:grayscale-0">
+            <img src="https://img.shields.io/badge/Made%20with-❤️-6a11cb?style=flat-square">
+            <img src="https://img.shields.io/badge/Status-Beast%20Mode-8A2387?style=flat-square">
+        </div>
+    </footer>
+
+    <script>
+        // BACKGROUND PARTICLE SYSTEM
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null };
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.color = Math.random() > 0.5 ? '#b967ff' : '#05d9e8';
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                else if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                else if (this.y < 0) this.y = canvas.height;
+
+                // Mouse interaction
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 100) {
+                    this.x -= dx / 20;
+                    this.y -= dy / 20;
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function createParticles() {
+            particles = [];
+            for (let i = 0; i < 150; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        // CURSOR LOGIC
+        const cursor = document.getElementById('cursor');
+        const dot = document.getElementById('cursor-dot');
+        
+        window.addEventListener('mousemove', (e) => {
+            cursor.style.transform = `translate(${e.clientX - 10}px, ${e.clientY - 10}px)`;
+            dot.style.transform = `translate(${e.clientX - 2}px, ${e.clientY - 2}px)`;
+        });
+
+        // Hover effect for cursor
+        document.querySelectorAll('a, button, .mission-card').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.style.transform += ' scale(2.5)';
+                cursor.style.borderColor = 'var(--toxic-green)';
+                cursor.style.backgroundColor = 'rgba(67, 233, 123, 0.1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.style.transform = cursor.style.transform.replace(' scale(2.5)', '');
+                cursor.style.borderColor = 'var(--neon-violet)';
+                cursor.style.backgroundColor = 'transparent';
+            });
+        });
+
+        // CHAOS TOGGLE
+        const chaosBtn = document.getElementById('chaos-toggle');
+        let chaosMode = false;
+        chaosBtn.addEventListener('click', () => {
+            chaosMode = !chaosMode;
+            if (chaosMode) {
+                document.body.style.filter = 'hue-rotate(90deg) contrast(1.5)';
+                chaosBtn.innerHTML = 'SANITY_CHECK: <span class="text-red-500 animate-pulse">CRITICAL_ERROR</span>';
+                document.querySelector('.crt-overlay').style.background = 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(255, 0, 0, 0.25) 50%)';
+            } else {
+                document.body.style.filter = 'none';
+                chaosBtn.innerHTML = 'SANITY_CHECK: <span class="text-green-400">NORMAL</span>';
+                document.querySelector('.crt-overlay').style.background = '';
+            }
+        });
+
+        // INIT
+        initCanvas();
+        createParticles();
+        animate();
+
+        // Console Secret
+        console.log("%c ACCESS GRANTED ", "background: #b967ff; color: #fff; font-size: 20px; font-weight: bold;");
+        console.log("%c Shivam is already refactoring your landing page... ", "color: #05d9e8; font-style: italic;");
+    </script>
+</body>
+</html>
