@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0614" />
+  <meta name="description" content="Shivam Bhadoriya — Full Stack Developer (MERN). A glitchpunk portfolio built for impact: performance, craft, and personality." />
+  <title>Shivam Bhadoriya — Full Stack Developer</title>
+
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <style>
+    :root{
+      --bg:#07020f;
+      --bg2:#0b0614;
+      --txt:#eae7ff;
+      --muted: rgba(234,231,255,.7);
+      --violet:#b967ff;
+      --cyan:#05d9e8;
+      --green:#43e97b;
+      --pink:#ff2a6d;
+      --amber:#ffb86b;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.10);
+      --stroke: rgba(255,255,255,.12);
+      --glow: 0 0 12px rgba(185,103,255,.65), 0 0 30px rgba(5,217,232,.25);
+      --glow2: 0 0 20px rgba(5,217,232,.55), 0 0 40px rgba(255,42,109,.20);
+      --radius: 20px;
+      --noiseOpacity: .10;
+      --scanOpacity: .10;
+      --crtOpacity: .12;
+      --shadow: 0 25px 70px rgba(0,0,0,.55);
+    }
+
+    /* “Sanity Off” mode (intentionally intense) */
+    [data-sanity="off"]{
+      --bg:#010005;
+      --bg2:#070011;
+      --txt:#ffffff;
+      --muted: rgba(255,255,255,.72);
+      --card: rgba(255,255,255,.075);
+      --card2: rgba(255,255,255,.13);
+      --stroke: rgba(255,255,255,.18);
+      --noiseOpacity: .16;
+      --scanOpacity: .16;
+      --crtOpacity: .18;
+    }
+
+    html{ scroll-behavior:smooth; }
+    body{
+      background: radial-gradient(1200px 650px at 20% 10%, rgba(185,103,255,.22), transparent 55%),
+                  radial-gradient(1100px 700px at 85% 25%, rgba(5,217,232,.17), transparent 60%),
+                  radial-gradient(900px 700px at 65% 95%, rgba(255,42,109,.12), transparent 60%),
+                  linear-gradient(180deg, var(--bg), var(--bg2) 55%, #04010a);
+      color: var(--txt);
+      overflow-x: hidden;
+    }
+
+    /* Ambient layers */
+    .fx-layer{ position: fixed; inset:0; pointer-events:none; z-index:0; }
+
+    #bgCanvas{ position: fixed; inset:0; z-index:0; }
+
+    /* Film grain / noise */
+    .noise{
+      opacity: var(--noiseOpacity);
+      mix-blend-mode: overlay;
+      background-image: url('data:image/svg+xml;utf8,\
+        <svg xmlns="http://www.w3.org/2000/svg" width="220" height="220">\
+          <filter id="n">\
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>\
+          </filter>\
+          <rect width="220" height="220" filter="url(%23n)" opacity="0.6"/>\
+        </svg>');
+      background-size: 220px 220px;
+      animation: noiseShift 1.3s steps(2) infinite;
+    }
+    @keyframes noiseShift{
+      0%{ transform: translate3d(0,0,0); }
+      33%{ transform: translate3d(-8px,6px,0); }
+      66%{ transform: translate3d(10px,-7px,0); }
+      100%{ transform: translate3d(0,0,0); }
+    }
+
+    /* Scanlines */
+    .scanlines{
+      opacity: var(--scanOpacity);
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.06) 0px,
+        rgba(255,255,255,.06) 1px,
+        rgba(0,0,0,0) 4px,
+        rgba(0,0,0,0) 7px
+      );
+      mix-blend-mode: overlay;
+      animation: scanMove 7s linear infinite;
+    }
+    @keyframes scanMove{ from{ background-position: 0 0; } to{ background-position: 0 240px; } }
+
+    /* CRT vignette */
+    .crt{
+      opacity: var(--crtOpacity);
+      background: radial-gradient(closest-side at 50% 50%, rgba(255,255,255,.10), transparent 55%),
+                  radial-gradient(closest-side at 50% 50%, rgba(0,0,0,.0), rgba(0,0,0,.55) 85%);
+      mix-blend-mode: overlay;
+    }
+
+    /* Main container over FX */
+    .app{ position: relative; z-index: 10; }
+
+    /* Frosted glass cards */
+    .glass{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .glass-strong{
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.16);
+    }
+
+    /* Neon outlines */
+    .neon{
+      box-shadow: 0 0 0 1px rgba(185,103,255,.22),
+                  0 0 24px rgba(185,103,255,.20),
+                  0 0 44px rgba(5,217,232,.09);
+    }
+
+    /* Glitch text */
+    .glitch{
+      position: relative;
+      display: inline-block;
+      text-shadow: 0 0 10px rgba(185,103,255,.35);
+    }
+    .glitch::before, .glitch::after{
+      content: attr(data-text);
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.85;
+      mix-blend-mode: screen;
+      clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
+    }
+    .glitch::before{
+      transform: translate(2px, -1px);
+      color: var(--cyan);
+      animation: glitchTop 2.5s infinite linear;
+    }
+    .glitch::after{
+      transform: translate(-2px, 1px);
+      color: var(--pink);
+      clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+      animation: glitchBottom 2.9s infinite linear;
+    }
+    @keyframes glitchTop{
+      0%{ clip-path: polygon(0 0,100% 0,100% 40%,0 40%); transform: translate(2px,-1px); }
+      11%{ clip-path: polygon(0 5%,100% 5%,100% 32%,0 32%); transform: translate(3px,-2px); }
+      22%{ clip-path: polygon(0 0,100% 0,100% 44%,0 44%); transform: translate(1px,0px); }
+      35%{ clip-path: polygon(0 10%,100% 10%,100% 38%,0 38%); transform: translate(4px,-1px); }
+      50%{ clip-path: polygon(0 0,100% 0,100% 40%,0 40%); transform: translate(2px,-1px); }
+      60%{ clip-path: polygon(0 4%,100% 4%,100% 26%,0 26%); transform: translate(0px,-1px); }
+      72%{ clip-path: polygon(0 0,100% 0,100% 48%,0 48%); transform: translate(3px,1px); }
+      86%{ clip-path: polygon(0 7%,100% 7%,100% 36%,0 36%); transform: translate(2px,-2px); }
+      100%{ clip-path: polygon(0 0,100% 0,100% 40%,0 40%); transform: translate(2px,-1px); }
+    }
+    @keyframes glitchBottom{
+      0%{ clip-path: polygon(0 60%,100% 60%,100% 100%,0 100%); transform: translate(-2px,1px); }
+      13%{ clip-path: polygon(0 66%,100% 66%,100% 100%,0 100%); transform: translate(-4px,2px); }
+      28%{ clip-path: polygon(0 56%,100% 56%,100% 100%,0 100%); transform: translate(-1px,0px); }
+      42%{ clip-path: polygon(0 72%,100% 72%,100% 100%,0 100%); transform: translate(-3px,1px); }
+      56%{ clip-path: polygon(0 60%,100% 60%,100% 100%,0 100%); transform: translate(-2px,1px); }
+      70%{ clip-path: polygon(0 63%,100% 63%,100% 100%,0 100%); transform: translate(-1px,2px); }
+      85%{ clip-path: polygon(0 58%,100% 58%,100% 100%,0 100%); transform: translate(-4px,0px); }
+      100%{ clip-path: polygon(0 60%,100% 60%,100% 100%,0 100%); transform: translate(-2px,1px); }
+    }
+
+    /* Glitch forward (scroll feedback) */
+    #glitchFlash{
+      position: fixed;
+      inset: 0;
+      pointer-events:none;
+      z-index: 80;
+      opacity: 0;
+      mix-blend-mode: screen;
+      background:
+        radial-gradient(600px 250px at 30% 20%, rgba(185,103,255,.25), transparent 60%),
+        radial-gradient(700px 300px at 80% 35%, rgba(5,217,232,.20), transparent 60%),
+        linear-gradient(90deg, rgba(255,42,109,.0), rgba(255,42,109,.18), rgba(255,42,109,.0));
+      filter: blur(0px) saturate(140%);
+      transform: translateZ(0);
+    }
+
+    /* Custom cursor */
+    @media (pointer:fine){
+      body{ cursor: none; }
+      #cursor{ position: fixed; top:0; left:0; z-index: 90; width: 34px; height: 34px; pointer-events: none; transform: translate(-50%,-50%); }
+      #cursor .ring{ position:absolute; inset:0; border-radius: 9999px; border: 1px solid rgba(255,255,255,.35); box-shadow: var(--glow2); }
+      #cursor .dot{ position:absolute; left:50%; top:50%; width: 6px; height: 6px; transform: translate(-50%,-50%); border-radius: 9999px; background: linear-gradient(90deg, var(--cyan), var(--violet)); box-shadow: var(--glow); }
+      #cursor .cross::before, #cursor .cross::after{
+        content:""; position:absolute; left:50%; top:50%; background: rgba(255,255,255,.35); box-shadow: 0 0 14px rgba(5,217,232,.35);
+      }
+      #cursor .cross::before{ width: 1px; height: 18px; transform: translate(-50%,-50%); }
+      #cursor .cross::after{ height: 1px; width: 18px; transform: translate(-50%,-50%); }
+    }
+
+    /* Cursor trail bits */
+    .trail{
+      position: fixed;
+      z-index: 85;
+      pointer-events:none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 10px;
+      color: rgba(5,217,232,.85);
+      text-shadow: 0 0 10px rgba(185,103,255,.35);
+      opacity: .95;
+      transform: translate(-50%,-50%);
+      will-change: transform, opacity;
+    }
+
+    /* Reveal animations */
+    .reveal{ opacity: 0; transform: translateY(16px) scale(.98); filter: blur(6px); }
+    .reveal.is-in{ opacity: 1; transform: translateY(0) scale(1); filter: blur(0); transition: opacity 800ms ease, transform 800ms cubic-bezier(.2,.9,.2,1), filter 900ms ease; }
+
+    /* Shimmer border */
+    .shimmer-border{ position: relative; }
+    .shimmer-border::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius: calc(var(--radius) + 2px);
+      background: conic-gradient(from 180deg, rgba(185,103,255,.0), rgba(185,103,255,.35), rgba(5,217,232,.35), rgba(255,42,109,.2), rgba(185,103,255,.0));
+      filter: blur(10px);
+      opacity: .55;
+      z-index:-1;
+      animation: spin 6s linear infinite;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+
+    /* Button treatment */
+    .btn{
+      position: relative;
+      border-radius: 9999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+      overflow: hidden;
+    }
+    .btn::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(90deg, rgba(185,103,255,.0), rgba(185,103,255,.22), rgba(5,217,232,.22), rgba(255,42,109,.0));
+      transform: translateX(-80%);
+      transition: transform 380ms ease;
+      opacity: .9;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(5,217,232,.35); background: rgba(255,255,255,.08); }
+    .btn:hover::before{ transform: translateX(0%); }
+    .btn:active{ transform: translateY(1px) scale(.99); }
+
+    /* Section snap feel (soft) */
+    .section{ scroll-margin-top: 96px; }
+
+    /* Top nav blur */
+    .topbar{ background: rgba(5,2,15,.55); border-bottom: 1px solid rgba(255,255,255,.10); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+
+    /* Code block */
+    pre{
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 14px;
+      overflow:auto;
+    }
+
+    /* Reduced motion */
+    [data-motion="reduced"] *{
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    /* Loading intro */
+    #boot{
+      position: fixed; inset: 0; z-index: 100;
+      background: radial-gradient(900px 500px at 50% 30%, rgba(185,103,255,.22), transparent 60%),
+                  radial-gradient(900px 500px at 70% 60%, rgba(5,217,232,.14), transparent 62%),
+                  linear-gradient(180deg, #060111, #04010a);
+      display: grid; place-items: center;
+    }
+
+    .type{
+      display:inline-block;
+      border-right: 2px solid rgba(5,217,232,.85);
+      padding-right: 4px;
+      animation: caret 800ms steps(1) infinite;
+    }
+    @keyframes caret{ 50%{ border-color: transparent; } }
+
+    .hud-pill{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      border-radius: 9999px;
+      box-shadow: 0 0 0 1px rgba(185,103,255,.08), 0 10px 40px rgba(0,0,0,.35);
+    }
+
+    /* Little 3D tilt hint */
+    .tilt{ transform-style: preserve-3d; }
+
+    /* Tooltip */
+    .tip{ position: relative; }
+    .tip:hover .tipbox{ opacity: 1; transform: translate(-50%, -10px); }
+    .tipbox{
+      position:absolute;
+      left:50%;
+      bottom: calc(100% + 10px);
+      transform: translate(-50%, 0);
+      opacity: 0;
+      transition: opacity 200ms ease, transform 200ms ease;
+      width: min(320px, 80vw);
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 10px 12px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.55);
+    }
+
+    /* Gradient cards for stats */
+    .grad-card-purple { background: linear-gradient(135deg, rgba(138,43,226,0.15), rgba(186,85,211,0.1)); border: 1px solid rgba(138,43,226,0.3); }
+    .grad-card-pink { background: linear-gradient(135deg, rgba(255,20,147,0.15), rgba(255,105,180,0.1)); border: 1px solid rgba(255,20,147,0.3); }
+    .grad-card-green { background: linear-gradient(135deg, rgba(0,255,127,0.15), rgba(50,205,50,0.1)); border: 1px solid rgba(0,255,127,0.3); }
+    .grad-card-indigo { background: linear-gradient(135deg, rgba(138,43,226,0.15), rgba(75,0,130,0.1)); border: 1px solid rgba(138,43,226,0.3); }
+
+    /* Hidden helper */
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+  </style>
+</head>
+
+<body data-sanity="on" data-motion="full">
+  <!-- FX Canvas -->
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+  <div class="fx-layer noise" aria-hidden="true"></div>
+  <div class="fx-layer scanlines" aria-hidden="true"></div>
+  <div class="fx-layer crt" aria-hidden="true"></div>
+  <div id="glitchFlash" aria-hidden="true"></div>
+
+  <!-- Custom cursor (desktop only) -->
+  <div id="cursor" aria-hidden="true" class="hidden md:block">
+    <div class="ring"></div>
+    <div class="cross"></div>
+    <div class="dot"></div>
+  </div>
+
+  <!-- Boot / intro overlay -->
+  <div id="boot">
+    <div class="w-[min(600px,92vw)] glass neon rounded-[24px] p-8 text-center relative overflow-hidden">
+       <!-- Gradient accent at top -->
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#b967ff] via-[#05d9e8] to-[#ff2a6d]"></div>
+      
+      <div class="flex justify-center mb-6">
+        <div class="flex items-center justify-center w-16 h-16 rounded-2xl glass neon">
+          <span class="font-mono text-xl font-bold">SB</span>
+        </div>
+      </div>
+
+      <h1 class="mb-3 text-3xl font-black sm:text-4xl">Welcome to the Singularity</h1>
+      <p class="max-w-md mx-auto mb-8 text-sm leading-relaxed text-gray-300 sm:text-base">
+        You are entering the digital workspace of <span class="font-semibold text-white">Shivam Bhadoriya</span>. 
+        Expect extreme performance, interactive visuals, and code that breaks the mold.
+      </p>
+
+      <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <button id="enterBtn" class="w-full px-8 py-4 text-lg font-bold transition-transform duration-200 btn sm:w-auto hover:scale-105">
+          <span class="relative z-10 flex items-center justify-center gap-2">
+            ENTER PORTFOLIO <span class="text-xl">→</span>
+          </span>
+        </button>
+      </div>
+
+      <div class="mt-6 font-mono text-xs text-gray-500">
+        System Status: <span class="text-green-400">ONLINE</span> • Audio: <span class="text-gray-400">MUTED</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- App -->
+  <div class="app">
+    <!-- Top nav -->
+    <header class="fixed top-0 left-0 right-0 z-50 topbar">
+      <div class="flex items-center justify-between gap-3 px-4 py-3 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <a href="#top" class="flex items-center gap-3 group" aria-label="Go to top">
+          <div class="h-9 w-9 rounded-xl grid place-items-center glass neon group-hover:scale-[1.02] transition">
+            <span class="font-mono text-sm">SB</span>
+          </div>
+          <div class="leading-tight">
+            <div class="text-sm font-semibold">Shivam Bhadoriya</div>
+            <div class="text-xs" style="color: var(--muted)">Full‑Stack Developer</div>
+          </div>
+        </a>
+
+        <!-- Desktop Nav -->
+        <nav class="items-center hidden gap-1 text-sm md:flex">
+          <a class="px-3 py-2 transition-colors rounded-lg hover:bg-white/5" href="#about">About</a>
+          <a class="px-3 py-2 transition-colors rounded-lg hover:bg-white/5" href="#skills">Skills</a>
+          <a class="px-3 py-2 transition-colors rounded-lg hover:bg-white/5" href="#projects">Projects</a>
+          <a class="px-3 py-2 transition-colors rounded-lg hover:bg-white/5" href="#stats">Stats</a>
+          <a class="px-3 py-2 transition-colors rounded-lg hover:bg-white/5" href="#contact">Contact</a>
+        </nav>
+
+        <div class="flex items-center gap-2">
+          <button id="settingsBtn" class="px-3 py-2 text-xs btn sm:px-4 sm:text-sm" aria-haspopup="dialog" aria-controls="settings" aria-expanded="false">
+            <span class="relative z-10">⚙️ Config</span>
+          </button>
+          <a href="#contact" class="px-3 py-2 text-xs font-semibold btn sm:px-4 sm:text-sm bg-white/5">
+            <span class="relative z-10">Hire Me</span>
+          </a>
+        </div>
+      </div>
+      <!-- Mobile Nav Links (Simple overflow scroll) -->
+      <nav class="flex items-center gap-4 px-4 pt-2 pb-3 overflow-x-auto text-xs border-t md:hidden sm:text-sm whitespace-nowrap hide-scrollbar border-white/5">
+         <a class="opacity-80 hover:opacity-100" href="#about">About</a>
+         <a class="opacity-80 hover:opacity-100" href="#skills">Skills</a>
+         <a class="opacity-80 hover:opacity-100" href="#projects">Projects</a>
+         <a class="opacity-80 hover:opacity-100" href="#stats">Stats</a>
+         <a class="opacity-80 hover:opacity-100" href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <!-- Settings panel -->
+    <div id="settings" class="hidden fixed inset-0 z-[70]">
+      <div class="absolute inset-0 bg-black/60" id="settingsBackdrop"></div>
+      <div class="absolute right-3 sm:right-6 top-20 w-[min(480px,92vw)] glass glass-strong rounded-[22px] p-5 neon shimmer-border">
+        <div class="flex items-start justify-between gap-2 mb-4">
+          <div>
+            <div class="text-base font-semibold">System Configuration</div>
+            <div class="mt-1 text-xs text-gray-400">Customize your viewing experience.</div>
+          </div>
+          <button id="closeSettings" class="btn px-3 py-1.5 text-xs"><span class="relative z-10">Close</span></button>
+        </div>
+
+        <div class="grid gap-3">
+          <div class="glass rounded-[16px] p-3 border border-white/10 flex items-center justify-between">
+             <div>
+                <div class="text-sm font-semibold text-white">Beast Mode</div>
+                <div class="text-[10px] text-gray-400">Intense neon & glitches. Off by default.</div>
+             </div>
+             <button id="toggleSanity" class="btn px-3 py-1.5 text-xs w-16"><span class="relative z-10" id="toggleSanityLabel">Off</span></button>
+          </div>
+
+          <div class="glass rounded-[16px] p-3 border border-white/10 flex items-center justify-between">
+             <div>
+                <div class="text-sm font-semibold text-white">Audio</div>
+                <div class="text-[10px] text-gray-400">Ambient sci-fi drone.</div>
+             </div>
+             <button id="toggleSound" class="btn px-3 py-1.5 text-xs w-16"><span class="relative z-10" id="toggleSoundLabel">Muted</span></button>
+          </div>
+          
+           <div class="glass rounded-[16px] p-3 border border-white/10 flex items-center justify-between">
+             <div>
+                <div class="text-sm font-semibold text-white">Motion</div>
+                <div class="text-[10px] text-gray-400">Reduce animations.</div>
+             </div>
+             <button id="toggleMotion" class="btn px-3 py-1.5 text-xs w-16"><span class="relative z-10" id="toggleMotionLabel">Full</span></button>
+          </div>
+        </div>
+        
+        <div class="mt-4 pt-3 border-t border-white/10 text-[10px] font-mono text-center text-gray-500">
+          CMD: ↑ ↑ ↓ ↓ ← → ← → B A
+        </div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <main id="top" class="pb-12 pt-28 sm:pt-32">
+      <!-- Hero -->
+      <section class="px-4 mx-auto section max-w-7xl sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-[1.3fr_.7fr] gap-6 items-center">
+          <!-- Text Side -->
+          <div class="glass neon shimmer-border rounded-[26px] p-6 sm:p-10 tilt" id="heroTilt">
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="hud-pill px-3 py-1 text-[10px] sm:text-xs font-mono text-white/80">BSc IT • VidhyaDeep University</span>
+              <span class="hud-pill px-3 py-1 text-[10px] sm:text-xs font-mono text-green-300 border-green-500/30">Open to Work</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight mb-6">
+              <span class="block text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-gray-400">Shivam</span>
+              <span class="glitch" data-text="Bhadoriya">Bhadoriya</span>
+            </h1>
+            
+            <p class="max-w-2xl mb-8 text-base leading-relaxed text-gray-300 sm:text-lg">
+              Passionate <strong>Full Stack Developer (MERN)</strong>. I bridge the gap between <span class="text-cyan-300">functional logic</span> and <span class="text-violet-300">creative chaos</span>. 
+              Currently mastering data structures while building scalable web architectures.
+            </p>
+
+            <div class="flex flex-wrap gap-3 mb-8">
+               <button id="ctaDeploy" class="px-6 py-3 font-bold text-white btn bg-white/5 hover:bg-white/10">
+                 <span class="relative z-10">CONTACT ME</span>
+               </button>
+               <button id="ctaResume" class="px-6 py-3 font-medium text-gray-200 btn">
+                 <span class="relative z-10">Download Resume</span>
+               </button>
+               <a href="https://github.com/Dev-Shivam-05" target="_blank" class="px-4 py-3 text-gray-300 btn" aria-label="GitHub">
+                 <span class="relative z-10"><svg fill="currentColor" class="w-5 h-5" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></span>
+               </a>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-4 pt-6 font-mono text-xs text-gray-500 border-t border-white/10">
+               <span>CURRENT STACK:</span>
+               <div id="heroStack" class="flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+
+          <!-- Mission Control / Side Panel -->
+          <div class="flex flex-col gap-6">
+             <div class="glass neon rounded-[26px] p-6 reveal">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-sm font-bold tracking-wider text-gray-400">STATUS LOG</span>
+                  <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse box-shadow-green"></span>
+                </div>
+                
+                <div class="space-y-3">
+                   <div class="flex items-center justify-between p-3 border bg-white/5 rounded-xl border-white/5">
+                      <span class="text-xs text-gray-400">Current Role</span>
+                      <span class="text-xs font-semibold text-white">Student / Freelancer</span>
+                   </div>
+                    <div class="flex items-center justify-between p-3 border bg-white/5 rounded-xl border-white/5">
+                      <span class="text-xs text-gray-400">Location</span>
+                      <span class="text-xs font-semibold text-white">India (IST)</span>
+                   </div>
+                    <div class="flex items-center justify-between p-3 border bg-white/5 rounded-xl border-white/5">
+                      <span class="text-xs text-gray-400">Focus</span>
+                      <span class="text-xs font-semibold text-white">Backend Arch & Algorithms</span>
+                   </div>
+                </div>
+
+                <div class="pt-4 mt-4 border-t border-white/10">
+                   <div class="text-[10px] uppercase tracking-widest text-gray-500 mb-2">Connect</div>
+                   <div class="grid grid-cols-4 gap-2">
+                      <a href="mailto:shivambhadoriya1605@gmail.com" class="p-2 text-center transition rounded-lg bg-white/5 hover:bg-white/10"><span class="text-lg">📧</span></a>
+                      <a href="https://www.linkedin.com/in/shivam-bhadoriya-b82792324/" class="p-2 text-center transition rounded-lg bg-white/5 hover:bg-white/10"><span class="text-lg">💼</span></a>
+                      <a href="https://www.behance.net/shivambhadoriya2/" class="p-2 text-center transition rounded-lg bg-white/5 hover:bg-white/10"><span class="text-lg">🎨</span></a>
+                      <a href="https://www.instagram.com/__https.shivu/" class="p-2 text-center transition rounded-lg bg-white/5 hover:bg-white/10"><span class="text-lg">📸</span></a>
+                   </div>
+                </div>
+             </div>
+             
+             <!-- Daily Challenge Mini -->
+             <div class="glass rounded-[26px] p-6 reveal relative overflow-hidden group">
+                 <div class="absolute inset-0 transition duration-500 opacity-0 bg-gradient-to-br from-violet-500/10 to-cyan-500/10 group-hover:opacity-100"></div>
+                 <div class="relative z-10">
+                    <div class="mb-1 font-mono text-xs text-cyan-400">DAILY CHALLENGE</div>
+                    <div class="mb-2 text-lg font-bold text-white" id="challengeTitle">Loading...</div>
+                    <div class="w-12 h-1 mb-3 bg-gray-600 rounded-full"></div>
+                    <code class="block text-[10px] sm:text-xs font-mono text-gray-400 bg-black/30 p-2 rounded-lg overflow-hidden whitespace-nowrap text-ellipsis">function twoSum(nums, target)...</code>
+                 </div>
+             </div>
+          </div>
+        </div>
+        
+        <!-- Scroll indicator -->
+        <div class="flex justify-center mt-12 opacity-50 animate-bounce">
+           <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
+      </section>
+
+      <!-- About -->
+      <section id="about" class="px-4 mx-auto mt-20 section max-w-7xl sm:px-6 lg:px-8">
+         <div class="max-w-3xl mx-auto mb-10 text-center reveal">
+            <h2 class="mb-4 text-3xl font-bold">Origin Story</h2>
+            <p class="leading-relaxed text-gray-400">
+               I’m <span class="font-semibold text-white">Shivam</span> — a builder who treats shipping as a craft. 
+               I don’t just write code; I engineer solutions. When things break, I isolate, instrument, and refactor.
+               Currently pursuing my <span class="text-white">BSc in IT</span> while freelancing and pushing the boundaries of what a browser can do.
+            </p>
+         </div>
+
+         <div class="grid max-w-4xl gap-4 mx-auto sm:grid-cols-3 reveal">
+            <div class="glass rounded-[20px] p-5 text-center border border-white/5 hover:border-violet-500/30 transition duration-300">
+               <div class="mb-2 text-2xl">🚀</div>
+               <h3 class="mb-1 font-bold text-white">Frontend Ninja</h3>
+               <p class="text-xs text-gray-400">Pixel-perfect UIs with Tailwind & CSS magic.</p>
+            </div>
+            <div class="glass rounded-[20px] p-5 text-center border border-white/5 hover:border-cyan-500/30 transition duration-300">
+               <div class="mb-2 text-2xl">⚡</div>
+               <h3 class="mb-1 font-bold text-white">Backend Explorer</h3>
+               <p class="text-xs text-gray-400">Building robust logic with JS, Python & SQL.</p>
+            </div>
+            <div class="glass rounded-[20px] p-5 text-center border border-white/5 hover:border-pink-500/30 transition duration-300">
+               <div class="mb-2 text-2xl">🏆</div>
+               <h3 class="mb-1 font-bold text-white">DSA Enthusiast</h3>
+               <p class="text-xs text-gray-400">Optimizing algorithms one problem at a time.</p>
+            </div>
+         </div>
+      </section>
+
+      <!-- Skills -->
+      <section id="skills" class="px-4 mx-auto mt-24 section max-w-7xl sm:px-6 lg:px-8">
+        <h2 class="pl-4 mb-8 text-2xl font-black border-l-4 sm:text-3xl border-cyan-400 reveal">Tech Arsenal</h2>
+
+        <div class="grid gap-8 lg:grid-cols-2">
+          <!-- Current Stack -->
+          <div class="glass neon rounded-[26px] p-6 reveal">
+            <div class="flex items-center gap-2 mb-6 text-sm font-semibold text-gray-300">
+               <span class="w-2 h-2 bg-green-400 rounded-full"></span> 
+               CURRENTLY USING
+            </div>
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3" id="coreSkills">
+               <!-- Injected via JS -->
+            </div>
+          </div>
+
+          <!-- Learning/Future -->
+          <div class="glass neon rounded-[26px] p-6 reveal">
+            <div class="flex items-center gap-2 mb-6 text-sm font-semibold text-gray-300">
+               <span class="w-2 h-2 rounded-full bg-violet-400"></span> 
+               LOADING NEXT...
+            </div>
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3" id="futureSkills">
+               <!-- Injected via JS -->
+            </div>
+            
+            <div class="pt-6 mt-6 border-t border-white/10">
+               <div class="flex items-center justify-between mb-2">
+                  <span class="font-mono text-xs text-gray-500">RADAR SCAN</span>
+                  <span class="font-mono text-xs text-green-400 animate-pulse">LIVE</span>
+               </div>
+               <div class="relative w-full h-32 overflow-hidden border rounded-xl bg-black/40 border-white/5">
+                  <canvas id="radarCanvas" class="absolute inset-0 w-full h-full"></canvas>
+               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Projects -->
+      <section id="projects" class="px-4 mx-auto mt-24 section max-w-7xl sm:px-6 lg:px-8">
+        <div class="flex flex-col items-start justify-between gap-4 mb-8 sm:flex-row sm:items-end reveal">
+           <div>
+             <h2 class="pl-4 text-2xl font-black border-l-4 sm:text-3xl border-violet-400">Mission Archive</h2>
+             <p class="pl-5 mt-2 text-sm text-gray-400">Selected works and experiments.</p>
+           </div>
+           
+           <div class="flex flex-wrap gap-2">
+              <button class="px-3 py-1 text-xs btn" data-filter="all"><span class="relative z-10">All</span></button>
+              <button class="px-3 py-1 text-xs btn" data-filter="bootstrap"><span class="relative z-10">Bootstrap</span></button>
+              <button class="px-3 py-1 text-xs btn" data-filter="js"><span class="relative z-10">JS / Logic</span></button>
+           </div>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3" id="projectGrid">
+           <!-- Injected via JS -->
+        </div>
+      </section>
+
+      <!-- Stats Dashboard -->
+      <section id="stats" class="px-4 mx-auto mt-24 section max-w-7xl sm:px-6 lg:px-8">
+        <h2 class="pl-4 mb-8 text-2xl font-black border-l-4 border-pink-500 sm:text-3xl reveal">Beast Mode Stats</h2>
+        
+        <div class="mb-4 font-mono text-xs text-gray-500 reveal" id="embedsInfo">
+           Embeds: <span class="text-green-400">ACTIVE</span> (Loading external badges)
+        </div>
+
+        <!-- Responsive Grid for Stats Badges -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 reveal" id="statsGrid">
+           <!-- Card 1: Views -->
+           <div class="grad-card-purple rounded-xl p-4 flex flex-col items-center justify-center gap-3 text-center transition hover:scale-[1.02]">
+              <img src="https://komarev.com/ghpvc/?username=Dev-Shivam-05&color=8A2BE2&style=flat-square&label=Profile%20Views" alt="Profile Views" loading="lazy" class="object-contain h-6">
+              <div class="font-mono text-xs text-cyan-300">🚀 Live Counter</div>
+           </div>
+           
+           <!-- Card 2: Followers -->
+           <div class="grad-card-pink rounded-xl p-4 flex flex-col items-center justify-center gap-3 text-center transition hover:scale-[1.02]">
+              <div class="flex gap-2">
+                 <img src="https://img.shields.io/github/followers/Dev-Shivam-05?style=flat-square&color=FF1493&label=Followers&logo=person-add" alt="Followers" loading="lazy" class="h-5">
+                 <img src="https://img.shields.io/github/stars/Dev-Shivam-05?style=flat-square&color=FF69B4&label=Stars&logo=star" alt="Stars" loading="lazy" class="h-5">
+              </div>
+              <div class="font-mono text-xs text-amber-300">📈 Growth Metrics</div>
+           </div>
+           
+           <!-- Card 3: Status -->
+           <div class="grad-card-green rounded-xl p-4 flex flex-col items-center justify-center gap-3 text-center transition hover:scale-[1.02]">
+              <img src="https://img.shields.io/badge/Open%20to%20Work-✅%20YES-00FF7F?style=flat-square&logo=briefcase" alt="Open to Work" loading="lazy" class="h-5">
+              <a href="mailto:shivambhadoriya1605@gmail.com" class="transition hover:opacity-80">
+                <img src="https://img.shields.io/badge/Hire%20Me-🚀%20Click%20Here-FF4500?style=flat-square&logo=rocket&logoColor=white" alt="Hire Me" loading="lazy" class="h-5">
+              </a>
+              <div class="font-mono text-xs text-white">💼 Professional Status</div>
+           </div>
+           
+           <!-- Card 4: Streak -->
+           <div class="grad-card-indigo rounded-xl p-4 flex flex-col items-center justify-center gap-3 text-center transition hover:scale-[1.02] overflow-hidden">
+              <img src="https://github-readme-streak-stats.herokuapp.com/?user=Dev-Shivam-05&theme=dark&hide_border=true&stroke=0000&background=00000000&ring=00FFFF&fire=FF4500&currStreakLabel=8A2BE2&sideLabels=00FF7F&dates=8A2BE2" alt="Streak" loading="lazy" class="object-contain h-32 scale-110">
+              <div class="-mt-2 font-mono text-xs text-violet-300">🔥 Contribution Streak</div>
+           </div>
+        </div>
+
+        <!-- WakaTime & Trophies -->
+        <div class="grid gap-4 mt-4 lg:grid-cols-2 reveal">
+           <div class="flex flex-col items-center p-4 border glass rounded-xl border-white/10">
+              <div class="w-full mb-2 font-mono text-xs text-left text-gray-500">CODING ACTIVITY</div>
+              <img src="https://github-readme-stats.vercel.app/api/wakatime?username=__https_shivu&color=black&theme=dark&hide_border=true" alt="WakaTime" loading="lazy" class="w-full max-w-md rounded-lg">
+           </div>
+           <div class="flex flex-col items-center p-4 border glass rounded-xl border-white/10">
+              <div class="w-full mb-2 font-mono text-xs text-left text-gray-500">TROPHY CASE</div>
+              <div class="flex justify-center w-full pb-2 overflow-x-auto">
+                 <img src="https://github-profile-trophy.vercel.app/?username=Dev-Shivam-05&theme=radical&margin-w=15&margin-h=15&column=4&no-frame=true&title=Stars,Commits,Followers,PullRequest,Issues,Repositories,MultiLanguage,Experience" alt="Trophies" loading="lazy" class="object-contain h-40">
+              </div>
+           </div>
+        </div>
+
+        <!-- Snake Graph -->
+        <div class="mt-6 glass rounded-[26px] p-6 sm:p-8 reveal border border-white/10 text-center">
+            <h3 class="mb-4 text-lg font-bold">Contribution Graph — Sissa Edition</h3>
+            <div id="snakeWrap" class="bg-gradient-to-br from-[#2c3e50] to-[#4a6572] p-4 rounded-[20px] shadow-2xl inline-block max-w-full">
+              <picture>
+                <source media="(prefers-color-scheme: dark)" data-srcset="https://raw.githubusercontent.com/Dev-Shivam-05/Dev-Shivam-05/main/output/snake-dark.svg#gh-dark-mode-only">
+                <source media="(prefers-color-scheme: light)" data-srcset="https://raw.githubusercontent.com/Dev-Shivam-05/Dev-Shivam-05/main/output/snake-light.svg#gh-light-mode-only">
+                <img id="snakeImg" alt="GitHub Contribution Snake" class="w-full max-w-2xl rounded-[15px] shadow-[0_0_25px_rgba(0,255,255,0.25)] transition-transform duration-300 hover:scale-[1.02]" />
+              </picture>
+            </div>
+            <p class="mt-4 text-sm italic text-gray-400">"Code. Commit. Conquer."</p>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section id="contact" class="px-4 mx-auto mt-24 mb-16 section max-w-7xl sm:px-6 lg:px-8">
+        <div class="glass neon shimmer-border rounded-[26px] p-8 sm:p-12 text-center reveal">
+           <h2 class="mb-6 text-3xl font-black sm:text-5xl">Deploy Me</h2>
+           <p class="max-w-2xl mx-auto mb-10 text-lg text-gray-300">
+             Ready to build something insane? I'm available for freelance work and full-time roles. 
+             Response time &lt; 24 hours.
+           </p>
+           
+           <div class="flex flex-col justify-center gap-4 sm:flex-row">
+              <a href="mailto:shivambhadoriya1605@gmail.com" class="px-8 py-4 text-lg font-bold btn bg-white/10 hover:bg-white/20">
+                <span class="relative z-10">📧 Email Me</span>
+              </a>
+              <a href="https://www.linkedin.com/in/shivam-bhadoriya-b82792324/" target="_blank" class="px-8 py-4 text-lg font-bold btn text-cyan-300 border-cyan-500/30">
+                <span class="relative z-10">LinkedIn</span>
+              </a>
+           </div>
+
+           <div class="pt-8 mt-12 font-mono text-xs text-gray-500 border-t border-white/10">
+              Designed & Built by Shivam Bhadoriya using HTML, Tailwind, & Vanilla JS.<br>
+              © <span id="year"></span> All Rights Reserved.
+           </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // === Data ===
+    const DATA = {
+      name: 'Shivam Bhadoriya',
+      github: 'Dev-Shivam-05',
+      email: 'shivambhadoriya1605@gmail.com',
+      // Strict data from prompt
+      stack: [
+        'HTML', 'CSS', 'Bootstrap', 'JavaScript', 'Tailwind', 
+        'C', 'C++', 'Python (Basics)', 'MySQL (Basics)'
+      ],
+      future: [
+        'React', 'REST API', 'Docker', 'AWS', 'Nginx'
+      ],
+      projects: [
+        {
+          id: 'feane',
+          tag: 'bootstrap',
+          name: 'Feane (Wireframe)',
+          status: 'Terminated',
+          stack: 'HTML/CSS/Bootstrap',
+          link: 'https://pr-bootstrap-feane-web.vercel.app/',
+          debrief: 'Client wireframe. Clean, responsive, and pixel-perfect implementation of the design spec.'
+        },
+        {
+          id: 'snapfolio',
+          tag: 'bootstrap',
+          name: 'Snapfolio',
+          status: 'Active',
+          stack: 'Bootstrap 5',
+          link: 'https://pr-1-bootstrap-shivam-portfolio-01.vercel.app/',
+          debrief: 'A highly polished portfolio clone that outperforms the original in load speed and accessibility.'
+        },
+        {
+          id: 'recipe',
+          tag: 'js',
+          name: 'Recipe Book Logic',
+          status: 'Legendary',
+          stack: 'Pure JavaScript',
+          link: 'https://recipe-book-js-liart.vercel.app/',
+          debrief: 'Complex state management without frameworks. Features local storage and dynamic DOM manipulation.'
+        },
+        {
+          id: 'davis',
+          tag: 'js',
+          name: 'Davis Portfolio',
+          status: 'Deployed',
+          stack: 'Vanilla Stack',
+          link: 'https://pr-01-davis-porfolio.vercel.app/',
+          debrief: 'Surgical minimalist design. Every interaction is calculated. 99 Lighthouse score.'
+        }
+      ]
+    };
+
+    // === Helpers ===
+    const $ = (s, el=document) => el.querySelector(s);
+    const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
+    
+    // === Render Logic ===
+    function renderSkills(){
+       const coreWrap = $('#coreSkills');
+       const futureWrap = $('#futureSkills');
+       const heroStack = $('#heroStack');
+       
+       coreWrap.innerHTML = '';
+       futureWrap.innerHTML = '';
+       heroStack.innerHTML = '';
+
+       // Core
+       DATA.stack.forEach(s => {
+          // Card
+          const div = document.createElement('div');
+          div.className = 'bg-white/5 rounded-lg p-3 border border-white/5 hover:bg-white/10 transition text-center';
+          div.innerHTML = `<span class="text-xs font-semibold sm:text-sm">${s}</span>`;
+          coreWrap.appendChild(div);
+          
+          // Hero pill
+          const pill = document.createElement('span');
+          pill.className = 'px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px]';
+          pill.textContent = s;
+          heroStack.appendChild(pill);
+       });
+
+       // Future
+       DATA.future.forEach(s => {
+          const div = document.createElement('div');
+          div.className = 'bg-white/5 rounded-lg p-3 border border-white/5 border-dashed opacity-70 text-center';
+          div.innerHTML = `<span class="text-xs text-gray-400 sm:text-sm">${s}</span>`;
+          futureWrap.appendChild(div);
+       });
+    }
+
+    function renderProjects(){
+       const grid = $('#projectGrid');
+       grid.innerHTML = '';
+       
+       DATA.projects.forEach(p => {
+          const card = document.createElement('article');
+          card.className = 'glass rounded-[22px] p-5 hover:border-violet-500/40 transition duration-300 flex flex-col h-full relative overflow-hidden group';
+          card.dataset.tag = p.tag;
+          
+          card.innerHTML = `
+            <div class="absolute top-0 right-0 p-3 transition opacity-10 group-hover:opacity-20">
+               <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L24 12L12 24L0 12L12 0Z" /></svg>
+            </div>
+            
+            <div class="flex items-center justify-between mb-3">
+               <span class="text-[10px] font-mono uppercase px-2 py-1 rounded bg-white/10 text-cyan-300">${p.tag}</span>
+               <span class="text-[10px] font-mono text-gray-500">${p.status}</span>
+            </div>
+            
+            <h3 class="mb-2 text-xl font-bold">${p.name}</h3>
+            <p class="flex-grow mb-4 text-sm leading-relaxed text-gray-400">${p.debrief}</p>
+            
+            <div class="flex items-center justify-between pt-4 mt-auto border-t border-white/10">
+               <span class="font-mono text-xs text-gray-500">${p.stack}</span>
+               <a href="${p.link}" target="_blank" class="px-4 py-2 text-xs btn bg-white/5 hover:bg-white/10">View Project</a>
+            </div>
+          `;
+          grid.appendChild(card);
+       });
+    }
+
+    // === Interactions ===
+    function initFilters(){
+       const btns = $$('[data-filter]');
+       btns.forEach(btn => {
+          btn.addEventListener('click', () => {
+             // Reset style
+             btns.forEach(b => b.classList.remove('bg-violet-500/20', 'border-violet-500/50'));
+             btn.classList.add('bg-violet-500/20', 'border-violet-500/50');
+             
+             const filter = btn.dataset.filter;
+             $$('#projectGrid article').forEach(card => {
+                if(filter === 'all' || card.dataset.tag === filter) {
+                   card.style.display = 'flex';
+                } else {
+                   card.style.display = 'none';
+                }
+             });
+          });
+       });
+       // Select all by default
+       $('[data-filter="all"]').click();
+    }
+    
+    // === Boot ===
+    function initBoot(){
+       const boot = $('#boot');
+       const btn = $('#enterBtn');
+       
+       const enter = () => {
+          boot.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          boot.style.opacity = '0';
+          boot.style.transform = 'scale(1.05)';
+          setTimeout(() => boot.remove(), 550);
+          
+          // Auto start audio if user enabled it (default is muted so no-op usually)
+          // But we play a silent buffer just to unlock context if they toggle later
+          try {
+             const ctx = new (window.AudioContext || window.webkitAudioContext)();
+             ctx.resume(); 
+          } catch(e){}
+       };
+       
+       btn.addEventListener('click', enter);
+    }
+    
+    // === Settings / Control Panel ===
+    function initSettings(){
+       let state = {
+          sanity: 'on', // Default ON for normal users
+          sound: 'muted',
+          motion: 'full'
+       };
+       
+       // Toggles
+       $('#toggleSanity').addEventListener('click', () => {
+          state.sanity = state.sanity === 'on' ? 'off' : 'on';
+          document.body.dataset.sanity = state.sanity;
+          $('#toggleSanityLabel').textContent = state.sanity === 'on' ? 'On' : 'Off';
+       });
+       
+       $('#toggleSound').addEventListener('click', () => {
+          state.sound = state.sound === 'muted' ? 'on' : 'muted';
+          $('#toggleSoundLabel').textContent = state.sound === 'muted' ? 'Muted' : 'On';
+          if(state.sound === 'on') startAudio();
+          else stopAudio();
+       });
+       
+       $('#toggleMotion').addEventListener('click', () => {
+          state.motion = state.motion === 'full' ? 'reduced' : 'full';
+          document.body.dataset.motion = state.motion;
+          $('#toggleMotionLabel').textContent = state.motion === 'full' ? 'Full' : 'Reduced';
+       });
+       
+       // Modal
+       $('#settingsBtn').addEventListener('click', () => $('#settings').classList.remove('hidden'));
+       $('#closeSettings').addEventListener('click', () => $('#settings').classList.add('hidden'));
+       $('#settingsBackdrop').addEventListener('click', () => $('#settings').classList.add('hidden'));
+    }
+
+    // === Audio Engine (Simple Drone) ===
+    let audioCtx, oscillators = [];
+    function startAudio(){
+       if(audioCtx) return;
+       try {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const createOsc = (freq, type, gainVal) => {
+             const osc = audioCtx.createOscillator();
+             const gain = audioCtx.createGain();
+             osc.type = type;
+             osc.frequency.value = freq;
+             gain.gain.value = gainVal;
+             osc.connect(gain);
+             gain.connect(audioCtx.destination);
+             osc.start();
+             oscillators.push({osc, gain});
+          };
+          
+          // Deep drone
+          createOsc(50, 'sine', 0.1);
+          createOsc(52, 'sine', 0.1); // Binaural beat
+          createOsc(100, 'triangle', 0.02); // Texture
+       } catch(e) { console.error(e); }
+    }
+    
+    function stopAudio(){
+       if(!audioCtx) return;
+       oscillators.forEach(o => {
+          try{ o.osc.stop(); o.osc.disconnect(); }catch(e){}
+       });
+       oscillators = [];
+       audioCtx.close();
+       audioCtx = null;
+    }
+
+    // === Canvas Radar (Visual only) ===
+    function initRadar(){
+       const c = $('#radarCanvas');
+       const ctx = c.getContext('2d');
+       let angle = 0;
+       
+       const draw = () => {
+          const w = c.width = c.offsetWidth;
+          const h = c.height = c.offsetHeight;
+          const cx = w/2, cy = h/2;
+          
+          ctx.clearRect(0,0,w,h);
+          
+          // Grid
+          ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+          ctx.beginPath();
+          ctx.arc(cx, cy, h*0.3, 0, Math.PI*2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(cx, cy, h*0.15, 0, Math.PI*2);
+          ctx.stroke();
+          
+          // Line
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(angle);
+          ctx.strokeStyle = '#4ade80';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(0,0);
+          ctx.lineTo(h*0.4, 0);
+          ctx.stroke();
+          
+          // Sweep gradient
+          const grad = ctx.createConicGradient(0, 0, 0);
+          grad.addColorStop(0, 'rgba(74, 222, 128, 0)');
+          grad.addColorStop(0.8, 'rgba(74, 222, 128, 0)');
+          grad.addColorStop(1, 'rgba(74, 222, 128, 0.2)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.moveTo(0,0);
+          ctx.arc(0, 0, h*0.4, 0, Math.PI*2);
+          ctx.fill();
+          
+          ctx.restore();
+          
+          angle += 0.05;
+          requestAnimationFrame(draw);
+       };
+       requestAnimationFrame(draw);
+    }
+
+    // === Daily Challenge (Static for Demo) ===
+    function initChallenge(){
+       const d = new Date();
+       const ch = {
+          title: 'Two Sum',
+          code: 'function twoSum(nums, target) {\n  const map = new Map();\n  for(let i=0; i<nums.length; i++){\n    // ...logic\n  }\n}'
+       };
+       $('#challengeTitle').textContent = ch.title;
+    }
+
+    // === Init ===
+    window.addEventListener('DOMContentLoaded', () => {
+       renderSkills();
+       renderProjects();
+       initFilters();
+       initBoot();
+       initSettings();
+       initRadar();
+       initChallenge();
+       $('#year').textContent = new Date().getFullYear();
+       
+       // Reveal on scroll
+       const observer = new IntersectionObserver((entries) => {
+          entries.forEach(e => {
+             if(e.isIntersecting) {
+                e.target.classList.add('is-in');
+                observer.unobserve(e.target);
+             }
+          });
+       }, { threshold: 0.1 });
+       $$('.reveal').forEach(el => observer.observe(el));
+       
+       // Load Snake
+       const snake = $('#snakeImg');
+       snake.src = 'https://raw.githubusercontent.com/Dev-Shivam-05/Dev-Shivam-05/main/output/snake-dark.svg';
+       $$('source', $('#snakeWrap')).forEach(s => {
+          if(s.dataset.srcset) s.srcset = s.dataset.srcset;
+       });
+    });
+
+  </script>
+</body>
+</html>

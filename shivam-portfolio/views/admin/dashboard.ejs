@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Admin Fortress</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+  <style>
+    /* =============================================
+       ADMIN DASHBOARD — ALL-IN-ONE STYLES
+       ============================================= */
+
+    :root {
+      --bg-primary: #06060b;
+      --bg-secondary: #0c0c15;
+      --bg-tertiary: #10101c;
+      --surface: rgba(255, 255, 255, 0.02);
+      --surface-hover: rgba(255, 255, 255, 0.06);
+      --glass: rgba(255, 255, 255, 0.025);
+      --glass-border: rgba(255, 255, 255, 0.07);
+      --green: #00ff88;
+      --green-dark: #00cc6a;
+      --green-glow: rgba(0, 255, 136, 0.2);
+      --purple: #8b5cf6;
+      --purple-dark: #7c3aed;
+      --purple-glow: rgba(139, 92, 246, 0.2);
+      --cyan: #06b6d4;
+      --pink: #ec4899;
+      --orange: #f97316;
+      --yellow: #facc15;
+      --red: #ef4444;
+      --text: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-muted: #475569;
+      --font-body: 'Inter', sans-serif;
+      --font-heading: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius: 16px;
+      --radius-sm: 8px;
+      --radius-lg: 24px;
+      --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: var(--green) var(--bg-primary);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--green);
+      border-radius: 10px;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    ::selection {
+      background: var(--green);
+      color: var(--bg-primary);
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+      transition: var(--transition);
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: var(--font-heading);
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    /* ===== PRELOADER ===== */
+    #preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s, visibility 0.6s;
+    }
+
+    #preloader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-ring {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: var(--green);
+      border-right-color: var(--purple);
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    /* ===== CURSOR ===== */
+    .cursor-dot,
+    .cursor-outline {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 99998;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .cursor-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      transition: width 0.3s, height 0.3s;
+    }
+
+    .cursor-outline {
+      width: 36px;
+      height: 36px;
+      border: 1.5px solid rgba(0, 255, 136, 0.3);
+      transition: all 0.15s ease-out;
+    }
+
+    @media(max-width:1024px) {
+
+      .cursor-dot,
+      .cursor-outline {
+        display: none !important;
+      }
+    }
+
+    /* ===== PARTICLES ===== */
+    #particles-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ===== NOISE ===== */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      opacity: 0.4;
+    }
+
+    /* ===== LAYOUT ===== */
+    .admin-wrapper {
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .admin-sidebar {
+      width: 280px;
+      background: rgba(8, 8, 16, 0.97);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--glass-border);
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .admin-sidebar::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-thumb {
+      background: var(--green);
+      border-radius: 10px;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .sidebar-brand {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar-brand small {
+      display: block;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      -webkit-text-fill-color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .sidebar-close {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px;
+      transition: var(--transition);
+    }
+
+    .sidebar-close:hover {
+      color: var(--green);
+    }
+
+    .sidebar-nav {
+      padding: 16px 12px;
+      flex: 1;
+    }
+
+    .sidebar-section-title {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 14px 14px 8px;
+      margin-top: 6px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border-radius: 12px;
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: var(--transition);
+      margin-bottom: 2px;
+      position: relative;
+    }
+
+    .sidebar-link::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 0;
+      background: var(--green);
+      border-radius: 0 3px 3px 0;
+      transition: height 0.3s;
+    }
+
+    .sidebar-link:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .sidebar-link:hover::before {
+      height: 55%;
+    }
+
+    .sidebar-link.active {
+      color: var(--green);
+      background: rgba(0, 255, 136, 0.06);
+      font-weight: 600;
+    }
+
+    .sidebar-link.active::before {
+      height: 55%;
+    }
+
+    .sidebar-link i {
+      width: 20px;
+      text-align: center;
+      font-size: 0.92rem;
+      flex-shrink: 0;
+    }
+
+    .sidebar-link .badge-count {
+      margin-left: auto;
+      background: var(--green);
+      color: var(--bg-primary);
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 9px;
+      border-radius: 50px;
+      min-width: 22px;
+      text-align: center;
+    }
+
+    .sidebar-link .badge-count.red {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .sidebar-footer {
+      padding: 16px 12px;
+      border-top: 1px solid var(--glass-border);
+      flex-shrink: 0;
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+    }
+
+    .sidebar-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: var(--bg-primary);
+      flex-shrink: 0;
+    }
+
+    .sidebar-user-info h5 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .sidebar-user-info span {
+      font-size: 0.7rem;
+      color: var(--green);
+      font-weight: 500;
+    }
+
+    /* ===== MAIN AREA ===== */
+    .admin-main {
+      flex: 1;
+      margin-left: 280px;
+      min-height: 100vh;
+      position: relative;
+      z-index: 2;
+      background: var(--bg-primary);
+    }
+
+    /* ===== TOPBAR ===== */
+    .admin-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(6, 6, 11, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .topbar-burger {
+      display: none;
+      background: none;
+      border: 1px solid var(--glass-border);
+      color: var(--text);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 10px;
+      transition: var(--transition);
+    }
+
+    .topbar-burger:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .topbar-title h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .topbar-title p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topbar-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      font-size: 0.9rem;
+    }
+
+    .topbar-btn:hover {
+      border-color: var(--green);
+      color: var(--green);
+      box-shadow: 0 0 15px var(--green-glow);
+    }
+
+    .notification-dot {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--red);
+      border: 2px solid var(--bg-primary);
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .admin-content {
+      padding: 28px;
+    }
+
+    /* ===== STAT CARDS ===== */
+    .stat-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .stat-card.card-green::before {
+      background: linear-gradient(90deg, var(--green), var(--cyan));
+    }
+
+    .stat-card.card-purple::before {
+      background: linear-gradient(90deg, var(--purple), #a78bfa);
+    }
+
+    .stat-card.card-cyan::before {
+      background: linear-gradient(90deg, var(--cyan), #22d3ee);
+    }
+
+    .stat-card.card-orange::before {
+      background: linear-gradient(90deg, var(--orange), #fb923c);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+
+    .stat-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+    }
+
+    .stat-icon.green {
+      background: var(--green-glow);
+      color: var(--green);
+    }
+
+    .stat-icon.purple {
+      background: var(--purple-glow);
+      color: var(--purple);
+    }
+
+    .stat-icon.cyan {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--cyan);
+    }
+
+    .stat-icon.orange {
+      background: rgba(249, 115, 22, 0.15);
+      color: var(--orange);
+    }
+
+    .stat-trend {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-trend.up {
+      background: rgba(0, 255, 136, 0.1);
+      color: var(--green);
+    }
+
+    .stat-trend.down {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--red);
+    }
+
+    .stat-number {
+      font-family: var(--font-heading);
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+
+    /* Sparkline */
+    .sparkline {
+      margin-top: 18px;
+      height: 45px;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      padding: 0 4px;
+    }
+
+    .spark-bar {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      transition: height 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      height: 0;
+    }
+
+    .spark-bar.green {
+      background: linear-gradient(to top, var(--green), rgba(0, 255, 136, 0.3));
+    }
+
+    .spark-bar.purple {
+      background: linear-gradient(to top, var(--purple), rgba(139, 92, 246, 0.3));
+    }
+
+    .spark-bar.cyan {
+      background: linear-gradient(to top, var(--cyan), rgba(6, 182, 212, 0.3));
+    }
+
+    .spark-bar.orange {
+      background: linear-gradient(to top, var(--orange), rgba(249, 115, 22, 0.3));
+    }
+
+    /* ===== TABLE ===== */
+    .table-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .table-card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .table-card-header h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dot-live {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: dotPulse 2s infinite;
+    }
+
+    @keyframes dotPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.8)
+      }
+    }
+
+    .export-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font-body);
+    }
+
+    .export-btn:hover {
+      border-color: var(--green);
+      color: var(--green);
+      box-shadow: 0 0 15px var(--green-glow);
+    }
+
+    .table-responsive-wrap {
+      overflow-x: auto;
+    }
+
+    .table-responsive-wrap::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .table-responsive-wrap::-webkit-scrollbar-thumb {
+      background: var(--green);
+      border-radius: 10px;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .admin-table thead th {
+      padding: 12px 24px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      font-weight: 700;
+      border-bottom: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.01);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .admin-table tbody tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+      transition: var(--transition);
+    }
+
+    .admin-table tbody tr:hover {
+      background: rgba(0, 255, 136, 0.015);
+    }
+
+    .admin-table tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .admin-table tbody td {
+      padding: 14px 24px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .ip-badge {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--cyan);
+      background: rgba(6, 182, 212, 0.08);
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(6, 182, 212, 0.1);
+    }
+
+    .page-badge {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .time-badge {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .country-flag {
+      font-size: 1.1rem;
+      margin-right: 6px;
+    }
+
+    /* Status */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      border-radius: 50px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-pill::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .status-pill.active {
+      background: rgba(0, 255, 136, 0.1);
+      color: var(--green);
+    }
+
+    .status-pill.active::before {
+      background: var(--green);
+    }
+
+    .status-pill.idle {
+      background: rgba(250, 204, 21, 0.1);
+      color: var(--yellow);
+    }
+
+    .status-pill.idle::before {
+      background: var(--yellow);
+    }
+
+    .status-pill.left {
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--text-muted);
+    }
+
+    .status-pill.left::before {
+      background: var(--text-muted);
+    }
+
+    /* ===== VISITOR MAP ===== */
+    .map-container {
+      width: 100%;
+      height: 380px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .map-radials {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 25% 40%, rgba(0, 255, 136, 0.04), transparent 50%),
+        radial-gradient(circle at 75% 30%, rgba(139, 92, 246, 0.03), transparent 50%),
+        radial-gradient(circle at 50% 70%, rgba(6, 182, 212, 0.03), transparent 50%);
+    }
+
+    .map-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      z-index: 5;
+    }
+
+    .map-dot::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 2px solid;
+      animation: mapPulse 3s infinite;
+      opacity: 0.3;
+    }
+
+    .map-dot.g {
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green-glow);
+    }
+
+    .map-dot.g::after {
+      border-color: var(--green);
+    }
+
+    .map-dot.p {
+      background: var(--purple);
+      box-shadow: 0 0 12px var(--purple-glow);
+    }
+
+    .map-dot.p::after {
+      border-color: var(--purple);
+      animation-delay: 0.5s;
+    }
+
+    .map-dot.c {
+      background: var(--cyan);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+    }
+
+    .map-dot.c::after {
+      border-color: var(--cyan);
+      animation-delay: 1s;
+    }
+
+    .map-dot.o {
+      background: var(--orange);
+      box-shadow: 0 0 12px rgba(249, 115, 22, 0.3);
+    }
+
+    .map-dot.o::after {
+      border-color: var(--orange);
+      animation-delay: 1.5s;
+    }
+
+    .map-dot.pk {
+      background: var(--pink);
+      box-shadow: 0 0 12px rgba(236, 72, 153, 0.3);
+    }
+
+    .map-dot.pk::after {
+      border-color: var(--pink);
+      animation-delay: 2s;
+    }
+
+    @keyframes mapPulse {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.4
+      }
+
+      100% {
+        transform: scale(2.5);
+        opacity: 0
+      }
+    }
+
+    .map-center-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+    }
+
+    .map-center-label i {
+      font-size: 3.5rem;
+      color: var(--green);
+      opacity: 0.12;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .map-center-label span {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.4);
+      padding: 6px 20px;
+      border-radius: 50px;
+      backdrop-filter: blur(6px);
+    }
+
+    .map-legend {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      gap: 14px;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .map-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    .map-legend-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    /* ===== QUICK ACCESS GRID ===== */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .quick-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .quick-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 255, 136, 0.15);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      color: inherit;
+    }
+
+    .quick-card i {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      display: block;
+      transition: var(--transition);
+    }
+
+    .quick-card:hover i {
+      transform: scale(1.15);
+    }
+
+    .quick-card span {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* ===== ANIMATIONS ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s, transform 0.7s;
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-d1 {
+      transition-delay: 0.1s;
+    }
+
+    .reveal-d2 {
+      transition-delay: 0.2s;
+    }
+
+    .reveal-d3 {
+      transition-delay: 0.3s;
+    }
+
+    .reveal-d4 {
+      transition-delay: 0.4s;
+    }
+
+    /* ===== SIDEBAR OVERLAY ===== */
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    .sidebar-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width:1024px) {
+      .admin-sidebar {
+        transform: translateX(-100%);
+      }
+
+      .admin-sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-close {
+        display: block;
+      }
+
+      .topbar-burger {
+        display: flex;
+      }
+
+      .admin-main {
+        margin-left: 0;
+      }
+    }
+
+    @media(max-width:768px) {
+      .admin-content {
+        padding: 16px;
+      }
+
+      .admin-topbar {
+        padding: 12px 16px;
+      }
+
+      .stat-number {
+        font-size: 1.8rem;
+      }
+
+      .map-container {
+        height: 260px;
+      }
+
+      .map-legend {
+        display: none;
+      }
+    }
+
+    @media(max-width:480px) {
+      .topbar-title h2 {
+        font-size: 1rem;
+      }
+
+      .topbar-title p {
+        display: none;
+      }
+    }
+
+    /* ===== GRADIENT TEXT ===== */
+    .gradient-text {
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .text-green {
+      color: var(--green) !important;
+    }
+
+    .text-purple {
+      color: var(--purple) !important;
+    }
+
+    .text-cyan {
+      color: var(--cyan) !important;
+    }
+
+    .text-orange {
+      color: var(--orange) !important;
+    }
+
+    /* ===== SECTION HEADERS ===== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .section-header .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: dotPulse 2s infinite;
+    }
+
+    .section-header span {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--green);
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Preloader -->
+  <div id="preloader">
+    <div class="loader-ring"></div>
+  </div>
+
+  <!-- Cursor -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-outline"></div>
+
+  <!-- Background -->
+  <canvas id="particles-canvas"></canvas>
+  <div class="noise-overlay"></div>
+
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ==================== ADMIN LAYOUT ==================== -->
+  <div class="admin-wrapper">
+
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          SB.
+          <small>Admin Fortress</small>
+        </div>
+        <button class="sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-title">Main</div>
+        <a href="admin-dashboard.html" class="sidebar-link active">
+          <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+        <a href="admin-projects.html" class="sidebar-link">
+          <i class="fas fa-folder-open"></i> Projects
+          <span class="badge-count">12</span>
+        </a>
+        <a href="admin-inquiries.html" class="sidebar-link">
+          <i class="fas fa-envelope"></i> Inquiries
+          <span class="badge-count red">5</span>
+        </a>
+
+        <div class="sidebar-section-title">Content</div>
+        <a href="blog.html" class="sidebar-link">
+          <i class="fas fa-pen-fancy"></i> Blog Posts
+          <span class="badge-count">6</span>
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-image"></i> Media Library
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-comment-dots"></i> Testimonials
+        </a>
+
+        <div class="sidebar-section-title">Analytics</div>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-chart-bar"></i> Traffic
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-chart-pie"></i> Reports
+        </a>
+
+        <div class="sidebar-section-title">System</div>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-cog"></i> Settings
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-shield-alt"></i> Security
+        </a>
+        <a href="index.html" class="sidebar-link">
+          <i class="fas fa-globe"></i> View Public Site
+        </a>
+        <a href="login.html" class="sidebar-link" style="color:var(--red);">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar">SB</div>
+          <div class="sidebar-user-info">
+            <h5>Shivam B.</h5>
+            <span>● Online</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="admin-main">
+
+      <!-- Topbar -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button class="topbar-burger" id="burgerBtn"><i class="fas fa-bars"></i></button>
+          <div class="topbar-title">
+            <h2>Dashboard</h2>
+            <p>Welcome back, Commander. Here's your empire at a glance.</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <span id="liveClock"
+            style="font-family:var(--font-mono); font-size:0.8rem; color:var(--green); font-weight:600; margin-right:6px;"></span>
+          <button class="topbar-btn" title="Notifications">
+            <i class="fas fa-bell"></i>
+            <span class="notification-dot"></span>
+          </button>
+          <button class="topbar-btn" title="Search"><i class="fas fa-search"></i></button>
+          <a href="login.html" class="topbar-btn" title="Logout" style="text-decoration:none;"><i
+              class="fas fa-sign-out-alt"></i></a>
+        </div>
+      </header>
+
+      <!-- Main Dashboard Content -->
+      <div class="admin-content">
+
+        <!-- ===== STAT CARDS ROW ===== -->
+        <div class="row g-4 mb-4">
+
+          <!-- Total Views -->
+          <div class="col-xl-3 col-sm-6 reveal">
+            <div class="stat-card card-green">
+              <div class="stat-card-header">
+                <div class="stat-icon green"><i class="fas fa-eye"></i></div>
+                <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 12.5%</span>
+              </div>
+              <div class="stat-number counter" data-target="24853">0</div>
+              <div class="stat-label">Total Page Views</div>
+              <div class="sparkline" id="spark1">
+                <div class="spark-bar green" data-h="35%"></div>
+                <div class="spark-bar green" data-h="55%"></div>
+                <div class="spark-bar green" data-h="42%"></div>
+                <div class="spark-bar green" data-h="78%"></div>
+                <div class="spark-bar green" data-h="60%"></div>
+                <div class="spark-bar green" data-h="85%"></div>
+                <div class="spark-bar green" data-h="65%"></div>
+                <div class="spark-bar green" data-h="92%"></div>
+                <div class="spark-bar green" data-h="75%"></div>
+                <div class="spark-bar green" data-h="100%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- New Inquiries -->
+          <div class="col-xl-3 col-sm-6 reveal reveal-d1">
+            <div class="stat-card card-purple">
+              <div class="stat-card-header">
+                <div class="stat-icon purple"><i class="fas fa-envelope-open-text"></i></div>
+                <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 8.3%</span>
+              </div>
+              <div class="stat-number counter" data-target="47">0</div>
+              <div class="stat-label">New Inquiries</div>
+              <div class="sparkline" id="spark2">
+                <div class="spark-bar purple" data-h="50%"></div>
+                <div class="spark-bar purple" data-h="30%"></div>
+                <div class="spark-bar purple" data-h="70%"></div>
+                <div class="spark-bar purple" data-h="45%"></div>
+                <div class="spark-bar purple" data-h="85%"></div>
+                <div class="spark-bar purple" data-h="60%"></div>
+                <div class="spark-bar purple" data-h="90%"></div>
+                <div class="spark-bar purple" data-h="75%"></div>
+                <div class="spark-bar purple" data-h="80%"></div>
+                <div class="spark-bar purple" data-h="95%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Projects -->
+          <div class="col-xl-3 col-sm-6 reveal reveal-d2">
+            <div class="stat-card card-cyan">
+              <div class="stat-card-header">
+                <div class="stat-icon cyan"><i class="fas fa-code-branch"></i></div>
+                <span class="stat-trend up"><i class="fas fa-arrow-up"></i> 3</span>
+              </div>
+              <div class="stat-number counter" data-target="8">0</div>
+              <div class="stat-label">Active Projects</div>
+              <div class="sparkline" id="spark3">
+                <div class="spark-bar cyan" data-h="60%"></div>
+                <div class="spark-bar cyan" data-h="75%"></div>
+                <div class="spark-bar cyan" data-h="50%"></div>
+                <div class="spark-bar cyan" data-h="88%"></div>
+                <div class="spark-bar cyan" data-h="100%"></div>
+                <div class="spark-bar cyan" data-h="70%"></div>
+                <div class="spark-bar cyan" data-h="95%"></div>
+                <div class="spark-bar cyan" data-h="80%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GitHub Streak -->
+          <div class="col-xl-3 col-sm-6 reveal reveal-d3">
+            <div class="stat-card card-orange">
+              <div class="stat-card-header">
+                <div class="stat-icon orange"><i class="fas fa-fire"></i></div>
+                <span class="stat-trend up"><i class="fas fa-arrow-up"></i> +1 today</span>
+              </div>
+              <div class="stat-number"><span class="counter" data-target="312">0</span> <span
+                  style="font-size:1rem;color:var(--text-muted);">days</span></div>
+              <div class="stat-label">GitHub Streak 🔥</div>
+              <div class="sparkline" id="spark4">
+                <div class="spark-bar orange" data-h="82%"></div>
+                <div class="spark-bar orange" data-h="84%"></div>
+                <div class="spark-bar orange" data-h="86%"></div>
+                <div class="spark-bar orange" data-h="85%"></div>
+                <div class="spark-bar orange" data-h="89%"></div>
+                <div class="spark-bar orange" data-h="88%"></div>
+                <div class="spark-bar orange" data-h="92%"></div>
+                <div class="spark-bar orange" data-h="91%"></div>
+                <div class="spark-bar orange" data-h="95%"></div>
+                <div class="spark-bar orange" data-h="93%"></div>
+                <div class="spark-bar orange" data-h="97%"></div>
+                <div class="spark-bar orange" data-h="100%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== VISITOR MAP + QUICK ACCESS ===== -->
+        <div class="row g-4 mb-4">
+
+          <!-- Visitor Map -->
+          <div class="col-xl-8 reveal">
+            <div class="table-card">
+              <div class="table-card-header">
+                <h3><span class="dot-live"></span> Global Visitor Map</h3>
+                <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);">Live Data
+                  Feed</span>
+              </div>
+              <div class="map-container">
+                <div class="map-grid-bg"></div>
+                <div class="map-radials"></div>
+
+                <!-- Visitor Dots -->
+                <div class="map-dot g" style="top:28%;left:18%;"></div>
+                <div class="map-dot p" style="top:22%;left:48%;"></div>
+                <div class="map-dot c" style="top:42%;left:72%;"></div>
+                <div class="map-dot o" style="top:58%;left:30%;"></div>
+                <div class="map-dot g" style="top:32%;left:62%;"></div>
+                <div class="map-dot pk" style="top:48%;left:15%;"></div>
+                <div class="map-dot c" style="top:25%;left:82%;"></div>
+                <div class="map-dot g" style="top:65%;left:55%;"></div>
+                <div class="map-dot p" style="top:38%;left:40%;"></div>
+                <div class="map-dot o" style="top:55%;left:85%;"></div>
+
+                <div class="map-center-label">
+                  <i class="fas fa-globe-americas"></i>
+                  <span>Integrate analytics API for live data</span>
+                </div>
+
+                <div class="map-legend">
+                  <div class="map-legend-item">
+                    <div class="map-legend-dot" style="background:var(--green);"></div> Americas
+                  </div>
+                  <div class="map-legend-item">
+                    <div class="map-legend-dot" style="background:var(--purple);"></div> Europe
+                  </div>
+                  <div class="map-legend-item">
+                    <div class="map-legend-dot" style="background:var(--cyan);"></div> Asia
+                  </div>
+                  <div class="map-legend-item">
+                    <div class="map-legend-dot" style="background:var(--orange);"></div> Africa
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Access -->
+          <div class="col-xl-4 reveal reveal-d2">
+            <div class="table-card" style="height:100%;">
+              <div class="table-card-header">
+                <h3><i class="fas fa-bolt text-green me-2"></i> Quick Access</h3>
+              </div>
+              <div style="padding:20px;">
+                <div class="quick-grid">
+                  <a href="admin-projects.html" class="quick-card">
+                    <i class="fas fa-folder-open text-green"></i>
+                    <span>Projects</span>
+                  </a>
+                  <a href="admin-inquiries.html" class="quick-card">
+                    <i class="fas fa-envelope text-purple"></i>
+                    <span>Inbox</span>
+                  </a>
+                  <a href="blog.html" class="quick-card">
+                    <i class="fas fa-pen-fancy text-cyan"></i>
+                    <span>Blog</span>
+                  </a>
+                  <a href="#" class="quick-card">
+                    <i class="fas fa-chart-bar text-orange"></i>
+                    <span>Analytics</span>
+                  </a>
+                  <a href="#" class="quick-card">
+                    <i class="fas fa-image" style="color:var(--pink);"></i>
+                    <span>Media</span>
+                  </a>
+                  <a href="#" class="quick-card">
+                    <i class="fas fa-cog" style="color:var(--yellow);"></i>
+                    <span>Settings</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== RECENT ACTIVITY TABLE ===== -->
+        <div class="row g-4 mb-4">
+          <div class="col-12 reveal">
+            <div class="table-card">
+              <div class="table-card-header">
+                <h3><span class="dot-live"></span> Recent Visitor Activity</h3>
+                <button class="export-btn"><i class="fas fa-download"></i> Export CSV</button>
+              </div>
+              <div class="table-responsive-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>IP Address</th>
+                      <th>Page Visited</th>
+                      <th>Country</th>
+                      <th>Device</th>
+                      <th>Time</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="ip-badge">192.168.1.47</span></td>
+                      <td><span class="page-badge">/projects</span></td>
+                      <td><span class="country-flag">🇺🇸</span> United States</td>
+                      <td><i class="fas fa-desktop me-2" style="color:var(--text-muted);"></i> Desktop</td>
+                      <td><span class="time-badge">2 min ago</span></td>
+                      <td><span class="status-pill active">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">10.0.0.128</span></td>
+                      <td><span class="page-badge">/contact</span></td>
+                      <td><span class="country-flag">🇬🇧</span> United Kingdom</td>
+                      <td><i class="fas fa-mobile-alt me-2" style="color:var(--text-muted);"></i> Mobile</td>
+                      <td><span class="time-badge">5 min ago</span></td>
+                      <td><span class="status-pill active">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">172.16.0.55</span></td>
+                      <td><span class="page-badge">/about</span></td>
+                      <td><span class="country-flag">🇮🇳</span> India</td>
+                      <td><i class="fas fa-laptop me-2" style="color:var(--text-muted);"></i> Laptop</td>
+                      <td><span class="time-badge">12 min ago</span></td>
+                      <td><span class="status-pill idle">Idle</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">203.0.113.22</span></td>
+                      <td><span class="page-badge">/services</span></td>
+                      <td><span class="country-flag">🇩🇪</span> Germany</td>
+                      <td><i class="fas fa-desktop me-2" style="color:var(--text-muted);"></i> Desktop</td>
+                      <td><span class="time-badge">18 min ago</span></td>
+                      <td><span class="status-pill left">Left</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">198.51.100.8</span></td>
+                      <td><span class="page-badge">/blog</span></td>
+                      <td><span class="country-flag">🇨🇦</span> Canada</td>
+                      <td><i class="fas fa-tablet-alt me-2" style="color:var(--text-muted);"></i> Tablet</td>
+                      <td><span class="time-badge">25 min ago</span></td>
+                      <td><span class="status-pill left">Left</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">192.0.2.100</span></td>
+                      <td><span class="page-badge">/project-single</span></td>
+                      <td><span class="country-flag">🇦🇺</span> Australia</td>
+                      <td><i class="fas fa-desktop me-2" style="color:var(--text-muted);"></i> Desktop</td>
+                      <td><span class="time-badge">32 min ago</span></td>
+                      <td><span class="status-pill left">Left</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">100.24.56.78</span></td>
+                      <td><span class="page-badge">/index</span></td>
+                      <td><span class="country-flag">🇯🇵</span> Japan</td>
+                      <td><i class="fas fa-mobile-alt me-2" style="color:var(--text-muted);"></i> Mobile</td>
+                      <td><span class="time-badge">45 min ago</span></td>
+                      <td><span class="status-pill left">Left</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">85.214.33.9</span></td>
+                      <td><span class="page-badge">/services</span></td>
+                      <td><span class="country-flag">🇫🇷</span> France</td>
+                      <td><i class="fas fa-laptop me-2" style="color:var(--text-muted);"></i> Laptop</td>
+                      <td><span class="time-badge">1 hr ago</span></td>
+                      <td><span class="status-pill left">Left</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== BOTTOM ROW: RECENT PROJECTS + RECENT INQUIRIES ===== -->
+        <div class="row g-4">
+
+          <!-- Recent Projects -->
+          <div class="col-xl-6 reveal">
+            <div class="table-card">
+              <div class="table-card-header">
+                <h3><i class="fas fa-folder-open text-green me-2"></i> Recent Projects</h3>
+                <a href="admin-projects.html" class="export-btn">View All <i class="fas fa-arrow-right"></i></a>
+              </div>
+              <div class="table-responsive-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Project</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="font-weight:600; color:var(--text);">AI Art Generator</td>
+                      <td><span class="status-pill active">Live</span></td>
+                      <td><span class="time-badge">Oct 2024</span></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600; color:var(--text);">REST API Microservice</td>
+                      <td><span class="status-pill active">Live</span></td>
+                      <td><span class="time-badge">Sep 2024</span></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600; color:var(--text);">E-Commerce Platform</td>
+                      <td><span class="status-pill idle">In Dev</span></td>
+                      <td><span class="time-badge">Aug 2024</span></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600; color:var(--text);">Real-Time Chat Engine</td>
+                      <td><span class="status-pill active">Live</span></td>
+                      <td><span class="time-badge">Jun 2024</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Inquiries -->
+          <div class="col-xl-6 reveal reveal-d2">
+            <div class="table-card">
+              <div class="table-card-header">
+                <h3><i class="fas fa-envelope text-purple me-2"></i> Recent Inquiries</h3>
+                <a href="admin-inquiries" class="export-btn">View All <i class="fas fa-arrow-right"></i></a>
+              </div>
+              <div class="table-responsive-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Client</th>
+                      <th>Subject</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="font-weight:600; color:var(--text);">Sarah Mitchell</td>
+                      <td style="color:var(--text-secondary);">Full Stack SaaS Dev</td>
+                      <td><span class="status-pill"
+                          style="background:rgba(239,68,68,0.1); color:var(--red);">Unread</span></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600; color:var(--text);">Alex Thompson</td>
+                      <td style="color:var(--text-secondary);">API for Startup</td>
+                      <td><span class="status-pill"
+                          style="background:rgba(239,68,68,0.1); color:var(--red);">Unread</span></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600; color:var(--text);">Priya Sharma</td>
+                      <td style="color:var(--text-secondary);">E-Commerce MVP</td>
+                      <td><span class="status-pill"
+                          style="background:rgba(239,68,68,0.1); color:var(--red);">Unread</span></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600; color:var(--text);">David Kim</td>
+                      <td style="color:var(--text-secondary);">Portfolio Quote</td>
+                      <td><span class="status-pill active">Replied</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div style="text-align:center; padding:40px 0 10px; font-size:0.78rem; color:var(--text-muted);">
+          <p>© 2024 Shivam Bhadoriya — Admin Fortress v2.0 — Crafted with <i class="fas fa-heart text-green"></i></p>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      /* ===== PRELOADER ===== */
+      const preloader = document.getElementById('preloader');
+      window.addEventListener('load', () => setTimeout(() => preloader.classList.add('hidden'), 500));
+      setTimeout(() => preloader.classList.add('hidden'), 2500);
+
+      /* ===== CURSOR ===== */
+      const dot = document.querySelector('.cursor-dot');
+      const outline = document.querySelector('.cursor-outline');
+      if (dot && outline && window.innerWidth > 1024) {
+        let mx = 0, my = 0, ox = 0, oy = 0;
+        window.addEventListener('mousemove', e => {
+          mx = e.clientX; my = e.clientY;
+          dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+        });
+        (function anim() {
+          ox += (mx - ox) * 0.12; oy += (my - oy) * 0.12;
+          outline.style.left = ox + 'px'; outline.style.top = oy + 'px';
+          requestAnimationFrame(anim);
+        })();
+        document.querySelectorAll('a,button,.sidebar-link,.topbar-btn,.quick-card,.export-btn').forEach(el => {
+          el.addEventListener('mouseenter', () => {
+            outline.style.width = '56px'; outline.style.height = '56px';
+            outline.style.borderColor = 'rgba(0,255,136,0.6)';
+            dot.style.transform = 'translate(-50%,-50%) scale(0.5)';
+          });
+          el.addEventListener('mouseleave', () => {
+            outline.style.width = '36px'; outline.style.height = '36px';
+            outline.style.borderColor = 'rgba(0,255,136,0.3)';
+            dot.style.transform = 'translate(-50%,-50%) scale(1)';
+          });
+        });
+      }
+
+      /* ===== PARTICLES ===== */
+      const canvas = document.getElementById('particles-canvas');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let w, h, particles = [];
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        class Particle {
+          constructor() { this.reset(); }
+          reset() {
+            this.x = Math.random() * w; this.y = Math.random() * h;
+            this.vx = (Math.random() - 0.5) * 0.25; this.vy = (Math.random() - 0.5) * 0.25;
+            this.r = Math.random() * 1.2 + 0.3; this.a = Math.random() * 0.2 + 0.03;
+          }
+          update() {
+            this.x += this.vx; this.y += this.vy;
+            if (this.x < 0 || this.x > w) this.vx *= -1;
+            if (this.y < 0 || this.y > h) this.vy *= -1;
+          }
+          draw() {
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0,255,136,${this.a})`; ctx.fill();
+          }
+        }
+        for (let i = 0; i < 45; i++) particles.push(new Particle());
+        (function draw() {
+          ctx.clearRect(0, 0, w, h);
+          particles.forEach(p => { p.update(); p.draw() });
+          for (let i = 0; i < particles.length; i++) for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d < 100) {
+              ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(0,255,136,${0.03 * (1 - d / 100)})`;
+              ctx.lineWidth = 0.5; ctx.stroke();
+            }
+          }
+          requestAnimationFrame(draw);
+        })();
+      }
+
+      /* ===== SIDEBAR TOGGLE ===== */
+      const sidebar = document.getElementById('adminSidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const burger = document.getElementById('burgerBtn');
+      const closeBtn = document.getElementById('sidebarClose');
+
+      function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      if (burger) burger.addEventListener('click', openSidebar);
+      if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+      if (overlay) overlay.addEventListener('click', closeSidebar);
+
+      /* ===== LIVE CLOCK ===== */
+      const clockEl = document.getElementById('liveClock');
+      if (clockEl) {
+        function tick() {
+          const now = new Date();
+          clockEl.textContent = now.toLocaleTimeString('en-US', {
+            hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit'
+          });
+        }
+        tick(); setInterval(tick, 1000);
+      }
+
+      /* ===== COUNTER ANIMATION ===== */
+      const counters = document.querySelectorAll('.counter');
+      const counterObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !entry.target.dataset.done) {
+            entry.target.dataset.done = 'true';
+            const target = +entry.target.dataset.target;
+            let current = 0;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+              current += increment;
+              if (current >= target) { current = target; clearInterval(timer); }
+              entry.target.textContent = Math.floor(current).toLocaleString();
+            }, 30);
+          }
+        });
+      }, { threshold: 0.5 });
+      counters.forEach(c => counterObs.observe(c));
+
+      /* ===== SPARKLINE ANIMATION ===== */
+      const sparkBars = document.querySelectorAll('.spark-bar');
+      const sparkObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const bars = entry.target.querySelectorAll('.spark-bar');
+            bars.forEach((bar, i) => {
+              setTimeout(() => {
+                bar.style.height = bar.dataset.h;
+              }, i * 80);
+            });
+            sparkObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+      document.querySelectorAll('.sparkline').forEach(s => sparkObs.observe(s));
+
+      /* ===== SCROLL REVEAL ===== */
+      const reveals = document.querySelectorAll('.reveal');
+      const revealObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add('active');
+        });
+      }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
+      reveals.forEach(el => revealObs.observe(el));
+
+    });
+  </script>
+
+</body>
+
+</html>

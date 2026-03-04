@@ -1,0 +1,488 @@
+<% const pageTitle = "About — Shivam Bhadoriya | Full Stack Developer"; %>
+<% const activePage = "about"; %>
+<% const headPartial = "../partials/heads/about-head"; %>
+<% const scriptsPartial = "../partials/scripts/about-scripts"; %>
+<%- include("../partials/public-header") %>
+
+    <!-- PAGE HEADER -->
+    <section class="page-header page-section">
+        <div class="container">
+            <h1 class="page-header-title reveal">About <span class="gradient-text">Me</span></h1>
+            <p class="page-header-subtitle reveal reveal-delay-1">The story, the skills, and the relentless drive behind
+                300+ days of code.</p>
+            <div class="breadcrumb-custom reveal reveal-delay-2">
+                <a href="/">Home</a><span>/</span><span>About</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ABOUT INTRO ==================== -->
+    <section class="section" style="padding-top:20px;">
+        <div class="container">
+            <div class="row g-5 align-items-start">
+
+                <!-- Profile Card -->
+                <div class="col-lg-4 reveal">
+                    <div class="profile-card-wrapper" style="position:sticky; top:100px;">
+                        <div class="profile-card">
+                            <div class="profile-avatar">
+                                <div class="profile-avatar-ring"></div>
+                                <span class="initials">SB</span>
+                            </div>
+                            <div class="status-available">
+                                <span class="dot"></span> Available for Work
+                            </div>
+                            <h3 class="profile-name">Shivam Bhadoriya</h3>
+                            <p class="profile-role">Full Stack Developer</p>
+                            <p class="profile-location">
+                                <i class="fas fa-map-marker-alt"></i> India 🇮🇳 — Remote Worldwide
+                            </p>
+                            <div class="profile-stats-row">
+                                <div class="profile-stat">
+                                    <div class="profile-stat-num counter" data-target="300" data-suffix="+">0</div>
+                                    <div class="profile-stat-label">Day Streak</div>
+                                </div>
+                                <div class="profile-stat">
+                                    <div class="profile-stat-num counter" data-target="50" data-suffix="+">0</div>
+                                    <div class="profile-stat-label">Projects</div>
+                                </div>
+                                <div class="profile-stat">
+                                    <div class="profile-stat-num counter" data-target="25" data-suffix="+">0</div>
+                                    <div class="profile-stat-label">Clients</div>
+                                </div>
+                            </div>
+                            <div class="profile-social">
+                                <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-dev"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About Text -->
+                <div class="col-lg-8 reveal reveal-delay-2">
+                    <span class="section-label"><span class="dot"></span> Who I Am</span>
+                    <h2 class="section-title" style="margin-bottom:24px;">A Developer Who<br><span
+                            class="gradient-text">Never Stops Building</span></h2>
+
+                    <div style="color:var(--text-secondary); line-height:2; font-size:0.95rem;">
+                        <p style="margin-bottom:20px;">
+                            I'm <strong style="color:var(--text);">Shivam Bhadoriya</strong> — a self-taught full-stack
+                            developer
+                            from India with a burning obsession for clean code, scalable architecture, and shipping real
+                            products
+                            that solve real problems.
+                        </p>
+                        <p style="margin-bottom:20px;">
+                            My journey started with curiosity and has evolved into a <strong
+                                style="color:var(--green);">300+ day
+                                unbroken coding streak</strong> that I have zero intention of breaking. I don't code to
+                            fill a portfolio —
+                            I code because building things is the most powerful form of expression I know.
+                        </p>
+                        <p style="margin-bottom:20px;">
+                            I specialize in the <strong style="color:var(--text);">MERN stack</strong> (MongoDB,
+                            Express, React, Node.js),
+                            but my toolkit extends to Python, Docker, Firebase, Redis, and whatever else the problem
+                            demands.
+                            I believe in understanding systems at a deep level — not just gluing APIs together.
+                        </p>
+                        <p>
+                            When I'm not coding, I'm writing about backend architecture on my blog, contributing to open
+                            source,
+                            or mentoring other self-taught developers. The mission is simple:
+                            <strong style="color:var(--green);">be undeniable.</strong>
+                        </p>
+                    </div>
+
+                    <!-- Quick Facts -->
+                    <div class="row g-3 mt-4">
+                        <div class="col-md-6">
+                            <div
+                                style="background:var(--glass); border:1px solid var(--glass-border); border-radius:14px; padding:18px 20px; display:flex; align-items:center; gap:14px;">
+                                <div
+                                    style="width:40px; height:40px; border-radius:12px; background:var(--green-glow); display:flex; align-items:center; justify-content:center; color:var(--green); flex-shrink:0;">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                                <div>
+                                    <div
+                                        style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:600;">
+                                        Primary Stack</div>
+                                    <div style="font-weight:700; font-size:0.9rem;">MERN (Mongo, Express, React, Node)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div
+                                style="background:var(--glass); border:1px solid var(--glass-border); border-radius:14px; padding:18px 20px; display:flex; align-items:center; gap:14px;">
+                                <div
+                                    style="width:40px; height:40px; border-radius:12px; background:var(--purple-glow); display:flex; align-items:center; justify-content:center; color:var(--purple); flex-shrink:0;">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div>
+                                    <div
+                                        style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:600;">
+                                        Education</div>
+                                    <div style="font-weight:700; font-size:0.9rem;">Self-Taught + Continuous Learning
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div
+                                style="background:var(--glass); border:1px solid var(--glass-border); border-radius:14px; padding:18px 20px; display:flex; align-items:center; gap:14px;">
+                                <div
+                                    style="width:40px; height:40px; border-radius:12px; background:rgba(6,182,212,0.15); display:flex; align-items:center; justify-content:center; color:var(--cyan); flex-shrink:0;">
+                                    <i class="fas fa-coffee"></i>
+                                </div>
+                                <div>
+                                    <div
+                                        style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:600;">
+                                        Fuel</div>
+                                    <div style="font-weight:700; font-size:0.9rem;">Coffee, Ambition & Lo-Fi Beats</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div
+                                style="background:var(--glass); border:1px solid var(--glass-border); border-radius:14px; padding:18px 20px; display:flex; align-items:center; gap:14px;">
+                                <div
+                                    style="width:40px; height:40px; border-radius:12px; background:rgba(249,115,22,0.15); display:flex; align-items:center; justify-content:center; color:var(--orange); flex-shrink:0;">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <div>
+                                    <div
+                                        style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:600;">
+                                        Superpower</div>
+                                    <div style="font-weight:700; font-size:0.9rem;">Turning Ideas into Production Code
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TIMELINE ==================== -->
+    <section class="section"
+        style="background:var(--bg-secondary); border-top:1px solid var(--glass-border); border-bottom:1px solid var(--glass-border);">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="section-label justify-content-center"><span class="dot"></span> My Journey</span>
+                <h2 class="section-title">The <span class="gradient-text">Timeline</span></h2>
+                <p class="section-subtitle mx-auto">From writing my first "Hello World" to architecting production
+                    systems.</p>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="timeline-enhanced">
+
+                        <!-- 2021 -->
+                        <div class="tl-item reveal">
+                            <div class="tl-dot-wrapper">
+                                <div class="tl-dot green"></div>
+                                <div class="tl-pulse" style="border-color:var(--green);"></div>
+                            </div>
+                            <div class="tl-content">
+                                <div class="tl-year green">2021 — THE SPARK</div>
+                                <h4 class="tl-title"><span class="emoji">🎓</span> Curious Student</h4>
+                                <p class="tl-desc">
+                                    Wrote my first "Hello World" in Python. Got hooked instantly. Spent every free hour
+                                    watching tutorials, breaking things on purpose, and learning how to fix them.
+                                    Discovered that coding wasn't just a skill — it was a superpower.
+                                </p>
+                                <div class="tl-tags">
+                                    <span class="tl-tag">Python</span>
+                                    <span class="tl-tag">HTML/CSS</span>
+                                    <span class="tl-tag">Curiosity</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2022 -->
+                        <div class="tl-item reveal">
+                            <div class="tl-dot-wrapper">
+                                <div class="tl-dot purple"></div>
+                                <div class="tl-pulse" style="border-color:var(--purple);"></div>
+                            </div>
+                            <div class="tl-content">
+                                <div class="tl-year purple">2022 — GOING DEEP</div>
+                                <h4 class="tl-title"><span class="emoji">📚</span> Obsessive Learner</h4>
+                                <p class="tl-desc">
+                                    Dived headfirst into JavaScript, Node.js, and databases. Built 20+ projects to
+                                    practice.
+                                    Started the coding streak. Discovered that backend development was where my mind
+                                    truly
+                                    thrives — designing APIs, modeling data, and solving complex problems.
+                                </p>
+                                <div class="tl-tags">
+                                    <span class="tl-tag">JavaScript</span>
+                                    <span class="tl-tag">Node.js</span>
+                                    <span class="tl-tag">MongoDB</span>
+                                    <span class="tl-tag">Express</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2023 -->
+                        <div class="tl-item reveal">
+                            <div class="tl-dot-wrapper">
+                                <div class="tl-dot cyan"></div>
+                                <div class="tl-pulse" style="border-color:var(--cyan);"></div>
+                            </div>
+                            <div class="tl-content">
+                                <div class="tl-year cyan">2023 — BUILDING REAL THINGS</div>
+                                <h4 class="tl-title"><span class="emoji">🚀</span> Full Stack Developer</h4>
+                                <p class="tl-desc">
+                                    Launched my first SaaS product. Contributed to open-source projects. Started
+                                    freelancing
+                                    and landing real clients. The streak hit 200 days. Every project got more complex,
+                                    more polished, more production-ready. Added React to the stack.
+                                </p>
+                                <div class="tl-tags">
+                                    <span class="tl-tag">React</span>
+                                    <span class="tl-tag">Freelancing</span>
+                                    <span class="tl-tag">Open Source</span>
+                                    <span class="tl-tag">Docker</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2024 -->
+                        <div class="tl-item reveal">
+                            <div class="tl-dot-wrapper">
+                                <div class="tl-dot orange"></div>
+                                <div class="tl-pulse" style="border-color:var(--orange);"></div>
+                            </div>
+                            <div class="tl-content">
+                                <div class="tl-year orange">2024 — BEAST MODE</div>
+                                <h4 class="tl-title"><span class="emoji">⚡</span> The Machine Era</h4>
+                                <p class="tl-desc">
+                                    300+ day streak and counting. Building AI-powered applications, complex
+                                    microservices,
+                                    and production-grade systems used by real people. The goal isn't to be good —
+                                    it's to be <strong style="color:var(--orange);">undeniable</strong>. Every day I
+                                    ship, learn, and level up.
+                                </p>
+                                <div class="tl-tags">
+                                    <span class="tl-tag">AI/OpenAI</span>
+                                    <span class="tl-tag">Microservices</span>
+                                    <span class="tl-tag">Redis</span>
+                                    <span class="tl-tag">CI/CD</span>
+                                    <span class="tl-tag">Production</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SKILLS ==================== -->
+    <section class="section">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="section-label justify-content-center"><span class="dot"></span> Capabilities</span>
+                <h2 class="section-title">Skill <span class="gradient-text">Arsenal</span></h2>
+                <p class="section-subtitle mx-auto">Years of focused practice distilled into measurable expertise.</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Backend Skills -->
+                <div class="col-lg-6 reveal">
+                    <div class="skill-card">
+                        <div class="skill-category-title"><i class="fas fa-server" style="font-size:0.7rem;"></i>
+                            Backend & Server</div>
+
+                        <div class="skill-item-enhanced">
+                            <div class="skill-header-enhanced">
+                                <div class="skill-name-row">
+                                    <div class="skill-icon-mini green"><i class="fab fa-node-js"></i></div>
+                                    <span class="skill-name-text">Node.js / Express</span>
+                                </div>
+                                <span class="skill-percent-badge">95%</span>
+                            </div>
+                            <div class="skill-bar-outer-enhanced">
+                                <div class="skill-bar-inner-enhanced green-bar" data-width="95%"></div>
+                            </div>
+                        </div>
+
+                        <div class="skill-item-enhanced">
+                            <div class="skill-header-enhanced">
+                                <div class="skill-name-row">
+                                    <div class="skill-icon-mini green"><i class="fas fa-leaf"></i></div>
+                                    <span class="skill-name-text">MongoDB / Mongoose</span>
+                                </div>
+                                <span class="skill-percent-badge">92%</span>
+                            </div>
+                            <div class="skill-bar-outer-enhanced">
+                                <div class="skill-bar-inner-enhanced green-bar" data-width="92%"></div>
+                            </div>
+                        </div>
+
+                        <div class="skill-item-enhanced">
+                            <div class="skill-header-enhanced">
+                                <div class="skill-name-row">
+                                    <div class="skill-icon-mini cyan"><i class="fas fa-plug"></i></div>
+                                    <span class="skill-name-text">REST API Design</span>
+                                </div>
+                                <span class="skill-percent-badge"
+                                    style="background:rgba(6,182,212,0.15); color:var(--cyan);">93%</span>
+                            </div>
+                            <div class="skill-bar-outer-enhanced">
+                                <div class="skill-bar-inner-enhanced cyan-bar" data-width="93%"></div>
+                            </div>
+                        </div>
+
+                        <div class="skill-item-enhanced">
+                            <div class="skill-header-enhanced">
+                                <div class="skill-name-row">
+                                    <div class="skill-icon-mini purple"><i class="fab fa-python"></i></div>
+                                    <span class="skill-name-text">Python</span>
+                                </div>
+                                <span class="skill-percent-badge"
+                                    style="background:var(--purple-glow); color:var(--purple);">78%</span>
+                            </div>
+                            <div class="skill-bar-outer-enhanced">
+                                <div class="skill-bar-inner-enhanced purple-bar" data-width="78%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Frontend & Tools -->
+                <div class="col-lg-6 reveal reveal-delay-2">
+                    <div class="skill-card">
+                        <div class="skill-category-title"><i class="fas fa-paint-brush" style="font-size:0.7rem;"></i>
+                            Frontend & Tools</div>
+
+                        <div class="skill-item-enhanced">
+                            <div class="skill-header-enhanced">
+                                <div class="skill-name-row">
+                                    <div class="skill-icon-mini orange"><i class="fab fa-js-square"></i></div>
+                                    <span class="skill-name-text">JavaScript / TypeScript</span>
+                                </div>
+                                <span class="skill-percent-badge"
+                                    style="background:rgba(249,115,22,0.15); color:var(--orange);">94%</span>
+                            </div>
+                            <div class="skill-bar-outer-enhanced">
+                                <div class="skill-bar-inner-enhanced orange-bar" data-width="94%"></div>
+                            </div>
+                        </div>
+
+                        <div class="skill-item-enhanced">
+                            <div class="skill-header-enhanced">
+                                <div class="skill-name-row">
+                                    <div class="skill-icon-mini cyan"><i class="fab fa-react"></i></div>
+                                    <span class="skill-name-text">React.js</span>
+                                </div>
+                                <span class="skill-percent-badge"
+                                    style="background:rgba(6,182,212,0.15); color:var(--cyan);">85%</span>
+                            </div>
+                            <div class="skill-bar-outer-enhanced">
+                                <div class="skill-bar-inner-enhanced cyan-bar" data-width="85%"></div>
+                            </div>
+                        </div>
+
+                        <div class="skill-item-enhanced">
+                            <div class="skill-header-enhanced">
+                                <div class="skill-name-row">
+                                    <div class="skill-icon-mini purple"><i class="fab fa-css3-alt"></i></div>
+                                    <span class="skill-name-text">HTML / CSS / Bootstrap</span>
+                                </div>
+                                <span class="skill-percent-badge"
+                                    style="background:var(--purple-glow); color:var(--purple);">88%</span>
+                            </div>
+                            <div class="skill-bar-outer-enhanced">
+                                <div class="skill-bar-inner-enhanced purple-bar" data-width="88%"></div>
+                            </div>
+                        </div>
+
+                        <div class="skill-item-enhanced">
+                            <div class="skill-header-enhanced">
+                                <div class="skill-name-row">
+                                    <div class="skill-icon-mini green"><i class="fab fa-docker"></i></div>
+                                    <span class="skill-name-text">Git / Docker / CI/CD</span>
+                                </div>
+                                <span class="skill-percent-badge">87%</span>
+                            </div>
+                            <div class="skill-bar-outer-enhanced">
+                                <div class="skill-bar-inner-enhanced green-bar" data-width="87%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== PHILOSOPHY ==================== -->
+    <section class="section" style="padding-top:20px;">
+        <div class="container">
+            <div class="philosophy-card reveal">
+                <p class="philosophy-text">
+                    "I don't build software to survive — I build it to <span
+                        class="text-green glow-green">dominate</span>.
+                    Every line of code is a brick in the empire I'm constructing.
+                    Discipline will always crush motivation."
+                </p>
+                <p class="philosophy-author">— <span>Shivam Bhadoriya</span></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== RESUME DOWNLOAD ==================== -->
+    <section class="section" style="padding-top:20px;">
+        <div class="container">
+            <div class="resume-section-enhanced reveal">
+                <div class="resume-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h2 class="section-title" style="margin-bottom:12px;">Want the Full <span
+                        class="gradient-text">Picture?</span></h2>
+                <p
+                    style="color:var(--text-secondary); margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto; font-size:0.95rem;">
+                    Download my resume for a complete overview of my experience, projects, education, and technical
+                    expertise.
+                </p>
+                <a href="#" class="resume-btn-enhanced">
+                    <i class="fas fa-download"></i> Download My Resume
+                </a>
+                <div class="resume-formats">
+                    <span class="resume-format"><i class="fas fa-check-circle"></i> PDF Format</span>
+                    <span class="resume-format"><i class="fas fa-check-circle"></i> ATS-Friendly</span>
+                    <span class="resume-format"><i class="fas fa-check-circle"></i> Last updated Dec 2024</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CTA ==================== -->
+    <section class="section" style="padding-top:20px;">
+        <div class="container">
+            <div class="cta-section reveal">
+                <h2 class="section-title" style="margin-bottom:16px;">Like What You See? <span
+                        class="gradient-text">Let's Work Together.</span></h2>
+                <p
+                    style="color:var(--text-secondary); margin-bottom:30px; max-width:550px; margin-left:auto; margin-right:auto;">
+                    I'm currently available for freelance projects and full-time positions. Let's build something
+                    extraordinary.
+                </p>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="/contact" class="btn-glow-green"><i class="fas fa-paper-plane"></i> Get in Touch</a>
+                    <a href="/projects" class="btn-glow-purple"><i class="fas fa-eye"></i> View My Work</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<%- include("../partials/public-footer") %>

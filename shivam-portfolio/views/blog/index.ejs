@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog — Shivam Bhadoriya</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div id="preloader">
+        <div class="loader-ring"></div>
+    </div>
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="nav-logo" href="/">SB<span>.</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="mainNav">
+                <ul class="navbar-nav mx-auto gap-1">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/projects">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/blog">Blog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+                </ul>
+                <a href="/contact" class="nav-link nav-cta">Hire Me</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+        <div class="container">
+            <h1 class="page-header-title reveal">The <span class="gradient-text">Blog</span></h1>
+            <p class="page-header-subtitle reveal reveal-delay-1">Thoughts on backend architecture, JavaScript
+                internals, and what it takes to build things that last.</p>
+            <div class="breadcrumb-custom reveal reveal-delay-2">
+                <a href="/">Home</a><span>/</span><span>Blog</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- BLOG ARTICLES LIST -->
+    <section class="section" style="padding-top:20px;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+
+                    <!-- Article 1 -->
+                    <div class="blog-article-item reveal mb-4">
+                        <div class="blog-article-number">01</div>
+                        <div class="blog-article-content">
+                            <div class="blog-article-meta">
+                                <span class="blog-article-date"><i class="far fa-calendar me-1"></i> Dec 15, 2024</span>
+                                <span class="blog-article-category">Backend</span>
+                                <span class="blog-read-time"><i class="far fa-clock"></i> 8 min read</span>
+                            </div>
+                            <h3 class="blog-article-title">Why I Chose Node.js Over Everything Else — And Never Looked
+                                Back</h3>
+                            <p class="blog-article-excerpt">
+                                After experimenting with Python, Go, and Java for backend work, I settled on Node.js.
+                                Here's my brutally honest breakdown of why the V8 engine, non-blocking I/O, and the npm
+                                ecosystem
+                                make it the ultimate choice for developers who ship fast and scale hard.
+                            </p>
+                            <a href="#" class="blog-read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Article 2 -->
+                    <div class="blog-article-item reveal reveal-delay-1 mb-4">
+                        <div class="blog-article-number">02</div>
+                        <div class="blog-article-content">
+                            <div class="blog-article-meta">
+                                <span class="blog-article-date"><i class="far fa-calendar me-1"></i> Nov 28, 2024</span>
+                                <span class="blog-article-category"
+                                    style="background:rgba(6,182,212,0.15); color:var(--cyan);">Architecture</span>
+                                <span class="blog-read-time"><i class="far fa-clock"></i> 12 min read</span>
+                            </div>
+                            <h3 class="blog-article-title">Designing REST APIs That Don't Make Other Developers Want to
+                                Cry</h3>
+                            <p class="blog-article-excerpt">
+                                Bad APIs are everywhere. Inconsistent naming, no pagination, zero error handling — I've
+                                seen it all.
+                                This is my opinionated guide to designing REST APIs that are intuitive, scalable, and
+                                actually
+                                pleasant to consume. Includes real code examples from production projects.
+                            </p>
+                            <a href="#" class="blog-read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Article 3 -->
+                    <div class="blog-article-item reveal reveal-delay-2 mb-4">
+                        <div class="blog-article-number">03</div>
+                        <div class="blog-article-content">
+                            <div class="blog-article-meta">
+                                <span class="blog-article-date"><i class="far fa-calendar me-1"></i> Nov 10, 2024</span>
+                                <span class="blog-article-category"
+                                    style="background:rgba(249,115,22,0.15); color:var(--orange);">MongoDB</span>
+                                <span class="blog-read-time"><i class="far fa-clock"></i> 10 min read</span>
+                            </div>
+                            <h3 class="blog-article-title">MongoDB Aggregation Pipelines: The Superpower Nobody Talks
+                                About</h3>
+                            <p class="blog-article-excerpt">
+                                Most developers use MongoDB as a glorified JSON store. They're missing out on
+                                aggregation pipelines —
+                                a feature so powerful it can replace entire backend services. I walk through $lookup,
+                                $unwind, $group,
+                                and show you patterns that will change how you think about NoSQL queries.
+                            </p>
+                            <a href="#" class="blog-read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Article 4 -->
+                    <div class="blog-article-item reveal mb-4">
+                        <div class="blog-article-number">04</div>
+                        <div class="blog-article-content">
+                            <div class="blog-article-meta">
+                                <span class="blog-article-date"><i class="far fa-calendar me-1"></i> Oct 22, 2024</span>
+                                <span class="blog-article-category"
+                                    style="background:rgba(236,72,153,0.15); color:var(--pink);">Mindset</span>
+                                <span class="blog-read-time"><i class="far fa-clock"></i> 6 min read</span>
+                            </div>
+                            <h3 class="blog-article-title">300 Days of Code: What a Daily Streak Actually Teaches You
+                            </h3>
+                            <p class="blog-article-excerpt">
+                                It's not about the green squares on GitHub. It's about what happens to your brain when
+                                you commit
+                                to something for 300 consecutive days. I share the unexpected lessons, the dark days
+                                where I almost
+                                broke, and why discipline will always crush motivation.
+                            </p>
+                            <a href="#" class="blog-read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Article 5 -->
+                    <div class="blog-article-item reveal reveal-delay-1 mb-4">
+                        <div class="blog-article-number">05</div>
+                        <div class="blog-article-content">
+                            <div class="blog-article-meta">
+                                <span class="blog-article-date"><i class="far fa-calendar me-1"></i> Oct 05, 2024</span>
+                                <span class="blog-article-category">Backend</span>
+                                <span class="blog-read-time"><i class="far fa-clock"></i> 15 min read</span>
+                            </div>
+                            <h3 class="blog-article-title">JWT Authentication Done Right: A Complete Implementation
+                                Guide</h3>
+                            <p class="blog-article-excerpt">
+                                Most JWT tutorials are dangerously incomplete. They skip refresh tokens, ignore token
+                                rotation,
+                                and never handle edge cases. This is the definitive guide to building bullet-proof
+                                authentication
+                                with access tokens, refresh tokens, and proper security headers.
+                            </p>
+                            <a href="#" class="blog-read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Article 6 -->
+                    <div class="blog-article-item reveal reveal-delay-2 mb-4">
+                        <div class="blog-article-number">06</div>
+                        <div class="blog-article-content">
+                            <div class="blog-article-meta">
+                                <span class="blog-article-date"><i class="far fa-calendar me-1"></i> Sep 18, 2024</span>
+                                <span class="blog-article-category"
+                                    style="background:rgba(6,182,212,0.15); color:var(--cyan);">DevOps</span>
+                                <span class="blog-read-time"><i class="far fa-clock"></i> 9 min read</span>
+                            </div>
+                            <h3 class="blog-article-title">Docker for Backend Developers: From Zero to Production in One
+                                Article</h3>
+                            <p class="blog-article-excerpt">
+                                If you're still deploying Node.js apps by SSH-ing into a server and running npm start,
+                                this article is your wake-up call. I cover Dockerfiles, docker-compose, multi-stage
+                                builds,
+                                and a CI/CD pipeline that deploys on every push to main.
+                            </p>
+                            <a href="#" class="blog-read-more">Read Full Article <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination-custom reveal" style="margin-top:40px;">
+                        <button class="page-arrow"><i class="fas fa-chevron-left"></i> Newer</button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-arrow">Older <i class="fas fa-chevron-right"></i></button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-brand">SB.</div>
+                    <p class="footer-desc">Building the future one commit at a time.</p>
+                    <div class="contact-social" style="margin-top:20px;">
+                        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <h5 class="footer-title">Navigate</h5>
+                    <ul class="footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/projects">Projects</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/blog">Blog</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="footer-title">Services</h5>
+                    <ul class="footer-links">
+                        <li><a href="/services">Full Stack Dev</a></li>
+                        <li><a href="/services">API Design</a></li>
+                        <li><a href="/services">MVP Development</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="footer-title">Contact</h5>
+                    <ul class="footer-links">
+                        <li><a href="mailto:shivam@example.com">shivam@example.com</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2024 <a href="#">Shivam Bhadoriya</a>.</span>
+                <span>Crafted with <i class="fas fa-heart text-green"></i></span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/script.js"></script>
+</body>
+
+</html>

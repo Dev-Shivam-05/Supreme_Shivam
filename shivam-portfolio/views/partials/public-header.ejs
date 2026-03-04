@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title><%= (typeof pageTitle !== 'undefined') ? pageTitle : 'Shivam Bhadoriya | Portfolio' %></title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/style.css">
+    <%- typeof headPartial !== "undefined" ? include(headPartial) : "" %>
+</head>
+
+<body>
+    <div id="preloader">
+        <div class="loader-ring"></div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Floating Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Particles -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- ===================== NAVBAR ===================== -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="nav-logo" href="/">SB<span>.</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="mainNav">
+                <ul class="navbar-nav mx-auto gap-1">
+                    <li class="nav-item"><a class="nav-link <%= activePage === "home" ? "active" : "" %>" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link <%= activePage === "projects" ? "active" : "" %>" href="/projects">Project</a></li>
+                    <li class="nav-item"><a class="nav-link <%= activePage === "about" ? "active" : "" %>" href="/about">About</a></li>
+                    <li class="nav-item"><a class="nav-link <%= activePage === "services" ? "active" : "" %>" href="/services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link <%= activePage === "contact" ? "active" : "" %>" href="/contact">Contact</a></li>
+                </ul>
+                <a href="/contact" class="nav-link nav-cta">Hire Me</a>
+            </div>
+        </div>
+    </nav>

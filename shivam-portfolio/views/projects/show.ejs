@@ -1,0 +1,342 @@
+<% const pageTitle = "AI Art Generator — Case Study | Shivam Bhadoriya"; %>
+<% const activePage = "projects"; %>
+<% const headPartial = "../partials/heads/projects-show-head"; %>
+<%- include("../partials/public-header") %>
+
+    <!-- ==================== PROJECT HERO ==================== -->
+    <section class="project-hero">
+        <div class="container">
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb-custom mb-4 reveal" style="justify-content:flex-start;">
+                <a href="/">Home</a><span>/</span><a href="/projects">Projects</a><span>/</span><span>AI
+                    Art Generator</span>
+            </div>
+
+            <!-- Banner Image -->
+            <div class="project-hero-banner reveal">
+                <div class="browser-chrome">
+                    <span class="browser-dot r"></span>
+                    <span class="browser-dot y"></span>
+                    <span class="browser-dot g"></span>
+                    <div class="browser-url">
+                        <i class="fas fa-lock"></i>
+                        artgen.shivambhadoriya.dev
+                    </div>
+                </div>
+                <div class="screenshot-area">
+                    <div class="screenshot-grid">
+                        <div class="mock-card"></div>
+                        <div class="mock-card"></div>
+                        <div class="mock-card"></div>
+                        <div class="mock-card"></div>
+                        <div class="mock-card"></div>
+                    </div>
+                </div>
+                <div class="screenshot-label">
+                    <i class="fas fa-palette"></i>
+                    <span>AI Art Generator — Live Application</span>
+                </div>
+            </div>
+
+            <!-- Title Area -->
+            <div class="project-title-area reveal">
+                <div class="project-icon-badge">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h1 class="project-main-title">AI Art <span class="gradient-text">Generator</span></h1>
+                <p class="project-tagline">
+                    A production-grade full-stack application that harnesses artificial intelligence to generate
+                    stunning,
+                    unique artwork from text prompts — complete with user auth, galleries, community sharing,
+                    and a blazing-fast API powered by OpenAI's DALL·E.
+                </p>
+                <div class="project-tags-row">
+                    <span class="tech-tag">Node.js</span>
+                    <span class="tech-tag purple">React</span>
+                    <span class="tech-tag cyan">OpenAI API</span>
+                    <span class="tech-tag orange">MongoDB</span>
+                    <span class="tech-tag"
+                        style="background:rgba(236,72,153,0.15); color:#ec4899; border-color:rgba(236,72,153,0.2);">Cloudinary</span>
+                    <span class="tech-tag purple">JWT Auth</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== QUICK STATS ==================== -->
+    <section style="padding:0 0 60px;">
+        <div class="container">
+            <div class="quick-stats-grid reveal">
+                <div class="qs-card">
+                    <div class="qs-icon g"><i class="fas fa-user"></i></div>
+                    <div class="qs-label">Client / Type</div>
+                    <div class="qs-value">Personal SaaS</div>
+                </div>
+                <div class="qs-card">
+                    <div class="qs-icon p"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="qs-label">Date</div>
+                    <div class="qs-value">October 2024</div>
+                </div>
+                <div class="qs-card">
+                    <div class="qs-icon c"><i class="fas fa-layer-group"></i></div>
+                    <div class="qs-label">Tech Stack</div>
+                    <div class="qs-value">MERN + OpenAI</div>
+                </div>
+                <div class="qs-card">
+                    <div class="qs-icon o"><i class="fas fa-crown"></i></div>
+                    <div class="qs-label">Role</div>
+                    <div class="qs-value">Solo Full Stack</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== THE STORY ==================== -->
+    <section class="section" style="padding-top:20px;">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="section-label justify-content-center"><span class="dot"></span> Case Study</span>
+                <h2 class="section-title">The <span class="gradient-text">Story</span></h2>
+                <p class="section-subtitle mx-auto">Every great product begins with a real problem and ends with an
+                    elegant solution.</p>
+            </div>
+
+            <div class="row g-4 mb-80">
+                <!-- The Problem -->
+                <div class="col-lg-6 reveal">
+                    <div class="story-block problem">
+                        <div class="story-icon-row">
+                            <div class="story-icon-circle"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div>
+                                <div class="story-label">The Problem</div>
+                            </div>
+                        </div>
+                        <h3 class="story-heading">AI Art Was Gatekept</h3>
+                        <div class="story-text">
+                            <p>
+                                Existing AI art platforms were broken for average users. After extensive research,
+                                I identified the core frustrations:
+                            </p>
+                            <ul>
+                                <li><i class="fas fa-times-circle"></i> Prohibitively expensive — $20-50/month for basic
+                                    usage</li>
+                                <li><i class="fas fa-times-circle"></i> Overly complex interfaces designed for ML
+                                    engineers, not creators</li>
+                                <li><i class="fas fa-times-circle"></i> No community features — art was generated in
+                                    isolation</li>
+                                <li><i class="fas fa-times-circle"></i> No personal galleries or organization tools</li>
+                                <li><i class="fas fa-times-circle"></i> Slow generation with poor queue management</li>
+                            </ul>
+                            <p style="margin-top:16px;">
+                                Users needed a platform that was <strong>simple, affordable, and social</strong> —
+                                one that treated art generation as a creative experience, not a technical challenge.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- The Solution -->
+                <div class="col-lg-6 reveal reveal-delay-2">
+                    <div class="story-block solution">
+                        <div class="story-icon-row">
+                            <div class="story-icon-circle"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <div class="story-label">The Solution</div>
+                            </div>
+                        </div>
+                        <h3 class="story-heading">Build It Right. Build It Once.</h3>
+                        <div class="story-text">
+                            <p>
+                                I architected a full-stack MERN application with a relentless focus on UX and
+                                performance:
+                            </p>
+                            <ul>
+                                <li><i class="fas fa-check-circle"></i> <strong>Node.js + Express</strong> backend
+                                    proxying OpenAI DALL·E API</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>MongoDB + Mongoose</strong> for user
+                                    data, art storage, and social features</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>JWT authentication</strong> with refresh
+                                    token rotation and rate limiting</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>Cloudinary CDN</strong> for optimized
+                                    image delivery (WebP, lazy loading)</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>React frontend</strong> with skeleton
+                                    loading, infinite scroll gallery</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>Queue system</strong> with Redis for
+                                    managing concurrent generations</li>
+                            </ul>
+                            <p style="margin-top:16px;">
+                                Result: <strong style="color:var(--green);">Sub-3-second generation</strong>,
+                                <strong style="color:var(--green);">99.9% uptime</strong>, and a community gallery
+                                with 500+ shared artworks in the first month.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CODE SNIPPET ==================== -->
+    <section class="section" style="padding-top:0;">
+        <div class="container">
+            <div class="mb-5 reveal">
+                <span class="section-label"><span class="dot"></span> Under the Hood</span>
+                <h2 class="section-title">Code <span class="gradient-text">Highlight</span></h2>
+                <p class="section-subtitle">The core controller that orchestrates AI art generation, caching, and
+                    storage.</p>
+            </div>
+
+            <div class="code-window reveal">
+                <div class="code-toolbar">
+                    <div class="code-dots">
+                        <span class="code-dot r"></span>
+                        <span class="code-dot y"></span>
+                        <span class="code-dot g"></span>
+                    </div>
+                    <div class="code-tabs">
+                        <div class="code-tab active">generateArt.controller.js</div>
+                        <div class="code-tab">auth.middleware.js</div>
+                        <div class="code-tab">Art.model.js</div>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-action-btn" title="Copy"><i class="fas fa-copy"></i></button>
+                        <button class="code-action-btn" title="Wrap lines"><i class="fas fa-text-width"></i></button>
+                    </div>
+                </div>
+                <div class="code-body">
+                    <div class="code-line"><span class="ln">1</span><span class="cm">// AI Art Generation Controller —
+                            Shivam Bhadoriya</span></div>
+                    <div class="code-line"><span class="ln">2</span><span class="kw">const</span> { <span
+                            class="fn">Configuration</span>, <span class="fn">OpenAIApi</span> } = <span
+                            class="fn">require</span>(<span class="str">'openai'</span>);</div>
+                    <div class="code-line"><span class="ln">3</span><span class="kw">const</span> <span
+                            class="obj">Art</span> = <span class="fn">require</span>(<span
+                            class="str">'../models/Art'</span>);</div>
+                    <div class="code-line"><span class="ln">4</span><span class="kw">const</span> { <span
+                            class="fn">uploadToCloudinary</span> } = <span class="fn">require</span>(<span
+                            class="str">'../utils/cloud'</span>);</div>
+                    <div class="code-line"><span class="ln">5</span><span class="kw">const</span> { <span
+                            class="fn">rateLimiter</span> } = <span class="fn">require</span>(<span
+                            class="str">'../middleware/rateLimit'</span>);</div>
+                    <div class="code-line"><span class="ln">6</span></div>
+                    <div class="code-line"><span class="ln">7</span><span class="kw">const</span> <span
+                            class="fn">generateArt</span> = <span class="kw">async</span> (<span class="var">req</span>,
+                        <span class="var">res</span>) => {</div>
+                    <div class="code-line"><span class="ln">8</span> <span class="kw">try</span> {</div>
+                    <div class="code-line"><span class="ln">9</span> <span class="kw">const</span> { <span
+                            class="var">prompt</span>, <span class="var">style</span>, <span class="var">size</span> } =
+                        <span class="var">req</span>.<span class="obj">body</span>;</div>
+                    <div class="code-line"><span class="ln">10</span></div>
+                    <div class="code-line"><span class="ln">11</span> <span class="cm">// Validate & sanitize user
+                            input</span></div>
+                    <div class="code-line"><span class="ln">12</span> <span class="kw">if</span> (!<span
+                            class="var">prompt</span> || <span class="var">prompt</span>.<span class="pr">length</span>
+                        > <span class="num">500</span>) {</div>
+                    <div class="code-line"><span class="ln">13</span> <span class="kw">return</span> <span
+                            class="var">res</span>.<span class="fn">status</span>(<span class="num">400</span>).<span
+                            class="fn">json</span>({</div>
+                    <div class="code-line"><span class="ln">14</span> <span class="pr">error</span>: <span
+                            class="str">'Prompt required (max 500 chars)'</span></div>
+                    <div class="code-line"><span class="ln">15</span> });</div>
+                    <div class="code-line"><span class="ln">16</span> }</div>
+                    <div class="code-line"><span class="ln">17</span></div>
+                    <div class="code-line"><span class="ln">18</span> <span class="kw">const</span> <span
+                            class="var">sanitized</span> = <span class="fn">sanitize</span>(<span
+                            class="var">prompt</span>);</div>
+                    <div class="code-line"><span class="ln">19</span> <span class="kw">const</span> <span
+                            class="var">fullPrompt</span> = <span class="str">`${<span class="var">sanitized</span>},
+                            ${<span class="var">style</span>} style, 8k`</span>;</div>
+                    <div class="code-line"><span class="ln">20</span></div>
+                    <div class="code-line"><span class="ln">21</span> <span class="cm">// Call OpenAI DALL·E API</span>
+                    </div>
+                    <div class="code-line"><span class="ln">22</span> <span class="kw">const</span> <span
+                            class="var">response</span> = <span class="kw">await</span> <span
+                            class="obj">openai</span>.<span class="fn">createImage</span>({</div>
+                    <div class="code-line"><span class="ln">23</span> <span class="pr">prompt</span>: <span
+                            class="var">fullPrompt</span>,</div>
+                    <div class="code-line"><span class="ln">24</span> <span class="pr">n</span>: <span
+                            class="num">1</span>,</div>
+                    <div class="code-line"><span class="ln">25</span> <span class="pr">size</span>: <span
+                            class="var">size</span> || <span class="str">"1024x1024"</span>,</div>
+                    <div class="code-line"><span class="ln">26</span> <span class="pr">response_format</span>: <span
+                            class="str">"b64_json"</span></div>
+                    <div class="code-line"><span class="ln">27</span> });</div>
+                    <div class="code-line"><span class="ln">28</span></div>
+                    <div class="code-line"><span class="ln">29</span> <span class="cm">// Upload to Cloudinary
+                            CDN</span></div>
+                    <div class="code-line"><span class="ln">30</span> <span class="kw">const</span> <span
+                            class="var">imageUrl</span> = <span class="kw">await</span> <span
+                            class="fn">uploadToCloudinary</span>(</div>
+                    <div class="code-line"><span class="ln">31</span> <span class="var">response</span>.<span
+                            class="obj">data</span>.<span class="obj">data</span>[<span class="num">0</span>].<span
+                            class="pr">b64_json</span></div>
+                    <div class="code-line"><span class="ln">32</span> );</div>
+                    <div class="code-line"><span class="ln">33</span></div>
+                    <div class="code-line"><span class="ln">34</span> <span class="cm">// Save to database</span></div>
+                    <div class="code-line"><span class="ln">35</span> <span class="kw">const</span> <span
+                            class="var">artwork</span> = <span class="kw">await</span> <span
+                            class="obj">Art</span>.<span class="fn">create</span>({</div>
+                    <div class="code-line"><span class="ln">36</span> <span class="pr">user</span>: <span
+                            class="var">req</span>.<span class="obj">userId</span>,</div>
+                    <div class="code-line"><span class="ln">37</span> <span class="var">prompt</span>, <span
+                            class="var">style</span>, <span class="var">imageUrl</span>,</div>
+                    <div class="code-line"><span class="ln">38</span> <span class="pr">metadata</span>: { <span
+                            class="var">size</span>, <span class="pr">model</span>: <span class="str">'dall-e-3'</span>
+                        }</div>
+                    <div class="code-line"><span class="ln">39</span> });</div>
+                    <div class="code-line"><span class="ln">40</span></div>
+                    <div class="code-line"><span class="ln">41</span> <span class="var">res</span>.<span
+                            class="fn">status</span>(<span class="num">201</span>).<span class="fn">json</span>({</div>
+                    <div class="code-line"><span class="ln">42</span> <span class="pr">success</span>: <span
+                            class="num">true</span>,</div>
+                    <div class="code-line"><span class="ln">43</span> <span class="pr">artwork</span>: <span
+                            class="var">artwork</span></div>
+                    <div class="code-line"><span class="ln">44</span> });</div>
+                    <div class="code-line"><span class="ln">45</span></div>
+                    <div class="code-line"><span class="ln">46</span> } <span class="kw">catch</span> (<span
+                            class="var">err</span>) {</div>
+                    <div class="code-line"><span class="ln">47</span> <span class="obj">logger</span>.<span
+                            class="fn">error</span>(<span class="str">'Art generation failed:'</span>, <span
+                            class="var">err</span>);</div>
+                    <div class="code-line"><span class="ln">48</span> <span class="var">res</span>.<span
+                            class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({</div>
+                    <div class="code-line"><span class="ln">49</span> <span class="pr">error</span>: <span
+                            class="str">'Generation failed. Try again.'</span></div>
+                    <div class="code-line"><span class="ln">50</span> });</div>
+                    <div class="code-line"><span class="ln">51</span> }</div>
+                    <div class="code-line"><span class="ln">52</span>};</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="project-actions reveal">
+                <a href="#" class="action-large live">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Live Demo</span>
+                </a>
+                <a href="#" class="action-large github">
+                    <i class="fab fa-github"></i>
+                    <span>View Source Code</span>
+                </a>
+            </div>
+
+            <!-- Project Navigation -->
+            <div class="project-nav reveal">
+                <a href="#" class="project-nav-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Previous Project</span>
+                </a>
+                <a href="/projects" class="btn-outline-subtle" style="padding:10px 24px;">
+                    <i class="fas fa-th"></i> All Projects
+                </a>
+                <a href="#" class="project-nav-link">
+                    <span>Next Project</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+<%- include("../partials/public-footer") %>

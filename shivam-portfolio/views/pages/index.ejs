@@ -1,0 +1,189 @@
+<% const pageTitle = "Title"; %>
+<% const activePage = "home"; %>
+<%- include("../partials/public-header") %>
+
+    <!-- ===================== HERO SECTION ===================== -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7 hero-content">
+                    <div class="hero-label reveal">
+                        <span></span> Available for Work
+                    </div>
+                    <h1 class="hero-name reveal reveal-delay-1">
+                        SHIVAM<br><span class="highlight">BHADORIYA</span>
+                    </h1>
+                    <div class="typing-container reveal reveal-delay-2">
+                        I'm a <span class="typing-text"></span>
+                    </div>
+                    <div class="hero-buttons reveal reveal-delay-3">
+                        <a href="/contact" class="btn-glow-green">
+                            <i class="fas fa-rocket"></i> Hire Me
+                        </a>
+                        <a href="project.html" class="btn-glow-purple">
+                            <i class="fas fa-eye"></i> View Work
+                        </a>
+                    </div>
+                    <div class="hero-stats reveal reveal-delay-4">
+                        <div class="hero-stat">
+                            <div class="hero-stat-number counter" data-target="300" data-suffix="+">0</div>
+                            <div class="hero-stat-label">Day Streak</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-number counter" data-target="50" data-suffix="+">0</div>
+                            <div class="hero-stat-label">project</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-number counter" data-target="25" data-suffix="+">0</div>
+                            <div class="hero-stat-label">Clients</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 d-none d-lg-flex hero-image-wrapper">
+                    <div class="hero-image-glow"></div>
+                    <div class="hero-image-box">
+                        <div class="code-lines">
+                            <span class="kw">const</span> <span class="fn">developer</span> = {<br>
+                            &nbsp;&nbsp;name: <span class="str">"Shivam"</span>,<br>
+                            &nbsp;&nbsp;skills: [<span class="str">"Node"</span>, <span class="str">"Mongo"</span>],<br>
+                            &nbsp;&nbsp;passion: <span class="str">"∞"</span>,<br>
+                            &nbsp;&nbsp;streak: <span class="num">300</span>,<br>
+                            &nbsp;&nbsp;<span class="fn">build</span>: () => {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="str">"The
+                                Future"</span>;<br>
+                            &nbsp;&nbsp;}<br>
+                            };
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-mouse"></div>
+            <span>Scroll</span>
+        </div>
+    </section>
+
+    <!-- ===================== LIVE BAR ===================== -->
+    <section class="section" style="padding-top:40px; padding-bottom:80px;">
+        <div class="container">
+            <div class="live-bar reveal">
+                <div class="live-bar-item">
+                    <div class="live-pulse"></div>
+                    <span>Status:</span>
+                    <span class="live-bar-value">Beast Mode 🔥</span>
+                </div>
+                <div class="live-bar-item">
+                    <i class="fas fa-fire text-green"></i>
+                    <span>Streak:</span>
+                    <span class="live-bar-value">300+ Days</span>
+                </div>
+                <div class="live-bar-item">
+                    <i class="fas fa-code text-purple"></i>
+                    <span>Current Project:</span>
+                    <span class="live-bar-value">Art Generator v2.0</span>
+                </div>
+                <div class="live-bar-item">
+                    <i class="fas fa-clock text-cyan"></i>
+                    <span>Response:</span>
+                    <span class="live-bar-value">&lt; 2 hrs</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FEATURED PROJECT ===================== -->
+    <section class="section featured-project" id="featured">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6 reveal">
+                    <span class="section-label"><span class="dot"></span> Featured Project</span>
+                    <h2 class="section-title">AI Art <span class="gradient-text">Generator</span></h2>
+                    <p class="section-subtitle" style="margin-bottom:24px;">
+                        A full-stack application that harnesses artificial intelligence to generate stunning artwork
+                        from text prompts.
+                        Built with a robust Node.js backend, MongoDB for persistent storage, and a buttery-smooth React
+                        frontend.
+                    </p>
+                    <div style="margin-bottom:28px;">
+                        <span class="tech-tag">Node.js</span>
+                        <span class="tech-tag purple">React</span>
+                        <span class="tech-tag cyan">OpenAI API</span>
+                        <span class="tech-tag orange">MongoDB</span>
+                    </div>
+                    <a href="project-single.html" class="btn-glow-green">
+                        <i class="fas fa-arrow-right"></i> View Case Study
+                    </a>
+                </div>
+                <div class="col-lg-6 reveal reveal-delay-2">
+                    <div class="featured-img-wrapper">
+                        <div class="featured-img-placeholder">
+                            <div style="text-align:center; position:relative; z-index:1;">
+                                <i class="fas fa-palette"
+                                    style="font-size:4rem; color:var(--green); opacity:0.3; margin-bottom:16px; display:block;"></i>
+                                <span>AI Art Generator Preview</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== TESTIMONIAL / QUOTE ===================== -->
+    <section class="section quote-section">
+        <div class="container text-center">
+            <div class="reveal">
+                <div class="quote-icon">"</div>
+                <p class="quote-text mx-auto">
+                    I don't build software to survive — I build it to <span
+                        class="text-green glow-green">dominate</span>.
+                    Every line of code is a brick in the empire I'm constructing. Relentless effort is not a phase —
+                    it's my identity.
+                </p>
+                <p class="quote-author">— <span>Shivam Bhadoriya</span>, on why sleep is optional</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== TECH STACK ===================== -->
+    <section class="section">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="section-label justify-content-center"><span class="dot"></span> Arsenal</span>
+                <h2 class="section-title">Tech <span class="gradient-text">Stack</span></h2>
+            </div>
+        </div>
+        <div class="marquee-wrapper reveal">
+            <div class="marquee-track">
+                <!-- Set 1 -->
+                <div class="tech-icon-card"><i class="devicon-nodejs-plain"></i><span>Node.js</span></div>
+                <div class="tech-icon-card"><i class="devicon-mongodb-plain"></i><span>MongoDB</span></div>
+                <div class="tech-icon-card"><i class="devicon-react-original"></i><span>React</span></div>
+                <div class="tech-icon-card"><i class="devicon-javascript-plain"></i><span>JavaScript</span></div>
+                <div class="tech-icon-card"><i class="devicon-express-original"></i><span>Express</span></div>
+                <div class="tech-icon-card"><i class="devicon-html5-plain"></i><span>HTML5</span></div>
+                <div class="tech-icon-card"><i class="devicon-css3-plain"></i><span>CSS3</span></div>
+                <div class="tech-icon-card"><i class="devicon-bootstrap-plain"></i><span>Bootstrap</span></div>
+                <div class="tech-icon-card"><i class="devicon-git-plain"></i><span>Git</span></div>
+                <div class="tech-icon-card"><i class="devicon-python-plain"></i><span>Python</span></div>
+                <div class="tech-icon-card"><i class="devicon-docker-plain"></i><span>Docker</span></div>
+                <div class="tech-icon-card"><i class="devicon-firebase-plain"></i><span>Firebase</span></div>
+                <!-- Set 2 (duplicate for seamless loop) -->
+                <div class="tech-icon-card"><i class="devicon-nodejs-plain"></i><span>Node.js</span></div>
+                <div class="tech-icon-card"><i class="devicon-mongodb-plain"></i><span>MongoDB</span></div>
+                <div class="tech-icon-card"><i class="devicon-react-original"></i><span>React</span></div>
+                <div class="tech-icon-card"><i class="devicon-javascript-plain"></i><span>JavaScript</span></div>
+                <div class="tech-icon-card"><i class="devicon-express-original"></i><span>Express</span></div>
+                <div class="tech-icon-card"><i class="devicon-html5-plain"></i><span>HTML5</span></div>
+                <div class="tech-icon-card"><i class="devicon-css3-plain"></i><span>CSS3</span></div>
+                <div class="tech-icon-card"><i class="devicon-bootstrap-plain"></i><span>Bootstrap</span></div>
+                <div class="tech-icon-card"><i class="devicon-git-plain"></i><span>Git</span></div>
+                <div class="tech-icon-card"><i class="devicon-python-plain"></i><span>Python</span></div>
+                <div class="tech-icon-card"><i class="devicon-docker-plain"></i><span>Docker</span></div>
+                <div class="tech-icon-card"><i class="devicon-firebase-plain"></i><span>Firebase</span></div>
+            </div>
+        </div>
+    </section>
+
+<%- include("../partials/public-footer") %>

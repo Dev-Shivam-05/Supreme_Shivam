@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIVAM BHADORIYA // DIGITAL SINGULARITY</title>
+    
+    <!-- Tailwind via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Glitch CSS -->
+    <style>
+        :root {
+            --void-black: #0d021a;
+            --neon-violet: #b967ff;
+            --toxic-green: #43e97b;
+            --glitch-red: #ff2a6d;
+            --data-cyan: #05d9e8;
+        }
+        
+        body {
+            background: var(--void-black);
+            overflow-x: hidden;
+            font-family: 'Fira Code', monospace;
+            cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTUiIHN0cm9rZT0iI2I5NjdmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxsaW5lIHgxPSIxNiIgeTE9IjAiIHgyPSIxNiIgeTI9IjgiIHN0cm9rZT0iI2I5NjdmZiIvPgo8bGluZSB4MT0iMTYiIHkxPSIyNCIgeDI9IjE2IiB5Mj0iMzIiIHN0cm9rZT0iI2I5NjdmZiIvPgo8bGluZSB4MT0iMCIgeTE9IjE2IiB4Mj0iOCIgeTI9IjE2IiBzdHJva2U9IiNiOTY3ZmYiLz4KPGxpbmUgeDE9IjI0IiB5MT0iMTYiIHgyPSIzMiIgeTI9IjE2IiBzdHJva2U9IiNiOTY3ZmYiLz4KPC9zdmc+'), auto;
+        }
+        
+        /* CRT scanline overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%,
+                rgba(0, 0, 0, 0.25) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 9999;
+            pointer-events: none;
+            animation: scanline 10s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+        
+        .glitch-text {
+            text-shadow: 
+                0.05em 0 0 var(--glitch-red),
+                -0.05em -0.05em 0 var(--data-cyan),
+                0.05em 0.05em 0 var(--toxic-green);
+            animation: glitch 3s infinite;
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        
+        @keyframes glitch-intense {
+            0% { transform: translate(0) skew(0deg); filter: hue-rotate(0deg); }
+            20% { transform: translate(-5px, 5px) skew(5deg); filter: hue-rotate(90deg); }
+            40% { transform: translate(5px, -5px) skew(-5deg); filter: hue-rotate(180deg); }
+            60% { transform: translate(-5px, -5px) skew(5deg); filter: hue-rotate(270deg); }
+            80% { transform: translate(5px, 5px) skew(-5deg); filter: hue-rotate(360deg); }
+            100% { transform: translate(0) skew(0deg); filter: hue-rotate(0deg); }
+        }
+        
+        .touch-glitch-active {
+            animation: glitch-intense 0.3s infinite;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d021a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-violet);
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--toxic-green);
+        }
+
+        /* Section spacing */
+        section {
+            scroll-margin-top: 2rem;
+        }
+
+        /* Pinch-to-zoom for stats */
+        .pinch-zoom {
+            touch-action: manipulation;
+        }
+        
+        /* Mobile brutality: forced horizontal scroll */
+        @media (max-width: 768px) {
+            .horizontal-scroll {
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                scroll-snap-type: x mandatory;
+            }
+            
+            .horizontal-scroll > * {
+                scroll-snap-align: start;
+                flex-shrink: 0;
+            }
+            
+            /* Glitch effect on touch */
+            .touch-glitch {
+                transition: filter 0.1s;
+            }
+            
+            .touch-glitch:active {
+                filter: hue-rotate(90deg) contrast(150%);
+            }
+        }
+    </style>
+</head>
+<body class="text-white">
+    
+    <!-- Particle Storm Container -->
+    <div id="particle-storm" class="fixed inset-0 z-0"></div>
+    
+    <!-- Glitch Overlay -->
+    <div class="fixed inset-0 z-10 pointer-events-none opacity-20">
+        <div class="absolute top-1/4 left-1/4 w-1/2 h-1/2 bg-gradient-to-r from-[#ff00ff] to-[#00ffff] mix-blend-overlay animate-pulse"></div>
+    </div>
+    
+    <!-- HERO SECTION -->
+    <section class="relative z-20 flex items-center justify-center min-h-screen px-4" id="hero">
+        <div class="text-center">
+            <!-- Glitch Avatar -->
+            <div class="relative w-48 h-48 mx-auto mb-8">
+                <img 
+                    src="https://avatars.githubusercontent.com/u/112786410?v=4" 
+                    alt="Shivam Glitch Avatar"
+                    class="rounded-full border-4 border-[#b967ff] shadow-[0_0_40px_#b967ff] animate-pulse"
+                    id="avatar"
+                >
+                <div class="absolute -inset-4 bg-gradient-to-r from-[#b967ff] to-[#43e97b] rounded-full blur-xl opacity-50"></div>
+            </div>
+            
+            <!-- Tagline with typing effect -->
+            <h1 class="mb-4 text-5xl font-bold md:text-7xl glitch-text">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#b967ff] to-[#43e97b]">
+                    SHIVAM BHADORIYA
+                </span>
+            </h1>
+            
+            <div class="mb-8 text-2xl md:text-3xl">
+                <span id="typing-effect" class="font-mono"></span>
+                <span class="animate-pulse">▮</span>
+            </div>
+            
+            <!-- Immediate CTA -->
+            <div class="space-y-4">
+                <button 
+                    id="deploy-btn"
+                    class="px-8 py-4 bg-gradient-to-r from-[#ff2a6d] to-[#ff2a6d] rounded-lg font-bold text-xl animate-pulse hover:scale-105 transition-transform duration-300"
+                    onclick="window.location.href='#contact'"
+                >
+                    🚀 DEPLOY ME IMMEDIATELY
+                </button>
+                
+                <div class="text-sm opacity-70">
+                    Warning: Idle time > 10s triggers system panic
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MANIFESTO SECTION -->
+    <section class="relative z-20 px-4 py-20" id="manifesto">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="mb-12 text-4xl font-bold text-center md:text-5xl glitch-text">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#05d9e8] to-[#43e97b]">
+                    CHAOS THEORY
+                </span>
+            </h2>
+            
+            <div class="bg-black/50 backdrop-blur-sm border border-[#b967ff]/50 p-8 rounded-xl">
+                <div class="space-y-6 font-mono text-lg leading-relaxed">
+                    <p class="border-l-4 border-[#ff2a6d] pl-4">
+                        <span class="text-[#05d9e8]">>></span> I engineer digital singularity events—points where code becomes consciousness, and interfaces become inevitabilities.
+                    </p>
+                    <p class="border-l-4 border-[#b967ff] pl-4">
+                        <span class="text-[#05d9e8]">>></span> My weapon of choice is JavaScript, but my ammunition includes TypeScript, React, Node.js, and a pathological hatred of legacy systems.
+                    </p>
+                    <p class="border-l-4 border-[#43e97b] pl-4">
+                        <span class="text-[#05d9e8]">>></span> I don't just build applications; I deploy cognitive viruses that reshape how teams think about possibility.
+                    </p>
+                    <p class="border-l-4 border-[#ff2a6d] pl-4">
+                        <span class="text-[#05d9e8]">>></span> The future belongs to those who can break systems faster than they can be built. I specialize in controlled demolition.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 gap-6 mt-12 md:grid-cols-3">
+                    <div class="bg-black/50 border border-[#05d9e8]/30 p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-[#05d9e8] mb-2">MISSION</h3>
+                        <p>Replace every jQuery instance with something that doesn't make me cry.</p>
+                    </div>
+                    <div class="bg-black/50 border border-[#43e97b]/30 p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-[#43e97b] mb-2">METHOD</h3>
+                        <p>Brute-force elegance through relentless iteration and caffeine.</p>
+                    </div>
+                    <div class="bg-black/50 border border-[#ff2a6d]/30 p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-[#ff2a6d] mb-2">MADNESS</h3>
+                        <p>Believing we can fix tech recruitment with one portfolio.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SKILLS HUD SECTION -->
+    <section class="relative z-20 px-4 py-20" id="skills">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="mb-12 text-4xl font-bold text-center md:text-5xl glitch-text">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#b967ff] to-[#ff2a6d]">
+                    ARSENAL DISPLAY
+                </span>
+            </h2>
+            
+            <div class="grid grid-cols-1 gap-12 lg:grid-cols-2">
+                <!-- Radar Chart Placeholder -->
+                <div class="bg-black/50 backdrop-blur-sm border border-[#05d9e8]/50 p-8 rounded-xl">
+                    <h3 class="text-2xl font-bold text-[#05d9e8] mb-6">TECH RADAR</h3>
+                    <canvas id="skills-radar" width="400" height="400" class="w-full h-auto"></canvas>
+                </div>
+                
+                <!-- Skill Breakdown - Horizontal scroll on mobile -->
+                <div class="md:space-y-6">
+                    <div class="flex pb-4 space-x-4 overflow-x-auto md:block md:overflow-visible md:pb-0 md:space-x-0 md:space-y-6">
+                        <div class="bg-black/50 border border-[#b967ff]/30 p-6 rounded-lg min-w-[300px] md:min-w-0">
+                            <h3 class="text-xl font-bold text-[#b967ff] mb-3">FRONTEND WEAPONRY</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span>React/Next.js</span>
+                                        <span class="text-[#43e97b]">97%</span>
+                                    </div>
+                                    <div class="h-2 overflow-hidden bg-gray-800 rounded-full">
+                                        <div class="h-full bg-gradient-to-r from-[#b967ff] to-[#43e97b]" style="width: 97%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span>TypeScript</span>
+                                        <span class="text-[#43e97b]">95%</span>
+                                    </div>
+                                    <div class="h-2 overflow-hidden bg-gray-800 rounded-full">
+                                        <div class="h-full bg-gradient-to-r from-[#b967ff] to-[#43e97b]" style="width: 95%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span>Tailwind CSS</span>
+                                        <span class="text-[#43e97b]">99%</span>
+                                    </div>
+                                    <div class="h-2 overflow-hidden bg-gray-800 rounded-full">
+                                        <div class="h-full bg-gradient-to-r from-[#b967ff] to-[#43e97b]" style="width: 99%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-black/50 border border-[#ff2a6d]/30 p-6 rounded-lg min-w-[300px] md:min-w-0">
+                            <h3 class="text-xl font-bold text-[#ff2a6d] mb-3">BACKEND ARTILLERY</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span>Node.js/Express</span>
+                                        <span class="text-[#43e97b]">92%</span>
+                                    </div>
+                                    <div class="h-2 overflow-hidden bg-gray-800 rounded-full">
+                                        <div class="h-full bg-gradient-to-r from-[#ff2a6d] to-[#b967ff]" style="width: 92%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span>Python/Django</span>
+                                        <span class="text-[#43e97b]">88%</span>
+                                    </div>
+                                    <div class="h-2 overflow-hidden bg-gray-800 rounded-full">
+                                        <div class="h-full bg-gradient-to-r from-[#ff2a6d] to-[#b967ff]" style="width: 88%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span>Database Design</span>
+                                        <span class="text-[#43e97b]">90%</span>
+                                    </div>
+                                    <div class="h-2 overflow-hidden bg-gray-800 rounded-full">
+                                        <div class="h-full bg-gradient-to-r from-[#ff2a6d] to-[#b967ff]" style="width: 90%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-black/50 border border-[#05d9e8]/30 p-6 rounded-lg min-w-[300px] md:min-w-0">
+                            <h3 class="text-xl font-bold text-[#05d9e8] mb-3">CYBERNETICS</h3>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="px-3 py-1 bg-[#05d9e8]/20 border border-[#05d9e8] rounded-full">Git/GitHub</span>
+                                <span class="px-3 py-1 bg-[#05d9e8]/20 border border-[#05d9e8] rounded-full">Docker</span>
+                                <span class="px-3 py-1 bg-[#05d9e8]/20 border border-[#05d9e8] rounded-full">AWS</span>
+                                <span class="px-3 py-1 bg-[#05d9e8]/20 border border-[#05d9e8] rounded-full">CI/CD</span>
+                                <span class="px-3 py-1 bg-[#05d9e8]/20 border border-[#05d9e8] rounded-full">System Design</span>
+                                <span class="px-3 py-1 bg-[#05d9e8]/20 border border-[#05d9e8] rounded-full">Performance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MISSION LOGS (PROJECTS) SECTION -->
+    <section class="relative z-20 px-4 py-20" id="projects">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="mb-12 text-4xl font-bold text-center md:text-5xl glitch-text">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#43e97b] to-[#05d9e8]">
+                    REDACTED OPS
+                </span>
+            </h2>
+            
+            <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Project 1 -->
+                <div class="bg-black/50 backdrop-blur-sm border border-[#b967ff]/50 p-6 rounded-xl hover:border-[#ff2a6d] transition-all duration-300 hover:scale-[1.02] group">
+                    <div class="relative h-48 mb-4 overflow-hidden rounded-lg">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#b967ff] to-[#ff2a6d] opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-5xl">⚡</span>
+                        </div>
+                        <div class="absolute top-2 right-2 px-2 py-1 bg-[#ff2a6d] text-black text-xs font-bold rounded">
+                            TOP SECRET
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#b967ff] mb-2">Quantum Flow</h3>
+                    <p class="mb-4 text-gray-300">A real-time collaboration platform that makes Figma look like Microsoft Paint.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-1 bg-[#b967ff]/20 text-[#b967ff] text-xs rounded">Next.js</span>
+                        <span class="px-2 py-1 bg-[#43e97b]/20 text-[#43e97b] text-xs rounded">Socket.io</span>
+                        <span class="px-2 py-1 bg-[#05d9e8]/20 text-[#05d9e8] text-xs rounded">Redis</span>
+                    </div>
+                    <button class="w-full py-2 bg-gradient-to-r from-[#b967ff] to-[#43e97b] rounded-lg font-bold hover:opacity-90 transition-opacity">
+                        DECLASSIFY
+                    </button>
+                </div>
+                
+                <!-- Project 2 -->
+                <div class="bg-black/50 backdrop-blur-sm border border-[#05d9e8]/50 p-6 rounded-xl hover:border-[#43e97b] transition-all duration-300 hover:scale-[1.02] group">
+                    <div class="relative h-48 mb-4 overflow-hidden rounded-lg">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#05d9e8] to-[#43e97b] opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-5xl">🔐</span>
+                        </div>
+                        <div class="absolute top-2 right-2 px-2 py-1 bg-[#43e97b] text-black text-xs font-bold rounded">
+                            ACTIVE
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#05d9e8] mb-2">CypherVault</h3>
+                    <p class="mb-4 text-gray-300">Zero-knowledge password manager that even I can't hack back into.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-1 bg-[#05d9e8]/20 text-[#05d9e8] text-xs rounded">TypeScript</span>
+                        <span class="px-2 py-1 bg-[#ff2a6d]/20 text-[#ff2a6d] text-xs rounded">Node.js</span>
+                        <span class="px-2 py-1 bg-[#43e97b]/20 text-[#43e97b] text-xs rounded">PostgreSQL</span>
+                    </div>
+                    <button class="w-full py-2 bg-gradient-to-r from-[#05d9e8] to-[#43e97b] rounded-lg font-bold hover:opacity-90 transition-opacity">
+                        DECLASSIFY
+                    </button>
+                </div>
+                
+                <!-- Project 3 -->
+                <div class="bg-black/50 backdrop-blur-sm border border-[#ff2a6d]/50 p-6 rounded-xl hover:border-[#b967ff] transition-all duration-300 hover:scale-[1.02] group">
+                    <div class="relative h-48 mb-4 overflow-hidden rounded-lg">
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#ff2a6d] to-[#b967ff] opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-5xl">🤖</span>
+                        </div>
+                        <div class="absolute top-2 right-2 px-2 py-1 bg-[#b967ff] text-black text-xs font-bold rounded">
+                            AI/ML
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#ff2a6d] mb-2">NeuroForge</h3>
+                    <p class="mb-4 text-gray-300">Generative AI platform that writes code better than 80% of bootcamp graduates.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-2 py-1 bg-[#ff2a6d]/20 text-[#ff2a6d] text-xs rounded">Python</span>
+                        <span class="px-2 py-1 bg-[#b967ff]/20 text-[#b967ff] text-xs rounded">TensorFlow</span>
+                        <span class="px-2 py-1 bg-[#05d9e8]/20 text-[#05d9e8] text-xs rounded">FastAPI</span>
+                    </div>
+                    <button class="w-full py-2 bg-gradient-to-r from-[#ff2a6d] to-[#b967ff] rounded-lg font-bold hover:opacity-90 transition-opacity">
+                        DECLASSIFY
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GITHUB LIVE SECTION -->
+    <section class="relative z-20 px-4 py-20" id="github">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="mb-12 text-4xl font-bold text-center md:text-5xl glitch-text">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff2a6d] to-[#05d9e8]">
+                    BEAST DASHBOARD
+                </span>
+            </h2>
+            
+            <div class="bg-black/50 backdrop-blur-sm border border-[#43e97b]/50 p-8 rounded-xl">
+                <div class="grid grid-cols-1 gap-6 mb-8 md:grid-cols-4 pinch-zoom">
+                    <div class="bg-black/70 border border-[#b967ff]/30 p-6 rounded-lg text-center">
+                        <div class="text-4xl font-bold text-[#b967ff] mb-2" id="repo-count">47</div>
+                        <div class="text-gray-300">Repositories</div>
+                    </div>
+                    <div class="bg-black/70 border border-[#43e97b]/30 p-6 rounded-lg text-center">
+                        <div class="text-4xl font-bold text-[#43e97b] mb-2" id="commit-count">1,248</div>
+                        <div class="text-gray-300">Total Commits</div>
+                    </div>
+                    <div class="bg-black/70 border border-[#05d9e8]/30 p-6 rounded-lg text-center">
+                        <div class="text-4xl font-bold text-[#05d9e8] mb-2" id="star-count">189</div>
+                        <div class="text-gray-300">Stars Earned</div>
+                    </div>
+                    <div class="bg-black/70 border border-[#ff2a6d]/30 p-6 rounded-lg text-center">
+                        <div class="text-4xl font-bold text-[#ff2a6d] mb-2" id="contribution-streak">142</div>
+                        <div class="text-gray-300">Day Streak</div>
+                    </div>
+                </div>
+                
+                <div class="mb-6 text-sm text-center text-gray-400">
+                    <span class="inline-flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z"/>
+                            <path d="M9 13h2v5a1 1 0 11-2 0v-5z"/>
+                        </svg>
+                        Mobile: Pinch to zoom stats • Touch triggers glitch distortion
+                    </span>
+                </div>
+                
+                <div class="mb-8">
+                    <h3 class="text-2xl font-bold text-[#05d9e8] mb-4">LIVE CONTRIBUTION GRAPH</h3>
+                    <div class="bg-black/70 border border-[#05d9e8]/30 p-4 rounded-lg">
+                        <div class="py-12 text-center" id="contribution-graph">
+                            <div class="mb-4 text-lg">Loading GitHub contribution data...</div>
+                            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#05d9e8]"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-2xl font-bold text-[#43e97b] mb-4">RECENT ACTIVITY</h3>
+                    <div class="space-y-4" id="recent-activity">
+                        <div class="bg-black/70 border border-[#43e97b]/30 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[#43e97b] font-mono">Pushed to master</span>
+                                <span class="text-sm text-gray-400">2 hours ago</span>
+                            </div>
+                            <div class="mt-2">Fixed critical bug in QuantumFlow collaboration engine</div>
+                        </div>
+                        <div class="bg-black/70 border border-[#b967ff]/30 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[#b967ff] font-mono">Created repository</span>
+                                <span class="text-sm text-gray-400">1 day ago</span>
+                            </div>
+                            <div class="mt-2">Started new project: Neural interface for code generation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <a href="https://github.com/Dev-Shivam-05" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#333] to-[#000] border border-gray-700 rounded-lg hover:border-[#43e97b] transition-colors">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    <span>BREACH GITHUB PROFILE</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SNAKE ARENA SECTION -->
+    <section class="relative z-20 px-4 py-20" id="snake">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="mb-12 text-4xl font-bold text-center md:text-5xl glitch-text">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#43e97b] to-[#b967ff]">
+                    CONTRIBUTION VOID
+                </span>
+            </h2>
+            
+            <div class="bg-black/50 backdrop-blur-sm border border-[#ff2a6d]/50 p-8 rounded-xl">
+                <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                    <div>
+                        <h3 class="text-2xl font-bold text-[#ff2a6d] mb-4">GITHUB SNAKE GAME</h3>
+                        <p class="mb-6 text-gray-300">This snake eats your contributions. Each dot represents a day of coding activity. The more you code, the longer the snake grows.</p>
+                        
+                        <div class="mb-6 space-y-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-4 h-4 bg-[#43e97b] rounded"></div>
+                                <span>Green = 10+ contributions</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-4 h-4 bg-[#05d9e8] rounded"></div>
+                                <span>Blue = 5-9 contributions</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-4 h-4 bg-[#b967ff] rounded"></div>
+                                <span>Purple = 1-4 contributions</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-4 h-4 bg-gray-800 rounded"></div>
+                                <span>Gray = No contributions</span>
+                            </div>
+                        </div>
+                        
+                        <div class="text-sm text-gray-400">
+                            <p class="mb-2">Double-click snake head to change color scheme.</p>
+                            <p>Click and drag to rotate view (on desktop).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <div class="bg-black/70 border border-[#05d9e8]/30 rounded-lg p-4 aspect-square flex items-center justify-center" id="snake-container">
+                            <canvas id="snake-canvas" width="400" height="400" class="w-full h-auto"></canvas>
+                            <div class="absolute inset-0 flex items-center justify-center" id="snake-controls">
+                                <div class="text-center">
+                                    <div class="mb-4 text-2xl">🐍</div>
+                                    <button id="start-snake" class="px-6 py-3 bg-gradient-to-r from-[#43e97b] to-[#05d9e8] rounded-lg font-bold hover:opacity-90">
+                                        INITIALIZE SNAKE
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <div class="font-mono text-lg">
+                                Score: <span id="snake-score">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DEPLOY ME (CONTACT) SECTION -->
+    <section class="relative z-20 px-4 py-20" id="contact">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="mb-12 text-4xl font-bold text-center md:text-5xl glitch-text">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#ff2a6d] to-[#43e97b]">
+                    URGENCY ENGINE
+                </span>
+            </h2>
+            
+            <div class="bg-black/50 backdrop-blur-sm border border-[#b967ff]/50 p-8 rounded-xl">
+                <div class="grid grid-cols-1 gap-12 lg:grid-cols-2">
+                    <div>
+                        <h3 class="text-2xl font-bold text-[#b967ff] mb-6">IMMEDIATE DEPLOYMENT PROTOCOL</h3>
+                        
+                        <div class="space-y-6">
+                            <div class="border-l-4 border-[#ff2a6d] pl-4">
+                                <h4 class="text-xl font-bold text-[#ff2a6d] mb-2">STEP 1: RECOGNIZE URGENCY</h4>
+                                <p>Your current tech stack has approximately 47 vulnerabilities I can fix in 3 days.</p>
+                            </div>
+                            
+                            <div class="border-l-4 border-[#43e97b] pl-4">
+                                <h4 class="text-xl font-bold text-[#43e97b] mb-2">STEP 2: INITIATE CONTACT</h4>
+                                <p>Use the panic button below. It sends a pre-formatted email with maximum urgency.</p>
+                            </div>
+                            
+                            <div class="border-l-4 border-[#05d9e8] pl-4">
+                                <h4 class="text-xl font-bold text-[#05d9e8] mb-2">STEP 3: DEPLOY</h4>
+                                <p>I join your team within 48 hours. First week: fix everything broken. Second week: break everything fixed (but better).</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 p-4 bg-black/70 border border-[#ff2a6d] rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-3 h-3 bg-[#ff2a6d] rounded-full animate-pulse"></div>
+                                <div class="font-mono text-sm">SYSTEM STATUS: AWAITING DEPLOYMENT COMMAND</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="space-y-6">
+                            <button 
+                                onclick="window.location.href='mailto:shivambhadoriya1605@gmail.com?subject=URGENT: System Compromise Request&body=I need your skills deployed immediately. My system is vulnerable to:'"
+                                class="w-full py-4 bg-gradient-to-r from-[#ff2a6d] to-[#ff2a6d] rounded-lg font-bold text-xl animate-pulse hover:scale-[1.02] transition-transform"
+                            >
+                                🚨 PANIC BUTTON: EMAIL NOW
+                            </button>
+                            
+                            <button 
+                                onclick="window.open('https://linkedin.com/in/shivam-bhadoriya-0439a5227', '_blank')"
+                                class="w-full py-4 bg-gradient-to-r from-[#0077b5] to-[#0077b5] rounded-lg font-bold text-xl hover:scale-[1.02] transition-transform"
+                            >
+                                💼 LINKEDIN BREACH
+                            </button>
+                            
+                            <button 
+                                onclick="window.open('https://twitter.com/Shivam16051', '_blank')"
+                                class="w-full py-4 bg-gradient-to-r from-[#1da1f2] to-[#1da1f2] rounded-lg font-bold text-xl hover:scale-[1.02] transition-transform"
+                            >
+                                🐦 TWITTER INFILTRATION
+                            </button>
+                            
+                            <div class="pt-6 border-t border-gray-800">
+                                <h4 class="text-lg font-bold text-[#05d9e8] mb-3">ALTERNATIVE COMMS</h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-[#43e97b]">>></span>
+                                        <span>Email: shivambhadoriya1605@gmail.com</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-[#43e97b]">>></span>
+                                        <span>Location: Remote / GMT+5:30</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-[#43e97b]">>></span>
+                                        <span>Response Time: < 2 hours</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TERMINAL CLI -->
+    <div class="fixed bottom-0 left-0 right-0 bg-black/90 border-t border-[#b967ff] z-50 p-4 hidden md:block" id="terminal">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex items-center mb-2">
+                <span class="text-[#43e97b] mr-2">$</span>
+                <input 
+                    type="text" 
+                    id="terminal-input"
+                    class="flex-1 bg-transparent border-none outline-none font-mono text-[#05d9e8]"
+                    placeholder="Type 'help' for commands..."
+                    autocomplete="off"
+                >
+            </div>
+            <div id="terminal-output" class="h-32 overflow-y-auto font-mono text-sm text-gray-400"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="relative z-20 px-4 py-8 text-sm text-center text-gray-500">
+        <div class="max-w-4xl mx-auto">
+            <p class="mb-2">SYSTEM STATUS: OPERATIONAL | LAST UPDATE: <span id="current-date"></span></p>
+            <p>This interface will self-destruct if not deployed within 30 days. Metrics are simulated for demonstration.</p>
+            <p class="mt-4">Built with <span class="text-[#ff2a6d]">chaos</span> and <span class="text-[#43e97b]">precision</span>.</p>
+        </div>
+    </footer>
+
+    <script>
+        // TYPING EFFECT
+        const phrases = [
+            "I BREAK BROWSERS SO YOU DON'T HAVE TO.",
+            "CERTIFIED CHAOS ENGINEER.",
+            "FAANG'S WORST NIGHTMARE.",
+            "DEBUGGING REALITY SINCE THE LAST SYSTEM CRASH."
+        ];
+        
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        
+        function typeEffect() {
+            const element = document.getElementById('typing-effect');
+            const currentPhrase = phrases[phraseIndex];
+            
+            if (isDeleting) {
+                element.textContent = currentPhrase.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                element.textContent = currentPhrase.substring(0, charIndex + 1);
+                charIndex++;
+            }
+            
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                isDeleting = true;
+                setTimeout(typeEffect, 2000); // Pause at end
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                setTimeout(typeEffect, 500);
+            } else {
+                setTimeout(typeEffect, isDeleting ? 50 : 100);
+            }
+        }
+        
+        // TERMINAL COMMANDS
+        const commands = {
+            help: "Available: hire, projects, snake, coffee, clear, github, skills, manifesto",
+            hire: "Opening email... mailto:shivambhadoriya1605@gmail.com?subject=URGENT: System Compromise Request",
+            projects: "Loading mission logs... Redirecting to #projects",
+            snake: "Initializing contribution singularity...",
+            coffee: "ERROR: Coffee machine offline. Sending frustration to GitHub Issues.",
+            github: "Breaching GitHub profile... Redirecting to #github",
+            skills: "Accessing arsenal display... Redirecting to #skills",
+            manifesto: "Decrypting chaos theory... Redirecting to #manifesto",
+            clear: "Clearing terminal output..."
+        };
+        
+        document.getElementById('terminal-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const input = e.target.value.trim().toLowerCase();
+                const output = document.getElementById('terminal-output');
+                
+                output.innerHTML += `<div class="text-[#43e97b]">$ ${input}</div>`;
+                
+                if (commands[input]) {
+                    output.innerHTML += `<div class="text-[#05d9e8]">${commands[input]}</div>`;
+                    
+                    // Execute actions
+                    if (input === 'hire') window.location.href = 'mailto:shivambhadoriya1605@gmail.com?subject=URGENT: System Compromise Request';
+                    if (input === 'projects') document.getElementById('projects')?.scrollIntoView({behavior: 'smooth'});
+                    if (input === 'snake') document.getElementById('snake')?.scrollIntoView({behavior: 'smooth'});
+                    if (input === 'github') document.getElementById('github')?.scrollIntoView({behavior: 'smooth'});
+                    if (input === 'skills') document.getElementById('skills')?.scrollIntoView({behavior: 'smooth'});
+                    if (input === 'manifesto') document.getElementById('manifesto')?.scrollIntoView({behavior: 'smooth'});
+                    if (input === 'clear') output.innerHTML = '';
+                } else if (input) {
+                    output.innerHTML += `<div class="text-[#ff2a6d]">Command not found: ${input}</div>`;
+                }
+                
+                e.target.value = '';
+                output.scrollTop = output.scrollHeight;
+            }
+        });
+        
+        // IDLE PANIC TIMER
+        let idleTime = 0;
+        setInterval(() => {
+            idleTime++;
+            if (idleTime > 10) {
+                document.body.insertAdjacentHTML('beforeend', `
+                    <div class="fixed top-4 right-4 bg-[#ff2a6d] text-black p-4 rounded-lg z-50 animate-pulse">
+                        ⚠️ TIME'S TICKING. YOUR TEAM IS STILL USING JQUERY.
+                    </div>
+                `);
+                setTimeout(() => document.querySelector('[class*="bg-[#ff2a6d]"]')?.remove(), 5000);
+                idleTime = 0;
+            }
+        }, 1000);
+        
+        // Reset idle on interaction
+        document.addEventListener('mousemove', () => idleTime = 0);
+        document.addEventListener('keypress', () => idleTime = 0);
+        
+        // PARTICLE STORM
+        function initParticles() {
+            const storm = document.getElementById('particle-storm');
+            for (let i = 0; i < 150; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'absolute w-1 h-1 bg-[#b967ff] rounded-full';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.animation = `float ${3 + Math.random() * 5}s infinite ease-in-out`;
+                storm.appendChild(particle);
+            }
+            
+            // Add CSS for floating animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes float {
+                    0%, 100% { transform: translate(0, 0); opacity: 0.7; }
+                    50% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // SKILLS RADAR CHART
+        function initSkillsRadar() {
+            const canvas = document.getElementById('skills-radar');
+            if (!canvas.getContext) return;
+            
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) * 0.8;
+            
+            // Draw background circles
+            ctx.strokeStyle = 'rgba(5, 217, 232, 0.2)';
+            ctx.lineWidth = 1;
+            
+            for (let i = 1; i <= 5; i++) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius * (i / 5), 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Draw axes
+            const skills = ['Frontend', 'Backend', 'DevOps', 'AI/ML', 'Design', 'Leadership'];
+            const scores = [95, 88, 85, 78, 82, 90];
+            
+            ctx.strokeStyle = 'rgba(5, 217, 232, 0.5)';
+            ctx.lineWidth = 2;
+            
+            for (let i = 0; i < skills.length; i++) {
+                const angle = (Math.PI * 2 * i) / skills.length;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                // Draw skill labels
+                ctx.fillStyle = '#05d9e8';
+                ctx.font = '14px "Fira Code", monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                const labelX = centerX + (radius + 30) * Math.cos(angle);
+                const labelY = centerY + (radius + 30) * Math.sin(angle);
+                ctx.fillText(skills[i], labelX, labelY);
+            }
+            
+            // Draw data polygon
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(185, 103, 255, 0.3)';
+            ctx.strokeStyle = '#b967ff';
+            ctx.lineWidth = 3;
+            
+            for (let i = 0; i < skills.length; i++) {
+                const angle = (Math.PI * 2 * i) / skills.length;
+                const scoreRadius = radius * (scores[i] / 100);
+                const x = centerX + scoreRadius * Math.cos(angle);
+                const y = centerY + scoreRadius * Math.sin(angle);
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            // Draw data points
+            ctx.fillStyle = '#ff2a6d';
+            for (let i = 0; i < skills.length; i++) {
+                const angle = (Math.PI * 2 * i) / skills.length;
+                const scoreRadius = radius * (scores[i] / 100);
+                const x = centerX + scoreRadius * Math.cos(angle);
+                const y = centerY + scoreRadius * Math.sin(angle);
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // SNAKE GAME
+        function initSnakeGame() {
+            const canvas = document.getElementById('snake-canvas');
+            const ctx = canvas.getContext('2d');
+            const startBtn = document.getElementById('start-snake');
+            const snakeContainer = document.getElementById('snake-container');
+            const snakeControls = document.getElementById('snake-controls');
+            const scoreElement = document.getElementById('snake-score');
+            
+            let snake = [{x: 10, y: 10}];
+            let food = {x: 15, y: 15};
+            let direction = {x: 0, y: 0};
+            let score = 0;
+            let gameInterval;
+            let isRunning = false;
+            let gridSize = 20;
+            let tileCount = canvas.width / gridSize;
+            
+            function drawGame() {
+                // Clear canvas
+                ctx.fillStyle = '#0d021a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw grid
+                ctx.strokeStyle = 'rgba(5, 217, 232, 0.1)';
+                ctx.lineWidth = 0.5;
+                for (let x = 0; x <= canvas.width; x += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+                }
+                for (let y = 0; y <= canvas.height; y += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+                
+                // Draw snake
+                snake.forEach((segment, index) => {
+                    const gradient = ctx.createLinearGradient(
+                        segment.x * gridSize, 
+                        segment.y * gridSize,
+                        segment.x * gridSize + gridSize,
+                        segment.y * gridSize + gridSize
+                    );
+                    
+                    if (index === 0) {
+                        // Head
+                        gradient.addColorStop(0, '#43e97b');
+                        gradient.addColorStop(1, '#05d9e8');
+                    } else {
+                        // Body
+                        gradient.addColorStop(0, '#b967ff');
+                        gradient.addColorStop(1, '#ff2a6d');
+                    }
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+                    
+                    ctx.strokeStyle = '#0d021a';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+                });
+                
+                // Draw food
+                ctx.fillStyle = '#ff2a6d';
+                ctx.beginPath();
+                ctx.arc(
+                    food.x * gridSize + gridSize / 2,
+                    food.y * gridSize + gridSize / 2,
+                    gridSize / 2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+                
+                // Draw food glow
+                ctx.shadowColor = '#ff2a6d';
+                ctx.shadowBlur = 15;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            
+            function updateGame() {
+                if (!isRunning) return;
+                
+                // Move snake
+                const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
+                
+                // Wall collision
+                if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                    gameOver();
+                    return;
+                }
+                
+                // Self collision
+                for (let segment of snake) {
+                    if (head.x === segment.x && head.y === segment.y) {
+                        gameOver();
+                        return;
+                    }
+                }
+                
+                snake.unshift(head);
+                
+                // Food collision
+                if (head.x === food.x && head.y === food.y) {
+                    score += 10;
+                    scoreElement.textContent = score;
+                    generateFood();
+                } else {
+                    snake.pop();
+                }
+                
+                drawGame();
+            }
+            
+            function generateFood() {
+                food = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+                
+                // Make sure food doesn't spawn on snake
+                for (let segment of snake) {
+                    if (food.x === segment.x && food.y === segment.y) {
+                        generateFood();
+                        break;
+                    }
+                }
+            }
+            
+            function gameOver() {
+                isRunning = false;
+                clearInterval(gameInterval);
+                alert(`Game Over! Score: ${score}`);
+                resetGame();
+            }
+            
+            function resetGame() {
+                snake = [{x: 10, y: 10}];
+                direction = {x: 0, y: 0};
+                score = 0;
+                scoreElement.textContent = score;
+                generateFood();
+                drawGame();
+            }
+            
+            function startGame() {
+                if (isRunning) return;
+                
+                isRunning = true;
+                snakeControls.style.display = 'none';
+                
+                // Random initial direction
+                const directions = [{x: 1, y: 0}, {x: 0, y: 1}, {x: -1, y: 0}, {x: 0, y: -1}];
+                direction = directions[Math.floor(Math.random() * directions.length)];
+                
+                gameInterval = setInterval(updateGame, 150);
+                drawGame();
+                
+                // Keyboard controls
+                document.addEventListener('keydown', handleKeyPress);
+            }
+            
+            function handleKeyPress(e) {
+                switch(e.key) {
+                    case 'ArrowUp':
+                        if (direction.y !== 1) direction = {x: 0, y: -1};
+                        break;
+                    case 'ArrowDown':
+                        if (direction.y !== -1) direction = {x: 0, y: 1};
+                        break;
+                    case 'ArrowLeft':
+                        if (direction.x !== 1) direction = {x: -1, y: 0};
+                        break;
+                    case 'ArrowRight':
+                        if (direction.x !== -1) direction = {x: 1, y: 0};
+                        break;
+                }
+            }
+            
+            // Touch controls for mobile
+            let touchStartX = 0;
+            let touchStartY = 0;
+            
+            canvas.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                e.preventDefault();
+            });
+            
+            canvas.addEventListener('touchmove', (e) => {
+                if (!touchStartX || !touchStartY) return;
+                
+                const touchEndX = e.touches[0].clientX;
+                const touchEndY = e.touches[0].clientY;
+                
+                const dx = touchEndX - touchStartX;
+                const dy = touchEndY - touchStartY;
+                
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    // Horizontal swipe
+                    if (dx > 0 && direction.x !== -1) direction = {x: 1, y: 0};
+                    else if (dx < 0 && direction.x !== 1) direction = {x: -1, y: 0};
+                } else {
+                    // Vertical swipe
+                    if (dy > 0 && direction.y !== -1) direction = {x: 0, y: 1};
+                    else if (dy < 0 && direction.y !== 1) direction = {x: 0, y: -1};
+                }
+                
+                touchStartX = touchEndX;
+                touchStartY = touchEndY;
+                e.preventDefault();
+            });
+            
+            // Double-click snake head to change color scheme
+            canvas.addEventListener('dblclick', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const head = snake[0];
+                const headX = head.x * gridSize;
+                const headY = head.y * gridSize;
+                
+                if (x >= headX && x <= headX + gridSize && y >= headY && y <= headY + gridSize) {
+                    document.body.classList.toggle('color-invert');
+                }
+            });
+            
+            startBtn.addEventListener('click', startGame);
+            
+            // Initial draw
+            drawGame();
+            generateFood();
+        }
+        
+        // SET CURRENT DATE
+        function setCurrentDate() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
+        }
+        
+        // INITIALIZE EVERYTHING
+        document.addEventListener('DOMContentLoaded', () => {
+            typeEffect();
+            initParticles();
+            initSkillsRadar();
+            initSnakeGame();
+            setCurrentDate();
+            
+            // Simulate GitHub data (in a real implementation, this would be API calls)
+            setTimeout(() => {
+                document.getElementById('repo-count').textContent = '42';
+                document.getElementById('commit-count').textContent = '1,892';
+                document.getElementById('star-count').textContent = '217';
+                document.getElementById('contribution-streak').textContent = '89';
+                
+                document.getElementById('contribution-graph').innerHTML = `
+                    <div class="mb-4 text-lg">GitHub contributions visualized as neural network activity</div>
+                    <div class="relative inline-block">
+                        <div class="absolute inset-0 bg-gradient-to-r from-[#b967ff] to-[#05d9e8] rounded-full blur-lg opacity-50"></div>
+                        <div class="relative px-6 py-3 bg-black/50 border border-[#05d9e8] rounded-lg">
+                            🔒 API RATE LIMIT: SIMULATED DATA
+                        </div>
+                    </div>
+                `;
+            }, 1500);
+            
+            // Mobile brutality: horizontal scroll on touch
+            if ('ontouchstart' in window) {
+                // Add glitch class on touch
+                document.addEventListener('touchstart', () => {
+                    document.body.classList.add('touch-glitch-active');
+                });
+                
+                document.addEventListener('touchend', () => {
+                    setTimeout(() => {
+                        document.body.classList.remove('touch-glitch-active');
+                    }, 200);
+                });
+                
+                document.addEventListener('touchmove', (e) => {
+                    // Add glitch effect on touch move
+                    document.body.style.filter = `hue-rotate(${Math.random() * 360}deg) contrast(150%)`;
+                    setTimeout(() => {
+                        document.body.style.filter = 'none';
+                    }, 100);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

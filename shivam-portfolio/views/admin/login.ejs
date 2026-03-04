@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔒 ADMIN FORTRESS — Restricted Access</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+
+    <style>
+        /* ===== VARIABLES ===== */
+        :root {
+            --bg-primary: #030308;
+            --bg-secondary: #07070f;
+            --bg-tertiary: #0a0a14;
+            --surface: rgba(255, 255, 255, 0.015);
+            --glass: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --green: #00ff88;
+            --green-dark: #00cc6a;
+            --green-glow: rgba(0, 255, 136, 0.2);
+            --purple: #8b5cf6;
+            --purple-glow: rgba(139, 92, 246, 0.2);
+            --cyan: #06b6d4;
+            --red: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.15);
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            --font-body: 'Inter', sans-serif;
+            --font-heading: 'Space Grotesk', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection {
+            background: var(--red);
+            color: #fff;
+        }
+
+        /* ===== CURSOR ===== */
+        .cursor-dot,
+        .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 99998;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--red);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .cursor-outline {
+            width: 36px;
+            height: 36px;
+            border: 1.5px solid rgba(239, 68, 68, 0.3);
+            transition: all 0.15s ease-out;
+        }
+
+        @media(max-width:1024px) {
+
+            .cursor-dot,
+            .cursor-outline {
+                display: none !important;
+            }
+        }
+
+        /* ===== NOISE ===== */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        /* ===== PARTICLES ===== */
+        #particles-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ===== BACKGROUND GRID ===== */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(239, 68, 68, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(239, 68, 68, 0.015) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* ===== FLOATING THREAT INDICATORS ===== */
+        .threat-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            z-index: 0;
+            animation: threatPulse 8s ease-in-out infinite;
+        }
+
+        .threat-orb-1 {
+            width: 500px;
+            height: 500px;
+            background: rgba(239, 68, 68, 0.06);
+            top: -15%;
+            left: -10%;
+        }
+
+        .threat-orb-2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(139, 92, 246, 0.05);
+            bottom: -10%;
+            right: -10%;
+            animation-delay: -3s;
+        }
+
+        .threat-orb-3 {
+            width: 300px;
+            height: 300px;
+            background: rgba(0, 255, 136, 0.04);
+            top: 60%;
+            left: 70%;
+            animation-delay: -6s;
+        }
+
+        @keyframes threatPulse {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.6;
+            }
+
+            33% {
+                transform: translate(30px, -20px) scale(1.1);
+                opacity: 0.3;
+            }
+
+            66% {
+                transform: translate(-20px, 30px) scale(0.9);
+                opacity: 0.5;
+            }
+        }
+
+        /* ===== SCANNING LINE ===== */
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            z-index: 10;
+            background: linear-gradient(90deg, transparent 20%, var(--red) 50%, transparent 80%);
+            opacity: 0.15;
+            animation: scanDown 6s linear infinite;
+        }
+
+        @keyframes scanDown {
+            0% {
+                top: -2px
+            }
+
+            100% {
+                top: 100vh
+            }
+        }
+
+        .scan-line-2 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 2px;
+            z-index: 10;
+            background: linear-gradient(180deg, transparent 20%, var(--green) 50%, transparent 80%);
+            opacity: 0.08;
+            animation: scanRight 8s linear infinite;
+        }
+
+        @keyframes scanRight {
+            0% {
+                left: -2px
+            }
+
+            100% {
+                left: 100vw
+            }
+        }
+
+        /* ===== CORNER DECORATIONS ===== */
+        .corner-bracket {
+            position: fixed;
+            z-index: 10;
+            width: 40px;
+            height: 40px;
+            border-color: rgba(239, 68, 68, 0.15);
+            border-style: solid;
+            border-width: 0;
+        }
+
+        .corner-tl {
+            top: 20px;
+            left: 20px;
+            border-top-width: 2px;
+            border-left-width: 2px;
+        }
+
+        .corner-tr {
+            top: 20px;
+            right: 20px;
+            border-top-width: 2px;
+            border-right-width: 2px;
+        }
+
+        .corner-bl {
+            bottom: 20px;
+            left: 20px;
+            border-bottom-width: 2px;
+            border-left-width: 2px;
+        }
+
+        .corner-br {
+            bottom: 20px;
+            right: 20px;
+            border-bottom-width: 2px;
+            border-right-width: 2px;
+        }
+
+        /* ===== HEX PATTERN ===== */
+        .hex-ring {
+            position: fixed;
+            z-index: 1;
+            pointer-events: none;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            border: 1px solid rgba(239, 68, 68, 0.04);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: hexSpin 60s linear infinite;
+        }
+
+        .hex-ring:nth-child(2) {
+            width: 500px;
+            height: 500px;
+            border-color: rgba(139, 92, 246, 0.03);
+            animation-direction: reverse;
+            animation-duration: 45s;
+        }
+
+        .hex-ring:nth-child(3) {
+            width: 700px;
+            height: 700px;
+            border-color: rgba(0, 255, 136, 0.02);
+            animation-duration: 90s;
+        }
+
+        @keyframes hexSpin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg)
+            }
+        }
+
+        /* ===== PRELOADER ===== */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.8s, visibility 0.8s;
+        }
+
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-container {
+            text-align: center;
+        }
+
+        .loader-ring {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            border: 2px solid transparent;
+            border-top-color: var(--red);
+            border-right-color: var(--purple);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .loader-text {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            animation: loaderBlink 1.5s infinite;
+        }
+
+        @keyframes loaderBlink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.3
+            }
+        }
+
+        /* ===== LOGIN PAGE ===== */
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 460px;
+            position: relative;
+        }
+
+        /* ===== TOP CLASSIFIED BANNER ===== */
+        .classified-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: repeating-linear-gradient(90deg, var(--red) 0px, var(--red) 20px, transparent 20px, transparent 40px);
+            height: 3px;
+            opacity: 0.6;
+        }
+
+        .classified-text {
+            position: fixed;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--red);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            background: var(--bg-primary);
+            padding: 2px 16px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 2px;
+        }
+
+        /* ===== BACK TO SITE ===== */
+        .back-link {
+            position: fixed;
+            top: 40px;
+            left: 28px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: var(--green);
+            gap: 12px;
+        }
+
+        .back-link i {
+            font-size: 0.7rem;
+        }
+
+        /* ===== SYSTEM STATUS ===== */
+        .sys-status {
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            z-index: 100;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sys-status .sys-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sys-status .dot-green {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: sysDot 2s infinite;
+        }
+
+        .sys-status .dot-red {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--red);
+            animation: sysDot 1.5s infinite;
+        }
+
+        @keyframes sysDot {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.2
+            }
+        }
+
+        /* ===== ACCESS LOGS (right side) ===== */
+        .access-logs {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 100;
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            text-align: right;
+            max-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .access-logs .log-line {
+            opacity: 0.4;
+            transition: opacity 0.3s;
+        }
+
+        .access-logs .log-line:last-child {
+            opacity: 0.8;
+        }
+
+        .access-logs .log-time {
+            color: var(--green);
+        }
+
+        .access-logs .log-warn {
+            color: var(--red);
+        }
+
+        /* ===== LOGIN CARD ===== */
+        .login-card {
+            background: rgba(7, 7, 15, 0.92);
+            border: 1px solid rgba(239, 68, 68, 0.08);
+            border-radius: 20px;
+            padding: 0;
+            backdrop-filter: blur(30px);
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                0 0 80px rgba(239, 68, 68, 0.03),
+                0 30px 80px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            animation: cardAppear 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+        }
+
+        @keyframes cardAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Top danger stripe */
+        .card-danger-stripe {
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--red), var(--purple), var(--red), transparent);
+            background-size: 200% 100%;
+            animation: dangerFlow 3s linear infinite;
+        }
+
+        @keyframes dangerFlow {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
+        /* Internal scan */
+        .card-scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.3), transparent);
+            animation: cardScan 5s linear infinite;
+            z-index: 5;
+        }
+
+        @keyframes cardScan {
+            0% {
+                top: 3px
+            }
+
+            100% {
+                top: 100%
+            }
+        }
+
+        /* Card content */
+        .card-inner {
+            padding: 44px 40px 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        @media(max-width:480px) {
+            .card-inner {
+                padding: 32px 24px 28px;
+            }
+        }
+
+        /* ===== SHIELD ICON ===== */
+        .shield-container {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 28px;
+            position: relative;
+        }
+
+        .shield-hexagon {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shield-hexagon::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: conic-gradient(from 0deg, var(--red), var(--purple), var(--cyan), var(--green), var(--red));
+            border-radius: 20px;
+            animation: shieldRotate 6s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes shieldRotate {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .shield-inner {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .shield-icon {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--red), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shieldPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes shieldPulse {
+
+            0%,
+            100% {
+                transform: scale(1)
+            }
+
+            50% {
+                transform: scale(1.08)
+            }
+        }
+
+        .shield-ring {
+            position: absolute;
+            inset: -12px;
+            border-radius: 50%;
+            border: 1px dashed rgba(239, 68, 68, 0.1);
+            animation: shieldRotate 20s linear infinite reverse;
+        }
+
+        /* ===== TITLES ===== */
+        .login-title {
+            font-family: var(--font-heading);
+            font-size: 1.7rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .login-subtitle {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        .threat-level {
+            text-align: center;
+            margin-bottom: 32px;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .threat-level .level-label {
+            color: var(--text-muted);
+        }
+
+        .threat-level .level-value {
+            color: var(--red);
+            font-weight: 700;
+            text-shadow: 0 0 10px var(--red-glow);
+            animation: threatBlink 2s infinite;
+        }
+
+        @keyframes threatBlink {
+
+            0%,
+            70%,
+            100% {
+                opacity: 1
+            }
+
+            75% {
+                opacity: 0.3
+            }
+        }
+
+        /* ===== FORM FIELDS ===== */
+        .field-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .field-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .field-label .req {
+            color: var(--red);
+            font-size: 0.8rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .input-wrapper::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--red), var(--purple));
+            transform: translateX(-50%);
+            transition: width 0.4s;
+            z-index: 3;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .input-wrapper:focus-within::before {
+            width: 100%;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            z-index: 2;
+            transition: var(--transition);
+        }
+
+        .input-wrapper:focus-within .input-icon {
+            color: var(--red);
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 16px 50px 16px 50px;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 0.92rem;
+            outline: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-input::placeholder {
+            color: rgba(148, 163, 184, 0.4);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            z-index: 2;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            padding: 4px;
+        }
+
+        .toggle-password:hover {
+            color: var(--text);
+        }
+
+        /* ===== SECURITY INDICATORS ===== */
+        .security-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .remember-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .custom-checkbox {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            border: 1.5px solid var(--glass-border);
+            background: transparent;
+            appearance: none;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .custom-checkbox:checked {
+            background: var(--red);
+            border-color: var(--red);
+        }
+
+        .custom-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .forgot-link {
+            font-size: 0.82rem;
+            color: var(--red);
+            font-weight: 500;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .forgot-link:hover {
+            color: #f87171;
+            text-decoration: underline;
+        }
+
+        /* ===== LOGIN BUTTON ===== */
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-weight: 800;
+            font-size: 0.95rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            background: linear-gradient(135deg, #dc2626, var(--red));
+            color: #fff;
+            box-shadow: 0 0 30px var(--red-glow), 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 50px var(--red-glow), 0 15px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .login-btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn .btn-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+        }
+
+        .divider span {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            white-space: nowrap;
+        }
+
+        /* ===== BIOMETRIC OPTIONS ===== */
+        .biometric-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .biometric-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            font-family: var(--font-body);
+        }
+
+        .biometric-btn:hover {
+            border-color: var(--green);
+            color: var(--green);
+            background: rgba(0, 255, 136, 0.03);
+        }
+
+        .biometric-btn i {
+            font-size: 1.1rem;
+        }
+
+        /* ===== WARNING FOOTER ===== */
+        .warning-footer {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(239, 68, 68, 0.08);
+        }
+
+        .warning-box {
+            background: rgba(239, 68, 68, 0.04);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .warning-box i {
+            color: var(--red);
+            font-size: 0.9rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+            animation: warnPulse 2s infinite;
+        }
+
+        @keyframes warnPulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.4
+            }
+        }
+
+        .warning-box p {
+            font-size: 0.75rem;
+            color: rgba(239, 68, 68, 0.7);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* ===== SECURITY BADGES ===== */
+        .security-badges {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            flex-wrap: wrap;
+            margin-top: 28px;
+        }
+
+        .sec-badge {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .sec-badge i {
+            font-size: 0.72rem;
+        }
+
+        .sec-badge .active-indicator {
+            color: var(--green);
+        }
+
+        /* ===== TERMINAL LOG ANIMATION ===== */
+        .terminal-log {
+            position: fixed;
+            top: 50px;
+            right: 28px;
+            z-index: 100;
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-align: left;
+            max-width: 240px;
+            opacity: 0.4;
+        }
+
+        .terminal-log .t-line {
+            margin-bottom: 2px;
+            opacity: 0;
+            animation: termAppear 0.3s forwards;
+        }
+
+        .terminal-log .t-line:nth-child(1) {
+            animation-delay: 1s;
+        }
+
+        .terminal-log .t-line:nth-child(2) {
+            animation-delay: 1.5s;
+        }
+
+        .terminal-log .t-line:nth-child(3) {
+            animation-delay: 2s;
+        }
+
+        .terminal-log .t-line:nth-child(4) {
+            animation-delay: 2.5s;
+        }
+
+        .terminal-log .t-line:nth-child(5) {
+            animation-delay: 3s;
+        }
+
+        .terminal-log .t-line:nth-child(6) {
+            animation-delay: 3.5s;
+        }
+
+        .terminal-log .t-line:nth-child(7) {
+            animation-delay: 4s;
+        }
+
+        .terminal-log .t-line:nth-child(8) {
+            animation-delay: 4.5s;
+        }
+
+        @keyframes termAppear {
+            to {
+                opacity: 1
+            }
+        }
+
+        .terminal-log .t-ok {
+            color: var(--green);
+        }
+
+        .terminal-log .t-warn {
+            color: var(--red);
+        }
+
+        .terminal-log .t-info {
+            color: var(--cyan);
+        }
+
+        /* ===== ERROR SHAKE ===== */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: translateX(-4px)
+            }
+
+            20%,
+            40%,
+            60%,
+            80% {
+                transform: translateX(4px)
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media(max-width:600px) {
+
+            .terminal-log,
+            .sys-status,
+            .access-logs {
+                display: none;
+            }
+
+            .corner-bracket {
+                display: none;
+            }
+
+            .classified-text {
+                font-size: 0.55rem;
+                letter-spacing: 4px;
+            }
+
+            .login-title {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader-container">
+            <div class="loader-ring"></div>
+            <div class="loader-text">Initializing Security Protocols</div>
+        </div>
+    </div>
+
+    <!-- Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Background -->
+    <canvas id="particles-canvas"></canvas>
+    <div class="bg-grid"></div>
+    <div class="threat-orb threat-orb-1"></div>
+    <div class="threat-orb threat-orb-2"></div>
+    <div class="threat-orb threat-orb-3"></div>
+    <div class="scan-line"></div>
+    <div class="scan-line-2"></div>
+
+    <!-- Hex Rings -->
+    <div class="hex-ring"></div>
+    <div class="hex-ring"></div>
+    <div class="hex-ring"></div>
+
+    <!-- Corner Brackets -->
+    <div class="corner-bracket corner-tl"></div>
+    <div class="corner-bracket corner-tr"></div>
+    <div class="corner-bracket corner-bl"></div>
+    <div class="corner-bracket corner-br"></div>
+
+    <!-- Classified Banner -->
+    <div class="classified-banner"></div>
+    <div class="classified-text">⚠ CLASSIFIED — AUTHORIZED ACCESS ONLY ⚠</div>
+
+    <!-- Back Link -->
+    <a href="/" class="back-link"><i class="fas fa-chevron-left"></i> Back to Public Site</a>
+
+    <!-- Terminal Log -->
+    <div class="terminal-log">
+        <div class="t-line"><span class="t-info">[SYS]</span> Booting security module...</div>
+        <div class="t-line"><span class="t-ok">[OK]</span> Firewall: Active</div>
+        <div class="t-line"><span class="t-ok">[OK]</span> SSL/TLS: Verified</div>
+        <div class="t-line"><span class="t-ok">[OK]</span> Rate Limiter: 5 req/min</div>
+        <div class="t-line"><span class="t-warn">[!]</span> 3 failed attempts (24h)</div>
+        <div class="t-line"><span class="t-ok">[OK]</span> Brute-force shield: ON</div>
+        <div class="t-line"><span class="t-info">[SYS]</span> Session: Awaiting auth...</div>
+        <div class="t-line"><span class="t-ok">[OK]</span> Ready for credentials_</div>
+    </div>
+
+    <!-- System Status -->
+    <div class="sys-status">
+        <div class="sys-line"><span class="dot-green"></span> System Online</div>
+        <div class="sys-line"><span class="dot-green"></span> Encryption: AES-256</div>
+        <div class="sys-line"><span class="dot-red"></span> Monitoring: Active</div>
+        <div class="sys-line" style="margin-top:4px; color:var(--green);" id="login-clock"></div>
+    </div>
+
+    <!-- Access Logs -->
+    <div class="access-logs">
+        <div class="log-line"><span class="log-time">14:22:08</span> — Connection from 192.168.1.1</div>
+        <div class="log-line"><span class="log-time">14:21:55</span> — TLS handshake completed</div>
+        <div class="log-line"><span class="log-warn">14:18:33</span> — Failed login: admin@***.com</div>
+        <div class="log-line"><span class="log-time">14:15:20</span> — New session initialized</div>
+        <div class="log-line"><span class="log-time">14:15:19</span> — Awaiting authentication...</div>
+    </div>
+
+    <!-- ==================== LOGIN CARD ==================== -->
+    <div class="login-page">
+        <div class="login-wrapper">
+            <div class="login-card">
+                <div class="card-danger-stripe"></div>
+                <div class="card-scanline"></div>
+
+                <div class="card-inner">
+
+                    <!-- Shield -->
+                    <div class="shield-container">
+                        <div class="shield-ring"></div>
+                        <div class="shield-hexagon">
+                            <div class="shield-inner">
+                                <i class="fas fa-skull-crossbones shield-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Titles -->
+                    <h1 class="login-title">Admin Fortress</h1>
+                    <p class="login-subtitle">Restricted terminal — Authenticate to proceed</p>
+                    <div class="threat-level">
+                        <span class="level-label">Threat Level: </span>
+                        <span class="level-value">■ ■ ■ ■ □ — HIGH</span>
+                    </div>
+
+                    <!-- Form -->
+                    <form id="loginForm" autocomplete="off">
+
+                        <!-- Username -->
+                        <div class="field-group">
+                            <label class="field-label"><i class="fas fa-terminal" style="font-size:0.6rem;"></i>
+                                Username <span class="req">*</span></label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user-secret input-icon"></i>
+                                <input type="text" class="login-input" placeholder="Enter admin username" required
+                                    id="username" autocomplete="off">
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="field-group">
+                            <label class="field-label"><i class="fas fa-key" style="font-size:0.6rem;"></i> Password
+                                <span class="req">*</span></label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" class="login-input" placeholder="Enter secure password" required
+                                    id="password" autocomplete="off">
+                                <button type="button" class="toggle-password" onclick="togglePass()">
+                                    <i class="fas fa-eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Remember + Forgot -->
+                        <div class="security-row">
+                            <label class="remember-label">
+                                <input type="checkbox" class="custom-checkbox">
+                                Remember this device
+                            </label>
+                            <a href="#" class="forgot-link">Lost access?</a>
+                        </div>
+
+                        <!-- Error Message (hidden by default) -->
+                        <div id="errorMsg"
+                            style="display:none; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.15); border-radius:10px; padding:12px 16px; margin-bottom:20px; font-size:0.82rem; color:var(--red); text-align:center;">
+                            <i class="fas fa-exclamation-circle me-1"></i> <span id="errorText">Invalid credentials.
+                                Attempt logged.</span>
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" class="login-btn" id="loginBtn">
+                            <span class="btn-content">
+                                <i class="fas fa-fingerprint"></i>
+                                <span>Authenticate & Enter</span>
+                            </span>
+                        </button>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="divider"><span>Alternative Auth</span></div>
+
+                    <!-- Biometric -->
+                    <div class="biometric-options">
+                        <button type="button" class="biometric-btn">
+                            <i class="fas fa-fingerprint"></i> Biometric
+                        </button>
+                        <button type="button" class="biometric-btn">
+                            <i class="fas fa-qrcode"></i> QR Code
+                        </button>
+                        <button type="button" class="biometric-btn">
+                            <i class="fas fa-key"></i> Passkey
+                        </button>
+                    </div>
+
+                    <!-- Warning -->
+                    <div class="warning-footer">
+                        <div class="warning-box">
+                            <i class="fas fa-radiation"></i>
+                            <p>This system is monitored 24/7. Unauthorized access attempts are automatically reported to
+                                security teams and logged with IP, device fingerprint, and geolocation data.
+                                <strong>Proceed only if authorized.</strong></p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Security Badges -->
+            <div class="security-badges">
+                <div class="sec-badge"><i class="fas fa-lock active-indicator"></i> AES-256 Encrypted</div>
+                <div class="sec-badge"><i class="fas fa-shield-alt active-indicator"></i> 2FA Enabled</div>
+                <div class="sec-badge"><i class="fas fa-eye active-indicator"></i> Session Tracked</div>
+                <div class="sec-badge"><i class="fas fa-server active-indicator"></i> Zero-Trust</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ===== PRELOADER ===== */
+        const preloader = document.getElementById('preloader');
+        window.addEventListener('load', () => setTimeout(() => preloader.classList.add('hidden'), 800));
+        setTimeout(() => preloader.classList.add('hidden'), 3000);
+
+        /* ===== CURSOR ===== */
+        const dot = document.querySelector('.cursor-dot');
+        const outline = document.querySelector('.cursor-outline');
+        if (dot && outline && window.innerWidth > 1024) {
+            let mx = 0, my = 0, ox = 0, oy = 0;
+            window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.left = mx + 'px'; dot.style.top = my + 'px'; });
+            (function anim() { ox += (mx - ox) * 0.12; oy += (my - oy) * 0.12; outline.style.left = ox + 'px'; outline.style.top = oy + 'px'; requestAnimationFrame(anim); })();
+            document.querySelectorAll('a, button, input, .biometric-btn, .toggle-password').forEach(el => {
+                el.addEventListener('mouseenter', () => { outline.style.width = '56px'; outline.style.height = '56px'; outline.style.borderColor = 'rgba(239,68,68,0.6)'; dot.style.transform = 'translate(-50%,-50%) scale(0.5)'; });
+                el.addEventListener('mouseleave', () => { outline.style.width = '36px'; outline.style.height = '36px'; outline.style.borderColor = 'rgba(239,68,68,0.3)'; dot.style.transform = 'translate(-50%,-50%) scale(1)'; });
+            });
+        }
+
+        /* ===== PARTICLES ===== */
+        const canvas = document.getElementById('particles-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let w, h, particles = [];
+            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+            resize(); window.addEventListener('resize', resize);
+            class P {
+                constructor() { this.reset(); }
+                reset() { this.x = Math.random() * w; this.y = Math.random() * h; this.vx = (Math.random() - 0.5) * 0.2; this.vy = (Math.random() - 0.5) * 0.2; this.r = Math.random() * 1.2 + 0.3; this.a = Math.random() * 0.2 + 0.03; }
+                update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > w) this.vx *= -1; if (this.y < 0 || this.y > h) this.vy *= -1; }
+                draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); ctx.fillStyle = `rgba(239,68,68,${this.a})`; ctx.fill(); }
+            }
+            for (let i = 0; i < 40; i++) particles.push(new P());
+            (function draw() {
+                ctx.clearRect(0, 0, w, h);
+                particles.forEach(p => { p.update(); p.draw() });
+                for (let i = 0; i < particles.length; i++)for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y, d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < 100) { ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = `rgba(239,68,68,${0.03 * (1 - d / 100)})`; ctx.lineWidth = 0.5; ctx.stroke(); }
+                }
+                requestAnimationFrame(draw);
+            })();
+        }
+
+        /* ===== PASSWORD TOGGLE ===== */
+        function togglePass() {
+            const p = document.getElementById('password');
+            const eye = document.getElementById('eyeIcon');
+            if (p.type === 'password') { p.type = 'text'; eye.className = 'fas fa-eye-slash'; }
+            else { p.type = 'password'; eye.className = 'fas fa-eye'; }
+        }
+
+        /* ===== LOGIN FORM ===== */
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const err = document.getElementById('errorMsg');
+            const card = document.querySelector('.login-card');
+
+            btn.innerHTML = '<span class="btn-content"><i class="fas fa-spinner fa-spin"></i><span>Verifying Credentials...</span></span>';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            err.style.display = 'none';
+
+            setTimeout(() => {
+                // Simulate failed attempt first for drama
+                btn.innerHTML = '<span class="btn-content"><i class="fas fa-shield-alt"></i><span>Validating Identity...</span></span>';
+
+                setTimeout(() => {
+                    btn.innerHTML = '<span class="btn-content"><i class="fas fa-check-circle"></i><span>Access Granted</span></span>';
+                    btn.style.background = 'linear-gradient(135deg, #059669, #10b981)';
+                    btn.style.boxShadow = '0 0 40px rgba(0,255,136,0.3)';
+                    btn.style.opacity = '1';
+
+                    // Redirect
+                    setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 1200);
+                }, 1500);
+            }, 1500);
+        });
+
+        /* ===== CLOCK ===== */
+        const clockEl = document.getElementById('login-clock');
+        if (clockEl) {
+            function tick() {
+                const n = new Date();
+                clockEl.textContent = n.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+            tick(); setInterval(tick, 1000);
+        }
+
+        /* ===== INPUT FOCUS EFFECTS ===== */
+        document.querySelectorAll('.login-input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.closest('.input-wrapper').style.boxShadow = '0 0 0 3px rgba(239,68,68,0.08)';
+            });
+            input.addEventListener('blur', () => {
+                input.closest('.input-wrapper').style.boxShadow = 'none';
+            });
+        });
+    </script>
+</body>
+
+</html>

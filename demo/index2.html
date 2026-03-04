@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0614" />
+  <meta name="description" content="Shivam Bhadoriya — Full Stack Developer (MERN). A glitchpunk portfolio built for impact: performance, craft, and personality." />
+  <title>Shivam Bhadoriya — Full Stack Developer</title>
+
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <style>
+    :root{
+      --bg:#07020f;
+      --bg2:#0b0614;
+      --txt:#eae7ff;
+      --muted: rgba(234,231,255,.7);
+      --violet:#b967ff;
+      --cyan:#05d9e8;
+      --green:#43e97b;
+      --pink:#ff2a6d;
+      --amber:#ffb86b;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.10);
+      --stroke: rgba(255,255,255,.12);
+      --glow: 0 0 12px rgba(185,103,255,.65), 0 0 30px rgba(5,217,232,.25);
+      --glow2: 0 0 20px rgba(5,217,232,.55), 0 0 40px rgba(255,42,109,.20);
+      --radius: 20px;
+      --noiseOpacity: .10;
+      --scanOpacity: .10;
+      --crtOpacity: .12;
+      --shadow: 0 25px 70px rgba(0,0,0,.55);
+    }
+
+    [data-sanity="off"]{
+      --bg:#010005;
+      --bg2:#070011;
+      --txt:#ffffff;
+      --muted: rgba(255,255,255,.72);
+      --card: rgba(255,255,255,.075);
+      --card2: rgba(255,255,255,.13);
+      --stroke: rgba(255,255,255,.18);
+      --noiseOpacity: .16;
+      --scanOpacity: .16;
+      --crtOpacity: .18;
+    }
+
+    html{ scroll-behavior:smooth; }
+    body{
+      background: radial-gradient(1200px 650px at 20% 10%, rgba(185,103,255,.22), transparent 55%),
+                  radial-gradient(1100px 700px at 85% 25%, rgba(5,217,232,.17), transparent 60%),
+                  radial-gradient(900px 700px at 65% 95%, rgba(255,42,109,.12), transparent 60%),
+                  linear-gradient(180deg, var(--bg), var(--bg2) 55%, #04010a);
+      color: var(--txt);
+      overflow-x: hidden;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .fx-layer{ position: fixed; inset:0; pointer-events:none; z-index:0; }
+
+    #bgCanvas{ position: fixed; inset:0; z-index:0; }
+
+    .noise{
+      opacity: var(--noiseOpacity);
+      mix-blend-mode: overlay;
+      background-image: url('data:image/svg+xml;utf8,\
+        <svg xmlns="http://www.w3.org/2000/svg" width="220" height="220">\
+          <filter id="n">\
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>\
+          </filter>\
+          <rect width="220" height="220" filter="url(%23n)" opacity="0.6"/>\
+        </svg>');
+      background-size: 220px 220px;
+      animation: noiseShift 1.3s steps(2) infinite;
+    }
+    @keyframes noiseShift{
+      0%{ transform: translate3d(0,0,0); }
+      33%{ transform: translate3d(-8px,6px,0); }
+      66%{ transform: translate3d(10px,-7px,0); }
+      100%{ transform: translate3d(0,0,0); }
+    }
+
+    .scanlines{
+      opacity: var(--scanOpacity);
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.06) 0px,
+        rgba(255,255,255,.06) 1px,
+        rgba(0,0,0,0) 4px,
+        rgba(0,0,0,0) 7px
+      );
+      mix-blend-mode: overlay;
+      animation: scanMove 7s linear infinite;
+    }
+    @keyframes scanMove{ from{ background-position: 0 0; } to{ background-position: 0 240px; } }
+
+    .crt{
+      opacity: var(--crtOpacity);
+      background: radial-gradient(closest-side at 50% 50%, rgba(255,255,255,.10), transparent 55%),
+                  radial-gradient(closest-side at 50% 50%, rgba(0,0,0,.0), rgba(0,0,0,.55) 85%);
+      mix-blend-mode: overlay;
+    }
+
+    .app{ position: relative; z-index: 10; }
+
+    .glass{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .glass-strong{
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.16);
+    }
+
+    .neon{
+      box-shadow: 0 0 0 1px rgba(185,103,255,.22),
+                  0 0 24px rgba(185,103,255,.20),
+                  0 0 44px rgba(5,217,232,.09);
+    }
+
+    .glitch{
+      position: relative;
+      display: inline-block;
+      text-shadow: 0 0 10px rgba(185,103,255,.35);
+    }
+    .glitch::before, .glitch::after{
+      content: attr(data-text);
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.85;
+      mix-blend-mode: screen;
+      clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
+    }
+    .glitch::before{
+      transform: translate(2px, -1px);
+      color: var(--cyan);
+      animation: glitchTop 2.5s infinite linear;
+    }
+    .glitch::after{
+      transform: translate(-2px, 1px);
+      color: var(--pink);
+      clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+      animation: glitchBottom 2.9s infinite linear;
+    }
+    @keyframes glitchTop{
+      0%{ clip-path: polygon(0 0,100% 0,100% 40%,0 40%); transform: translate(2px,-1px); }
+      11%{ clip-path: polygon(0 5%,100% 5%,100% 32%,0 32%); transform: translate(3px,-2px); }
+      22%{ clip-path: polygon(0 0,100% 0,100% 44%,0 44%); transform: translate(1px,0px); }
+      35%{ clip-path: polygon(0 10%,100% 10%,100% 38%,0 38%); transform: translate(4px,-1px); }
+      50%{ clip-path: polygon(0 0,100% 0,100% 40%,0 40%); transform: translate(2px,-1px); }
+      60%{ clip-path: polygon(0 4%,100% 4%,100% 26%,0 26%); transform: translate(0px,-1px); }
+      72%{ clip-path: polygon(0 0,100% 0,100% 48%,0 48%); transform: translate(3px,1px); }
+      86%{ clip-path: polygon(0 7%,100% 7%,100% 36%,0 36%); transform: translate(2px,-2px); }
+      100%{ clip-path: polygon(0 0,100% 0,100% 40%,0 40%); transform: translate(2px,-1px); }
+    }
+    @keyframes glitchBottom{
+      0%{ clip-path: polygon(0 60%,100% 60%,100% 100%,0 100%); transform: translate(-2px,1px); }
+      13%{ clip-path: polygon(0 66%,100% 66%,100% 100%,0 100%); transform: translate(-4px,2px); }
+      28%{ clip-path: polygon(0 56%,100% 56%,100% 100%,0 100%); transform: translate(-1px,0px); }
+      42%{ clip-path: polygon(0 72%,100% 72%,100% 100%,0 100%); transform: translate(-3px,1px); }
+      56%{ clip-path: polygon(0 60%,100% 60%,100% 100%,0 100%); transform: translate(-2px,1px); }
+      70%{ clip-path: polygon(0 63%,100% 63%,100% 100%,0 100%); transform: translate(-1px,2px); }
+      85%{ clip-path: polygon(0 58%,100% 58%,100% 100%,0 100%); transform: translate(-4px,0px); }
+      100%{ clip-path: polygon(0 60%,100% 60%,100% 100%,0 100%); transform: translate(-2px,1px); }
+    }
+
+    #glitchFlash{
+      position: fixed;
+      inset: 0;
+      pointer-events:none;
+      z-index: 80;
+      opacity: 0;
+      mix-blend-mode: screen;
+      background:
+        radial-gradient(600px 250px at 30% 20%, rgba(185,103,255,.25), transparent 60%),
+        radial-gradient(700px 300px at 80% 35%, rgba(5,217,232,.20), transparent 60%),
+        linear-gradient(90deg, rgba(255,42,109,.0), rgba(255,42,109,.18), rgba(255,42,109,.0));
+      filter: blur(0px) saturate(140%);
+      transform: translateZ(0);
+    }
+
+    @media (pointer:fine){
+      body{ cursor: none; }
+      #cursor{ position: fixed; top:0; left:0; z-index: 90; width: 34px; height: 34px; pointer-events: none; transform: translate(-50%,-50%); }
+      #cursor .ring{ position:absolute; inset:0; border-radius: 9999px; border: 1px solid rgba(255,255,255,.35); box-shadow: var(--glow2); transition: transform 0.15s ease; }
+      #cursor .dot{ position:absolute; left:50%; top:50%; width: 6px; height: 6px; transform: translate(-50%,-50%); border-radius: 9999px; background: linear-gradient(90deg, var(--cyan), var(--violet)); box-shadow: var(--glow); }
+      #cursor .cross::before, #cursor .cross::after{
+        content:""; position:absolute; left:50%; top:50%; background: rgba(255,255,255,.35); box-shadow: 0 0 14px rgba(5,217,232,.35);
+      }
+      #cursor .cross::before{ width: 1px; height: 18px; transform: translate(-50%,-50%); }
+      #cursor .cross::after{ height: 1px; width: 18px; transform: translate(-50%,-50%); }
+    }
+
+    .reveal{ opacity: 0; transform: translateY(16px) scale(.98); filter: blur(6px); }
+    .reveal.is-in{ opacity: 1; transform: translateY(0) scale(1); filter: blur(0); transition: opacity 800ms ease, transform 800ms cubic-bezier(.2,.9,.2,1), filter 900ms ease; }
+
+    .shimmer-border{ position: relative; }
+    .shimmer-border::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius: calc(var(--radius) + 2px);
+      background: conic-gradient(from 180deg, rgba(185,103,255,.0), rgba(185,103,255,.35), rgba(5,217,232,.35), rgba(255,42,109,.2), rgba(185,103,255,.0));
+      filter: blur(10px);
+      opacity: .55;
+      z-index:-1;
+      animation: spin 6s linear infinite;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+
+    .btn{
+      position: relative;
+      border-radius: 9999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+      overflow: hidden;
+      cursor: none;
+    }
+    .btn::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(90deg, rgba(185,103,255,.0), rgba(185,103,255,.22), rgba(5,217,232,.22), rgba(255,42,109,.0));
+      transform: translateX(-80%);
+      transition: transform 380ms ease;
+      opacity: .9;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(5,217,232,.35); background: rgba(255,255,255,.08); }
+    .btn:hover::before{ transform: translateX(0%); }
+    .btn:active{ transform: translateY(1px) scale(.99); }
+
+    .section{ scroll-margin-top: 96px; }
+
+    .topbar{ background: rgba(5,2,15,.55); border-bottom: 1px solid rgba(255,255,255,.10); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+
+    [data-motion="reduced"] *{
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    #boot{
+      position: fixed; inset: 0; z-index: 100;
+      background: radial-gradient(900px 500px at 50% 30%, rgba(185,103,255,.22), transparent 60%),
+                  radial-gradient(900px 500px at 70% 60%, rgba(5,217,232,.14), transparent 62%),
+                  linear-gradient(180deg, #060111, #04010a);
+      display: grid; place-items: center;
+    }
+
+    .type{
+      display:inline-block;
+      border-right: 2px solid rgba(5,217,232,.85);
+      padding-right: 4px;
+      animation: caret 800ms steps(1) infinite;
+    }
+    @keyframes caret{ 50%{ border-color: transparent; } }
+
+    .hud-pill{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      border-radius: 9999px;
+      box-shadow: 0 0 0 1px rgba(185,103,255,.08), 0 10px 40px rgba(0,0,0,.35);
+    }
+
+    .grad-card-purple { background: linear-gradient(135deg, rgba(138,43,226,0.15), rgba(186,85,211,0.1)); border: 1px solid rgba(138,43,226,0.3); }
+    .grad-card-pink { background: linear-gradient(135deg, rgba(255,20,147,0.15), rgba(255,105,180,0.1)); border: 1px solid rgba(255,20,147,0.3); }
+    .grad-card-green { background: linear-gradient(135deg, rgba(0,255,127,0.15), rgba(50,205,50,0.1)); border: 1px solid rgba(0,255,127,0.3); }
+    .grad-card-indigo { background: linear-gradient(135deg, rgba(138,43,226,0.15), rgba(75,0,130,0.1)); border: 1px solid rgba(138,43,226,0.3); }
+    .grad-card-cyan { background: linear-gradient(135deg, rgba(5,217,232,0.15), rgba(0,255,255,0.1)); border: 1px solid rgba(5,217,232,0.3); }
+
+    .floating { animation: floating 3s ease-in-out infinite; }
+    @keyframes floating {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .pulse-ring { animation: pulseRing 2s ease-out infinite; }
+    @keyframes pulseRing {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .skill-icon {
+      transition: all 0.3s ease;
+    }
+    .skill-icon:hover {
+      transform: scale(1.15) rotate(5deg);
+      box-shadow: 0 0 25px currentColor;
+    }
+
+    .philosophy-card {
+      transition: all 0.3s ease;
+    }
+    .philosophy-card:hover {
+      transform: translateX(10px);
+      border-left-color: var(--cyan);
+    }
+  </style>
+</head>
+
+<body data-sanity="on" data-motion="full">
+  <!-- FX Canvas -->
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+  <div class="fx-layer noise" aria-hidden="true"></div>
+  <div class="fx-layer scanlines" aria-hidden="true"></div>
+  <div class="fx-layer crt" aria-hidden="true"></div>
+  <div id="glitchFlash" aria-hidden="true"></div>
+
+  <!-- Custom cursor -->
+  <div id="cursor" aria-hidden="true" class="hidden md:block">
+    <div class="ring"></div>
+    <div class="cross"></div>
+    <div class="dot"></div>
+  </div>
+
+  <!-- Boot / intro overlay -->
+  <div id="boot">
+    <div class="w-[min(600px,92vw)] glass neon rounded-[24px] p-8 text-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#b967ff] via-[#05d9e8] to-[#ff2a6d]"></div>
+      
+      <div class="flex justify-center mb-6">
+        <div class="relative">
+          <div class="absolute inset-0 opacity-50 rounded-2xl bg-gradient-to-r from-violet-500 via-cyan-500 to-pink-500 blur-lg pulse-ring"></div>
+          <div class="relative flex items-center justify-center w-20 h-20 rounded-2xl glass neon">
+            <span class="text-4xl">👨‍💻</span>
+          </div>
+        </div>
+      </div>
+
+      <h1 class="mb-3 text-3xl font-black text-transparent sm:text-4xl bg-gradient-to-r from-white via-cyan-200 to-violet-200 bg-clip-text">
+        Welcome to the Singularity
+      </h1>
+      <p class="max-w-md mx-auto mb-8 text-sm leading-relaxed text-gray-300 sm:text-base">
+        You are entering the digital workspace of <span class="font-semibold text-cyan-300">Shivam Bhadoriya</span>. 
+        Expect extreme performance, interactive visuals, and code that breaks the mold.
+      </p>
+
+      <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <button id="enterBtn" class="w-full px-8 py-4 text-lg font-bold transition-transform duration-200 btn sm:w-auto hover:scale-105 group">
+          <span class="relative z-10 flex items-center justify-center gap-2">
+            ENTER PORTFOLIO <span class="text-xl transition-transform group-hover:translate-x-1">→</span>
+          </span>
+        </button>
+      </div>
+
+      <div class="mt-6 font-mono text-xs text-gray-500">
+        System Status: <span class="text-green-400">ONLINE</span> • Mode: <span class="text-violet-400">BEAST</span> • Audio: <span class="text-gray-400">MUTED</span>
+      </div>
+      
+      <div class="flex justify-center gap-2 mt-4">
+        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" style="animation-delay: 0.2s"></span>
+        <span class="w-2 h-2 rounded-full bg-violet-400 animate-pulse" style="animation-delay: 0.4s"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- App -->
+  <div class="app">
+    <!-- Top nav -->
+    <header class="fixed top-0 left-0 right-0 z-50 topbar">
+      <div class="flex items-center justify-between gap-3 px-4 py-3 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <a href="#top" class="flex items-center gap-3 group" aria-label="Go to top">
+          <div class="h-10 w-10 rounded-xl grid place-items-center glass neon group-hover:scale-[1.05] transition">
+            <span class="text-xl">🚀</span>
+          </div>
+          <div class="leading-tight">
+            <div class="text-sm font-bold text-white">Shivam Bhadoriya</div>
+            <div class="text-xs text-cyan-400">Full‑Stack Developer</div>
+          </div>
+        </a>
+
+        <!-- Desktop Nav -->
+        <nav class="items-center hidden gap-1 text-sm md:flex">
+          <a class="px-3 py-2 transition-colors rounded-lg hover:bg-white/5 hover:text-cyan-300" href="#about">About</a>
+          <a class="px-3 py-2 transition-colors rounded-lg hover:bg-white/5 hover:text-cyan-300" href="#skills">Skills</a>
+          <a class="px-3 py-2 transition-colors rounded-lg hover:bg-white/5 hover:text-cyan-300" href="#philosophy">Philosophy</a>
+          <a class="px-3 py-2 transition-colors rounded-lg hover:bg-white/5 hover:text-cyan-300" href="#stats">Stats</a>
+          <a class="px-3 py-2 transition-colors rounded-lg hover:bg-white/5 hover:text-cyan-300" href="#contact">Contact</a>
+        </nav>
+
+        <div class="flex items-center gap-2">
+          <button id="settingsBtn" class="px-3 py-2 text-xs btn sm:px-4 sm:text-sm" aria-haspopup="dialog">
+            <span class="relative z-10">⚙️ Config</span>
+          </button>
+          <a href="#contact" class="px-3 py-2 text-xs font-semibold btn sm:px-4 sm:text-sm bg-gradient-to-r from-violet-500/20 to-cyan-500/20">
+            <span class="relative z-10">🔥 Hire Me</span>
+          </a>
+        </div>
+      </div>
+      <!-- Mobile Nav -->
+      <nav class="flex items-center gap-4 px-4 pt-2 pb-3 overflow-x-auto text-xs border-t md:hidden sm:text-sm whitespace-nowrap hide-scrollbar border-white/5">
+         <a class="opacity-80 hover:opacity-100 hover:text-cyan-300" href="#about">About</a>
+         <a class="opacity-80 hover:opacity-100 hover:text-cyan-300" href="#skills">Skills</a>
+         <a class="opacity-80 hover:opacity-100 hover:text-cyan-300" href="#philosophy">Philosophy</a>
+         <a class="opacity-80 hover:opacity-100 hover:text-cyan-300" href="#stats">Stats</a>
+         <a class="opacity-80 hover:opacity-100 hover:text-cyan-300" href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <!-- Settings panel -->
+    <div id="settings" class="hidden fixed inset-0 z-[70]">
+      <div class="absolute inset-0 bg-black/60" id="settingsBackdrop"></div>
+      <div class="absolute right-3 sm:right-6 top-20 w-[min(480px,92vw)] glass glass-strong rounded-[22px] p-5 neon shimmer-border">
+        <div class="flex items-start justify-between gap-2 mb-4">
+          <div>
+            <div class="text-base font-semibold">⚙️ System Configuration</div>
+            <div class="mt-1 text-xs text-gray-400">Customize your viewing experience.</div>
+          </div>
+          <button id="closeSettings" class="btn px-3 py-1.5 text-xs"><span class="relative z-10">✕ Close</span></button>
+        </div>
+
+        <div class="grid gap-3">
+          <div class="glass rounded-[16px] p-3 border border-white/10 flex items-center justify-between">
+             <div>
+                <div class="text-sm font-semibold text-white">🔥 Beast Mode</div>
+                <div class="text-[10px] text-gray-400">Intense neon & glitches.</div>
+             </div>
+             <button id="toggleSanity" class="btn px-3 py-1.5 text-xs w-16"><span class="relative z-10" id="toggleSanityLabel">On</span></button>
+          </div>
+
+          <div class="glass rounded-[16px] p-3 border border-white/10 flex items-center justify-between">
+             <div>
+                <div class="text-sm font-semibold text-white">🔊 Audio</div>
+                <div class="text-[10px] text-gray-400">Ambient sci-fi drone.</div>
+             </div>
+             <button id="toggleSound" class="btn px-3 py-1.5 text-xs w-16"><span class="relative z-10" id="toggleSoundLabel">Muted</span></button>
+          </div>
+          
+           <div class="glass rounded-[16px] p-3 border border-white/10 flex items-center justify-between">
+             <div>
+                <div class="text-sm font-semibold text-white">✨ Motion</div>
+                <div class="text-[10px] text-gray-400">Reduce animations.</div>
+             </div>
+             <button id="toggleMotion" class="btn px-3 py-1.5 text-xs w-16"><span class="relative z-10" id="toggleMotionLabel">Full</span></button>
+          </div>
+        </div>
+        
+        <div class="mt-4 pt-3 border-t border-white/10 text-[10px] font-mono text-center text-gray-500">
+          Made with ❤️ by Shivam Bhadoriya
+        </div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <main id="top" class="pb-12 pt-28 sm:pt-32">
+      <!-- Hero -->
+      <section class="px-4 mx-auto section max-w-7xl sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-[1.3fr_.7fr] gap-6 items-center">
+          <!-- Text Side -->
+          <div class="glass neon shimmer-border rounded-[26px] p-6 sm:p-10">
+            <div class="flex flex-wrap gap-2 mb-6">
+              <span class="hud-pill px-3 py-1 text-[10px] sm:text-xs font-mono text-white/80">🎓 BSc IT • VidhyaDeep University</span>
+              <span class="hud-pill px-3 py-1 text-[10px] sm:text-xs font-mono text-green-300 border-green-500/30">✅ Open to Work</span>
+              <span class="hud-pill px-3 py-1 text-[10px] sm:text-xs font-mono text-orange-300 border-orange-500/30">🔥 Beast Mode ON</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight mb-6">
+              <span class="block text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-gray-400">Shivam</span>
+              <span class="glitch" data-text="Bhadoriya">Bhadoriya</span>
+            </h1>
+            
+            <p class="max-w-2xl mb-8 text-base leading-relaxed text-gray-300 sm:text-lg">
+              Passionate <strong class="text-white">Full Stack & MERN Stack Developer</strong>. I bridge the gap between 
+              <span class="text-cyan-300">functional logic</span> and <span class="text-violet-300">creative chaos</span>. 
+              Currently mastering data structures while building scalable web architectures.
+            </p>
+
+            <div class="flex flex-wrap gap-3 mb-8">
+               <a href="#contact" class="px-6 py-3 font-bold text-white btn bg-gradient-to-r from-violet-500/20 to-cyan-500/20 hover:from-violet-500/30 hover:to-cyan-500/30">
+                 <span class="relative z-10">🚀 HIRE ME NOW</span>
+               </a>
+               <a href="mailto:shivambhadoriya1605@gmail.com" class="px-6 py-3 font-medium text-gray-200 btn">
+                 <span class="relative z-10">📧 Email Me</span>
+               </a>
+               <a href="https://github.com/Dev-Shivam-05" target="_blank" class="px-4 py-3 text-gray-300 btn" aria-label="GitHub">
+                 <span class="relative z-10"><svg fill="currentColor" class="w-5 h-5" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></span>
+               </a>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-4 pt-6 font-mono text-xs text-gray-500 border-t border-white/10">
+               <span>CURRENT FOCUS:</span>
+               <div class="flex flex-wrap gap-2">
+                 <span class="px-2 py-1 border rounded bg-cyan-500/20 border-cyan-500/30 text-cyan-300">MERN Stack</span>
+                 <span class="px-2 py-1 border rounded bg-violet-500/20 border-violet-500/30 text-violet-300">DSA</span>
+                 <span class="px-2 py-1 text-pink-300 border rounded bg-pink-500/20 border-pink-500/30">React</span>
+               </div>
+            </div>
+          </div>
+
+          <!-- Mission Control -->
+          <div class="flex flex-col gap-6">
+             <div class="glass neon rounded-[26px] p-6 reveal">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-sm font-bold tracking-wider text-gray-400">📊 STATUS LOG</span>
+                  <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                </div>
+                
+                <div class="space-y-3">
+                   <div class="flex items-center justify-between p-3 border bg-white/5 rounded-xl border-white/5">
+                      <span class="text-xs text-gray-400">Current Role</span>
+                      <span class="text-xs font-semibold text-white">Student / Freelancer</span>
+                   </div>
+                    <div class="flex items-center justify-between p-3 border bg-white/5 rounded-xl border-white/5">
+                      <span class="text-xs text-gray-400">Location</span>
+                      <span class="text-xs font-semibold text-white">India 🇮🇳</span>
+                   </div>
+                    <div class="flex items-center justify-between p-3 border bg-white/5 rounded-xl border-white/5">
+                      <span class="text-xs text-gray-400">Response Time</span>
+                      <span class="text-xs font-semibold text-green-400">< 24 hours</span>
+                   </div>
+                </div>
+
+                <div class="pt-4 mt-4 border-t border-white/10">
+                   <div class="text-[10px] uppercase tracking-widest text-gray-500 mb-2">Quick Connect</div>
+                   <div class="grid grid-cols-5 gap-2">
+                      <a href="mailto:shivambhadoriya1605@gmail.com" class="p-2 text-center transition rounded-lg bg-white/5 hover:bg-red-500/20 hover:scale-110" title="Email"><span class="text-lg">📧</span></a>
+                      <a href="https://www.linkedin.com/in/shivam-bhadoriya-b82792324/" target="_blank" class="p-2 text-center transition rounded-lg bg-white/5 hover:bg-blue-500/20 hover:scale-110" title="LinkedIn"><span class="text-lg">💼</span></a>
+                      <a href="https://github.com/Dev-Shivam-05" target="_blank" class="p-2 text-center transition rounded-lg bg-white/5 hover:bg-gray-500/20 hover:scale-110" title="GitHub"><span class="text-lg">📦</span></a>
+                      <a href="https://www.behance.net/shivambhadoriya2/" target="_blank" class="p-2 text-center transition rounded-lg bg-white/5 hover:bg-blue-500/20 hover:scale-110" title="Behance"><span class="text-lg">🎨</span></a>
+                      <a href="https://www.instagram.com/__https.shivu/" target="_blank" class="p-2 text-center transition rounded-lg bg-white/5 hover:bg-pink-500/20 hover:scale-110" title="Instagram"><span class="text-lg">📸</span></a>
+                   </div>
+                </div>
+             </div>
+             
+             <!-- Daily Challenge -->
+             <div class="glass rounded-[26px] p-6 reveal relative overflow-hidden group">
+                 <div class="absolute inset-0 transition duration-500 opacity-0 bg-gradient-to-br from-violet-500/10 to-cyan-500/10 group-hover:opacity-100"></div>
+                 <div class="relative z-10">
+                    <div class="mb-1 font-mono text-xs text-cyan-400">🧠 DAILY CHALLENGE</div>
+                    <div class="mb-2 text-lg font-bold text-white">Two Sum Problem</div>
+                    <div class="w-12 h-1 mb-3 rounded-full bg-gradient-to-r from-violet-500 to-cyan-500"></div>
+                    <code class="block text-[10px] sm:text-xs font-mono text-gray-400 bg-black/30 p-2 rounded-lg overflow-hidden">function twoSum(nums, target) { ... }</code>
+                    <div class="mt-3 text-[10px] text-gray-500">Difficulty: 🟡 Medium</div>
+                 </div>
+             </div>
+          </div>
+        </div>
+        
+        <!-- Scroll indicator -->
+        <div class="flex justify-center mt-12 opacity-50 animate-bounce">
+           <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
+      </section>
+
+      <!-- About -->
+      <section id="about" class="px-4 mx-auto mt-20 section max-w-7xl sm:px-6 lg:px-8">
+         <div class="max-w-3xl mx-auto mb-10 text-center reveal">
+            <h2 class="mb-4 text-3xl font-bold sm:text-4xl">
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">Origin Story</span>
+            </h2>
+            <p class="leading-relaxed text-gray-400">
+               I'm <span class="font-semibold text-white">Shivam</span> — a builder who treats shipping as a craft. 
+               I don't just write code; I engineer solutions. When things break, I isolate, instrument, and refactor.
+               Currently pursuing my <span class="text-cyan-300">BSc in IT at VidhyaDeep University</span> while pushing the boundaries of what a browser can do.
+            </p>
+         </div>
+
+         <div class="grid max-w-5xl gap-4 mx-auto sm:grid-cols-2 lg:grid-cols-4 reveal">
+            <div class="glass rounded-[20px] p-5 text-center border border-white/5 hover:border-cyan-500/30 transition duration-300 group">
+               <div class="mb-3 text-4xl floating">⚡</div>
+               <h3 class="mb-1 font-bold text-white transition group-hover:text-cyan-300">Frontend Ninja</h3>
+               <p class="text-xs text-gray-400">Pixel-perfect UIs with Tailwind & CSS magic.</p>
+            </div>
+            <div class="glass rounded-[20px] p-5 text-center border border-white/5 hover:border-violet-500/30 transition duration-300 group">
+               <div class="mb-3 text-4xl floating" style="animation-delay: 0.2s">🔍</div>
+               <h3 class="mb-1 font-bold text-white transition group-hover:text-violet-300">Backend Explorer</h3>
+               <p class="text-xs text-gray-400">Building robust logic with JS, Python & SQL.</p>
+            </div>
+            <div class="glass rounded-[20px] p-5 text-center border border-white/5 hover:border-pink-500/30 transition duration-300 group">
+               <div class="mb-3 text-4xl floating" style="animation-delay: 0.4s">💻</div>
+               <h3 class="mb-1 font-bold text-white transition group-hover:text-pink-300">JS Enthusiast</h3>
+               <p class="text-xs text-gray-400">ES6+ wizardry & framework exploration.</p>
+            </div>
+            <div class="glass rounded-[20px] p-5 text-center border border-white/5 hover:border-green-500/30 transition duration-300 group">
+               <div class="mb-3 text-4xl floating" style="animation-delay: 0.6s">🏆</div>
+               <h3 class="mb-1 font-bold text-white transition group-hover:text-green-300">DSA Master</h3>
+               <p class="text-xs text-gray-400">Optimizing algorithms one problem at a time.</p>
+            </div>
+         </div>
+      </section>
+
+      <!-- Skills -->
+      <section id="skills" class="px-4 mx-auto mt-24 section max-w-7xl sm:px-6 lg:px-8">
+        <h2 class="pl-4 mb-8 text-2xl font-black border-l-4 sm:text-3xl border-cyan-400 reveal">
+          🛠️ Technology Arsenal
+        </h2>
+
+        <div class="grid gap-8 lg:grid-cols-2">
+          <!-- Proficient Skills -->
+          <div class="glass neon rounded-[26px] p-6 reveal">
+            <div class="flex items-center gap-2 mb-6 text-sm font-semibold text-green-300">
+               <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> 
+               ✅ PROFICIENT SKILLS
+            </div>
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3" id="coreSkills"></div>
+          </div>
+
+          <!-- Learning & Future -->
+          <div class="glass neon rounded-[26px] p-6 reveal">
+            <div class="flex items-center gap-2 mb-6 text-sm font-semibold text-yellow-300">
+               <span class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span> 
+               📚 CURRENTLY LEARNING
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-3" id="learningSkills"></div>
+            
+            <div class="flex items-center gap-2 mb-4 text-sm font-semibold text-violet-300">
+               <span class="w-2 h-2 rounded-full bg-violet-400"></span> 
+               🔮 FUTURE GOALS
+            </div>
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3" id="futureSkills"></div>
+            
+            <div class="pt-6 mt-6 border-t border-white/10">
+               <div class="flex items-center justify-between mb-2">
+                  <span class="font-mono text-xs text-gray-500">SKILL RADAR</span>
+                  <span class="font-mono text-xs text-green-400 animate-pulse">● LIVE</span>
+               </div>
+               <div class="relative w-full h-32 overflow-hidden border rounded-xl bg-black/40 border-white/5">
+                  <canvas id="radarCanvas" class="absolute inset-0 w-full h-full"></canvas>
+               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Philosophy -->
+      <section id="philosophy" class="px-4 mx-auto mt-24 section max-w-7xl sm:px-6 lg:px-8">
+        <h2 class="pl-4 mb-8 text-2xl font-black border-l-4 border-pink-500 sm:text-3xl reveal">
+          🌟 Developer Philosophy
+        </h2>
+        
+        <div class="max-w-4xl mx-auto">
+          <div class="grid gap-4 reveal">
+            <div class="flex items-center gap-4 p-5 transition border-l-4 philosophy-card glass rounded-xl border-violet-500 hover:bg-white/5">
+               <span class="text-3xl">💡</span>
+               <p class="text-gray-300">"Innovation happens at the intersection of curiosity and code"</p>
+            </div>
+            <div class="flex items-center gap-4 p-5 transition border-l-4 philosophy-card glass rounded-xl border-cyan-500 hover:bg-white/5">
+               <span class="text-3xl">🎯</span>
+               <p class="text-gray-300">"Focus on progress, not perfection"</p>
+            </div>
+            <div class="flex items-center gap-4 p-5 transition border-l-4 border-pink-500 philosophy-card glass rounded-xl hover:bg-white/5">
+               <span class="text-3xl">🔥</span>
+               <p class="text-gray-300">"Build it, break it, make it better"</p>
+            </div>
+            <div class="flex items-center gap-4 p-5 transition border-l-4 border-green-500 philosophy-card glass rounded-xl hover:bg-white/5">
+               <span class="text-3xl">⚡</span>
+               <p class="text-gray-300">"Learn in public, fail in private, succeed everywhere"</p>
+            </div>
+          </div>
+          
+          <!-- Animated Quote -->
+          <div class="mt-8 text-center reveal">
+            <div class="inline-block p-6 glass rounded-2xl">
+              <div class="mb-2 font-mono text-xs text-gray-500">// CURRENT MANTRA</div>
+              <p class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-cyan-400 to-pink-400" id="rotatingQuote">
+                Ship fast, learn more — push code, then soar!
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats Dashboard -->
+      <section id="stats" class="px-4 mx-auto mt-24 section max-w-7xl sm:px-6 lg:px-8">
+        <h2 class="pl-4 mb-8 text-2xl font-black border-l-4 border-violet-500 sm:text-3xl reveal">
+          📊 Beast Mode Stats
+        </h2>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 reveal">
+           <div class="grad-card-purple rounded-xl p-4 flex flex-col items-center justify-center gap-3 text-center transition hover:scale-[1.02]">
+              <div class="text-4xl">🚀</div>
+              <img src="https://komarev.com/ghpvc/?username=Dev-Shivam-05&color=8A2BE2&style=flat-square&label=Profile%20Views" alt="Profile Views" loading="lazy" class="object-contain h-6">
+              <div class="font-mono text-xs text-cyan-300">Live Counter</div>
+           </div>
+           
+           <div class="grad-card-pink rounded-xl p-4 flex flex-col items-center justify-center gap-3 text-center transition hover:scale-[1.02]">
+              <div class="text-4xl">📈</div>
+              <div class="flex gap-2">
+                 <img src="https://img.shields.io/github/followers/Dev-Shivam-05?style=flat-square&color=FF1493&label=Followers" alt="Followers" loading="lazy" class="h-5">
+                 <img src="https://img.shields.io/github/stars/Dev-Shivam-05?style=flat-square&color=FF69B4&label=Stars" alt="Stars" loading="lazy" class="h-5">
+              </div>
+              <div class="font-mono text-xs text-amber-300">Growth Metrics</div>
+           </div>
+           
+           <div class="grad-card-green rounded-xl p-4 flex flex-col items-center justify-center gap-3 text-center transition hover:scale-[1.02]">
+              <div class="text-4xl">💼</div>
+              <img src="https://img.shields.io/badge/Open%20to%20Work-✅%20YES-00FF7F?style=flat-square&logo=briefcase" alt="Open to Work" loading="lazy" class="h-5">
+              <a href="mailto:shivambhadoriya1605@gmail.com" class="transition hover:opacity-80">
+                <img src="https://img.shields.io/badge/Hire%20Me-🚀%20Click-FF4500?style=flat-square&logo=rocket&logoColor=white" alt="Hire Me" loading="lazy" class="h-5">
+              </a>
+              <div class="font-mono text-xs text-white">Professional Status</div>
+           </div>
+           
+           <div class="grad-card-cyan rounded-xl p-4 flex flex-col items-center justify-center gap-3 text-center transition hover:scale-[1.02]">
+              <div class="text-4xl">⏱️</div>
+              <div class="text-2xl font-bold text-cyan-300">< 24h</div>
+              <div class="font-mono text-xs text-gray-300">Response Time</div>
+           </div>
+        </div>
+
+        <!-- GitHub Stats -->
+        <div class="grid gap-4 mt-6 lg:grid-cols-2 reveal">
+           <div class="flex flex-col items-center p-4 overflow-hidden border glass rounded-xl border-white/10">
+              <div class="w-full mb-2 font-mono text-xs text-left text-gray-500">🔥 CONTRIBUTION STREAK</div>
+              <img src="https://github-readme-streak-stats.herokuapp.com/?user=Dev-Shivam-05&theme=dark&hide_border=true&stroke=0000&background=00000000&ring=05d9e8&fire=ff2a6d&currStreakLabel=b967ff&sideLabels=43e97b&dates=8A2BE2" alt="Streak" loading="lazy" class="w-full max-w-md rounded-lg">
+           </div>
+           <div class="flex flex-col items-center p-4 overflow-hidden border glass rounded-xl border-white/10">
+              <div class="w-full mb-2 font-mono text-xs text-left text-gray-500">🏆 TROPHY CASE</div>
+              <div class="flex justify-center w-full pb-2 overflow-x-auto hide-scrollbar">
+                 <img src="https://github-profile-trophy.vercel.app/?username=Dev-Shivam-05&theme=radical&margin-w=10&margin-h=10&column=4&no-frame=true&title=Stars,Commits,Followers,Repositories" alt="Trophies" loading="lazy" class="object-contain h-32">
+              </div>
+           </div>
+        </div>
+
+        <!-- Snake Graph -->
+        <div class="mt-6 glass rounded-[26px] p-6 sm:p-8 reveal border border-white/10 text-center">
+            <h3 class="mb-4 text-lg font-bold">🐍 Contribution Graph — Sissa Edition</h3>
+            <div class="bg-gradient-to-br from-[#2c3e50] to-[#4a6572] p-4 rounded-[20px] shadow-2xl inline-block max-w-full">
+              <img src="https://raw.githubusercontent.com/Dev-Shivam-05/Dev-Shivam-05/main/output/snake-dark.svg" alt="GitHub Contribution Snake" class="w-full max-w-2xl rounded-[15px] shadow-[0_0_25px_rgba(0,255,255,0.25)] transition-transform duration-300 hover:scale-[1.02]" loading="lazy" />
+            </div>
+            <p class="mt-4 text-sm italic text-gray-400">"Code. Commit. Conquer. — My journey, my style."</p>
+        </div>
+
+        <!-- Next Achievements -->
+        <div class="mt-6 text-center reveal">
+          <div class="mb-4 font-mono text-xs text-gray-500">🎯 NEXT ACHIEVEMENTS TO UNLOCK</div>
+          <div class="flex flex-wrap justify-center gap-2">
+            <img src="https://img.shields.io/badge/Arctic_Code_Vault_Contributor-2025-6a11cb?style=for-the-badge&logo=github" alt="Arctic" loading="lazy">
+            <img src="https://img.shields.io/badge/100_Days_Streak-In_Progress-2575fc?style=for-the-badge&logo=github" alt="Streak Goal" loading="lazy">
+            <img src="https://img.shields.io/badge/Pull_Shark-Coming_Soon-8A2387?style=for-the-badge&logo=github" alt="Pull Shark" loading="lazy">
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section id="contact" class="px-4 mx-auto mt-24 mb-16 section max-w-7xl sm:px-6 lg:px-8">
+        <div class="glass neon shimmer-border rounded-[26px] p-8 sm:p-12 text-center reveal">
+           <div class="mb-4 text-6xl">🚀</div>
+           <h2 class="mb-6 text-3xl font-black text-transparent sm:text-5xl bg-clip-text bg-gradient-to-r from-violet-400 via-cyan-400 to-pink-400">
+             Let's Build Something Insane
+           </h2>
+           <p class="max-w-2xl mx-auto mb-10 text-lg text-gray-300">
+             Ready to collaborate? I'm available for freelance work and full-time roles. 
+             Response time <span class="font-bold text-green-400">&lt; 24 hours</span>.
+           </p>
+           
+           <div class="flex flex-wrap justify-center gap-4 mb-8">
+              <a href="mailto:shivambhadoriya1605@gmail.com" class="px-8 py-4 text-lg font-bold btn bg-gradient-to-r from-red-500/20 to-orange-500/20 hover:from-red-500/30 hover:to-orange-500/30">
+                <span class="relative z-10">📧 Email Me</span>
+              </a>
+              <a href="https://www.linkedin.com/in/shivam-bhadoriya-b82792324/" target="_blank" class="px-8 py-4 text-lg font-bold btn bg-gradient-to-r from-blue-500/20 to-cyan-500/20 hover:from-blue-500/30 hover:to-cyan-500/30">
+                <span class="relative z-10">💼 LinkedIn</span>
+              </a>
+              <a href="https://github.com/Dev-Shivam-05" target="_blank" class="px-8 py-4 text-lg font-bold btn bg-gradient-to-r from-gray-500/20 to-gray-600/20 hover:from-gray-500/30 hover:to-gray-600/30">
+                <span class="relative z-10">📦 GitHub</span>
+              </a>
+           </div>
+
+           <div class="flex flex-wrap justify-center gap-3 mb-8">
+              <a href="https://www.behance.net/shivambhadoriya2/" target="_blank" class="px-6 py-3 btn">
+                <span class="relative z-10">🎨 Behance</span>
+              </a>
+              <a href="https://www.instagram.com/__https.shivu/" target="_blank" class="px-6 py-3 btn">
+                <span class="relative z-10">📸 Instagram</span>
+              </a>
+           </div>
+
+           <div class="pt-8 mt-8 border-t border-white/10">
+             <div class="flex flex-wrap justify-center gap-3 mb-4">
+               <span class="px-4 py-2 text-sm rounded-full bg-violet-500/20">Made with ❤️</span>
+               <span class="px-4 py-2 text-sm rounded-full bg-cyan-500/20">By Shivam Bhadoriya</span>
+               <span class="px-4 py-2 text-sm rounded-full bg-pink-500/20">Beast Mode ON 🔥</span>
+             </div>
+             <p class="font-mono text-xs text-gray-500">
+                © <span id="year"></span> • Full-Stack Developer Journey • All Rights Reserved
+             </p>
+           </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // === Data ===
+    const DATA = {
+      name: 'Shivam Bhadoriya',
+      github: 'Dev-Shivam-05',
+      email: 'shivambhadoriya1605@gmail.com',
+      
+      coreSkills: [
+        { name: 'HTML5', icon: '🌐', color: 'orange' },
+        { name: 'CSS3', icon: '🎨', color: 'blue' },
+        { name: 'JavaScript ES6+', icon: '⚡', color: 'yellow' },
+        { name: 'Bootstrap 5', icon: '🅱️', color: 'purple' },
+        { name: 'C', icon: '©️', color: 'blue' },
+        { name: 'C++', icon: '➕', color: 'pink' },
+        { name: 'Python', icon: '🐍', color: 'green' },
+        { name: 'MySQL', icon: '🗃️', color: 'cyan' },
+        { name: 'Git', icon: '📝', color: 'orange' },
+        { name: 'GitHub', icon: '📦', color: 'gray' },
+        { name: 'VS Code', icon: '💻', color: 'blue' },
+        { name: 'Figma', icon: '🎭', color: 'pink' },
+        { name: 'Photoshop', icon: '🖼️', color: 'blue' },
+        { name: 'Illustrator', icon: '✒️', color: 'orange' }
+      ],
+      
+      learningSkills: [
+        { name: 'React', icon: '⚛️', color: 'cyan' },
+        { name: 'REST API', icon: '🔗', color: 'violet' }
+      ],
+      
+      futureSkills: [
+        { name: 'Docker', icon: '🐳', color: 'blue' },
+        { name: 'AWS', icon: '☁️', color: 'orange' },
+        { name: 'Nginx', icon: '🌀', color: 'green' }
+      ],
+      
+      quotes: [
+        "Ship fast, learn more — push code, then soar!",
+        "Debug the code, not your dreams!",
+        "Every error is a step closer to excellence!",
+        "Code with passion, deploy with confidence!",
+        "Think twice, code once, refactor forever!"
+      ]
+    };
+
+    const $ = (s, el=document) => el.querySelector(s);
+    const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
+    
+    const colorClasses = {
+      orange: 'bg-orange-500/20 border-orange-500/40 text-orange-300 hover:bg-orange-500/30',
+      blue: 'bg-blue-500/20 border-blue-500/40 text-blue-300 hover:bg-blue-500/30',
+      yellow: 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300 hover:bg-yellow-500/30',
+      purple: 'bg-purple-500/20 border-purple-500/40 text-purple-300 hover:bg-purple-500/30',
+      pink: 'bg-pink-500/20 border-pink-500/40 text-pink-300 hover:bg-pink-500/30',
+      green: 'bg-green-500/20 border-green-500/40 text-green-300 hover:bg-green-500/30',
+      cyan: 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/30',
+      gray: 'bg-gray-500/20 border-gray-500/40 text-gray-300 hover:bg-gray-500/30',
+      violet: 'bg-violet-500/20 border-violet-500/40 text-violet-300 hover:bg-violet-500/30'
+    };
+
+    function renderSkills(){
+       const coreWrap = $('#coreSkills');
+       const learningWrap = $('#learningSkills');
+       const futureWrap = $('#futureSkills');
+       
+       coreWrap.innerHTML = '';
+       learningWrap.innerHTML = '';
+       futureWrap.innerHTML = '';
+
+       DATA.coreSkills.forEach(s => {
+          const div = document.createElement('div');
+          div.className = `skill-icon rounded-lg p-3 border text-center cursor-default ${colorClasses[s.color]}`;
+          div.innerHTML = `<span class="block mb-1 text-lg">${s.icon}</span><span class="text-xs font-semibold">${s.name}</span>`;
+          coreWrap.appendChild(div);
+       });
+
+       DATA.learningSkills.forEach(s => {
+          const div = document.createElement('div');
+          div.className = `skill-icon rounded-lg p-3 border text-center cursor-default ${colorClasses[s.color]}`;
+          div.innerHTML = `<span class="block mb-1 text-lg">${s.icon}</span><span class="text-xs font-semibold">${s.name}</span>`;
+          learningWrap.appendChild(div);
+       });
+
+       DATA.futureSkills.forEach(s => {
+          const div = document.createElement('div');
+          div.className = `skill-icon rounded-lg p-3 border border-dashed text-center cursor-default opacity-70 ${colorClasses[s.color]}`;
+          div.innerHTML = `<span class="block mb-1 text-lg">${s.icon}</span><span class="text-xs">${s.name}</span>`;
+          futureWrap.appendChild(div);
+       });
+    }
+
+    // Boot screen
+    function initBoot(){
+       const boot = $('#boot');
+       const btn = $('#enterBtn');
+       
+       const enter = () => {
+          boot.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+          boot.style.opacity = '0';
+          boot.style.transform = 'scale(1.05)';
+          setTimeout(() => boot.remove(), 600);
+          
+          try {
+             const ctx = new (window.AudioContext || window.webkitAudioContext)();
+             ctx.resume(); 
+          } catch(e){}
+       };
+       
+       btn.addEventListener('click', enter);
+    }
+    
+    // Settings panel
+    function initSettings(){
+       let state = { sanity: 'on', sound: 'muted', motion: 'full' };
+       
+       $('#toggleSanity').addEventListener('click', () => {
+          state.sanity = state.sanity === 'on' ? 'off' : 'on';
+          document.body.dataset.sanity = state.sanity;
+          $('#toggleSanityLabel').textContent = state.sanity === 'on' ? 'On' : 'Off';
+       });
+       
+       $('#toggleSound').addEventListener('click', () => {
+          state.sound = state.sound === 'muted' ? 'on' : 'muted';
+          $('#toggleSoundLabel').textContent = state.sound === 'muted' ? 'Muted' : 'On';
+          if(state.sound === 'on') startAudio();
+          else stopAudio();
+       });
+       
+       $('#toggleMotion').addEventListener('click', () => {
+          state.motion = state.motion === 'full' ? 'reduced' : 'full';
+          document.body.dataset.motion = state.motion;
+          $('#toggleMotionLabel').textContent = state.motion === 'full' ? 'Full' : 'Reduced';
+       });
+       
+       $('#settingsBtn').addEventListener('click', () => $('#settings').classList.remove('hidden'));
+       $('#closeSettings').addEventListener('click', () => $('#settings').classList.add('hidden'));
+       $('#settingsBackdrop').addEventListener('click', () => $('#settings').classList.add('hidden'));
+    }
+
+    // Audio
+    let audioCtx, oscillators = [];
+    function startAudio(){
+       if(audioCtx) return;
+       try {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const createOsc = (freq, type, gainVal) => {
+             const osc = audioCtx.createOscillator();
+             const gain = audioCtx.createGain();
+             osc.type = type;
+             osc.frequency.value = freq;
+             gain.gain.value = gainVal;
+             osc.connect(gain);
+             gain.connect(audioCtx.destination);
+             osc.start();
+             oscillators.push({osc, gain});
+          };
+          createOsc(50, 'sine', 0.08);
+          createOsc(52, 'sine', 0.08);
+          createOsc(100, 'triangle', 0.015);
+       } catch(e) { console.error(e); }
+    }
+    
+    function stopAudio(){
+       if(!audioCtx) return;
+       oscillators.forEach(o => { try{ o.osc.stop(); o.osc.disconnect(); }catch(e){} });
+       oscillators = [];
+       audioCtx.close();
+       audioCtx = null;
+    }
+
+    // Radar animation
+    function initRadar(){
+       const c = $('#radarCanvas');
+       if(!c) return;
+       const ctx = c.getContext('2d');
+       let angle = 0;
+       
+       const draw = () => {
+          const w = c.width = c.offsetWidth;
+          const h = c.height = c.offsetHeight;
+          const cx = w/2, cy = h/2;
+          const r = Math.min(h*0.4, w*0.3);
+          
+          ctx.clearRect(0,0,w,h);
+          
+          ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI*2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(cx, cy, r*0.5, 0, Math.PI*2);
+          ctx.stroke();
+          
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(angle);
+          
+          const grad = ctx.createLinearGradient(0, 0, r, 0);
+          grad.addColorStop(0, 'rgba(5, 217, 232, 0.8)');
+          grad.addColorStop(1, 'rgba(185, 103, 255, 0)');
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(r, 0);
+          ctx.stroke();
+          
+          ctx.restore();
+          
+          // Draw skill dots
+          const skills = ['JS', 'CSS', 'React', 'Git', 'SQL'];
+          skills.forEach((s, i) => {
+            const a = (Math.PI * 2 / skills.length) * i - Math.PI/2;
+            const x = cx + Math.cos(a) * r * 0.7;
+            const y = cy + Math.sin(a) * r * 0.7;
+            ctx.fillStyle = 'rgba(5, 217, 232, 0.6)';
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2);
+            ctx.fill();
+          });
+          
+          angle += 0.03;
+          requestAnimationFrame(draw);
+       };
+       requestAnimationFrame(draw);
+    }
+
+    // Rotating quotes
+    function initQuotes(){
+       const el = $('#rotatingQuote');
+       if(!el) return;
+       let i = 0;
+       setInterval(() => {
+          i = (i + 1) % DATA.quotes.length;
+          el.style.opacity = 0;
+          setTimeout(() => {
+            el.textContent = DATA.quotes[i];
+            el.style.opacity = 1;
+          }, 300);
+       }, 4000);
+    }
+
+    // Custom cursor
+    function initCursor(){
+       const cursor = $('#cursor');
+       if(!cursor || window.matchMedia('(pointer: coarse)').matches) return;
+       
+       document.addEventListener('mousemove', (e) => {
+          cursor.style.left = e.clientX + 'px';
+          cursor.style.top = e.clientY + 'px';
+       });
+       
+       document.addEventListener('mousedown', () => {
+          cursor.querySelector('.ring').style.transform = 'scale(0.8)';
+       });
+       document.addEventListener('mouseup', () => {
+          cursor.querySelector('.ring').style.transform = 'scale(1)';
+       });
+    }
+
+    // Particle background
+    function initParticles(){
+       const canvas = $('#bgCanvas');
+       if(!canvas) return;
+       const ctx = canvas.getContext('2d');
+       
+       const resize = () => {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+       };
+       resize();
+       window.addEventListener('resize', resize);
+       
+       const particles = [];
+       for(let i = 0; i < 50; i++){
+          particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            r: Math.random() * 2 + 1,
+            color: ['rgba(185,103,255,0.4)', 'rgba(5,217,232,0.4)', 'rgba(255,42,109,0.3)'][Math.floor(Math.random()*3)]
+          });
+       }
+       
+       const animate = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          
+          particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            
+            if(p.x < 0) p.x = canvas.width;
+            if(p.x > canvas.width) p.x = 0;
+            if(p.y < 0) p.y = canvas.height;
+            if(p.y > canvas.height) p.y = 0;
+            
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+          });
+          
+          // Draw connections
+          particles.forEach((p1, i) => {
+            particles.slice(i + 1).forEach(p2 => {
+              const dx = p1.x - p2.x;
+              const dy = p1.y - p2.y;
+              const dist = Math.sqrt(dx*dx + dy*dy);
+              if(dist < 150){
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.strokeStyle = `rgba(185,103,255,${0.1 * (1 - dist/150)})`;
+                ctx.stroke();
+              }
+            });
+          });
+          
+          requestAnimationFrame(animate);
+       };
+       animate();
+    }
+
+    // Init
+    window.addEventListener('DOMContentLoaded', () => {
+       renderSkills();
+       initBoot();
+       initSettings();
+       initRadar();
+       initQuotes();
+       initCursor();
+       initParticles();
+       $('#year').textContent = new Date().getFullYear();
+       
+       // Reveal on scroll
+       const observer = new IntersectionObserver((entries) => {
+          entries.forEach(e => {
+             if(e.isIntersecting) {
+                e.target.classList.add('is-in');
+                observer.unobserve(e.target);
+             }
+          });
+       }, { threshold: 0.1 });
+       $$('.reveal').forEach(el => observer.observe(el));
+       
+       // Glitch flash on scroll
+       let lastScroll = 0;
+       const flash = $('#glitchFlash');
+       window.addEventListener('scroll', () => {
+          const delta = Math.abs(window.scrollY - lastScroll);
+          if(delta > 100){
+             flash.style.opacity = '0.3';
+             setTimeout(() => flash.style.opacity = '0', 100);
+          }
+          lastScroll = window.scrollY;
+       });
+    });
+  </script>
+</body>
+</html>

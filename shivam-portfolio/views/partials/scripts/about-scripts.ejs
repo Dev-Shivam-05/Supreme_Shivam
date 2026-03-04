@@ -1,0 +1,16 @@
+<script>
+    /* Enhanced Skill Bars for this page */
+    document.addEventListener('DOMContentLoaded', () => {
+        const skillBars = document.querySelectorAll('.skill-bar-inner-enhanced');
+        if (skillBars.length) {
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.width = entry.target.dataset.width;
+                    }
+                });
+            }, { threshold: 0.3 });
+            skillBars.forEach(bar => obs.observe(bar));
+        }
+    });
+</script>

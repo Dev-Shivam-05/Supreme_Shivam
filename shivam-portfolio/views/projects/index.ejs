@@ -1,0 +1,129 @@
+<%- include("../partials/public-header") %>
+
+  <% projects.forEach(function(project) { %>
+  <!-- PAGE HEADER -->
+  <section class="page-header" style="padding-bottom:40px;">
+    <div class="container">
+      <div class="breadcrumb-custom reveal" style="margin-bottom:20px;">
+        <a href="/">Home</a><span>/</span><a href="/projects">Projects</a><span>/</span><span><%= project.title %></span>
+      </div>
+      <h1 class="page-header-title reveal reveal-delay-1"><%= project.title %></h1>
+      <p class="page-header-subtitle reveal reveal-delay-2"><%= project.description %></p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+
+      <!-- Project Hero Banner -->
+      <div class="project-hero-banner reveal">
+        <div style="position:relative; z-index:1; text-align:center;">
+          <i class="fas fa-palette" style="font-size:5rem; color:var(--green); opacity:0.2; margin-bottom:16px;"></i>
+          <p style="color:var(--text-muted); font-family:var(--font-mono); font-size:0.85rem;">Project Screenshot / Demo Preview</p>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="quick-stats reveal">
+        <div class="quick-stat-item">
+        <div class="quick-stat-label">Type</div>
+        <div class="quick-stat-value"><%= project.category %></div>
+        </div>
+        <div class="quick-stat-item">
+          <div class="quick-stat-label">Date</div>
+          <div class="quick-stat-value">Oct 2024</div>
+        </div>
+        <div class="quick-stat-item">
+        <div class="quick-stat-label">Tech Stack</div>
+        <div class="quick-stat-value">
+          <% project.techStack.forEach(function(tech) { %>
+            <span class="tech-tag"><%= tech %></span>
+          <% }) %>
+        </div>
+        </div>
+        <div class="quick-stat-item">
+          <div class="quick-stat-label">Role</div>
+          <div class="quick-stat-value">Solo Developer</div>
+        </div>
+      </div>
+
+      <!-- The Story -->
+      <div class="row g-5 mb-80">
+        <div class="col-lg-6 reveal story-section">
+          <div class="problem">
+            <h3><span class="icon-circle"><i class="fas fa-exclamation"></i></span> The Problem</h3>
+            <p>
+              Existing AI art tools were either prohibitively expensive, locked behind complex interfaces,
+              or lacked community features. Users wanted a simple, affordable platform where they could
+              generate AI art from text prompts, save creations to a personal gallery, and share
+              with a community — all without needing a PhD in machine learning.
+            </p>
+          </div>
+        </div>
+        <div class="col-lg-6 reveal reveal-delay-2 story-section">
+          <div class="solution">
+            <h3><span class="icon-circle"><i class="fas fa-check"></i></span> The Solution</h3>
+            <p>
+              I built a full-stack MERN application with a clean, intuitive UI. The backend leverages
+              Node.js and Express to proxy requests to OpenAI's DALL·E API, while MongoDB stores
+              user data and generated artworks. JWT-based authentication, image optimization via
+              Cloudinary, and a responsive React frontend make it production-ready and blazing fast.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code Snippet -->
+      <div class="mb-80 reveal">
+        <span class="section-label"><span class="dot"></span> Under the Hood</span>
+        <h2 class="section-title" style="margin-bottom:30px;">Code <span class="gradient-text">Highlight</span></h2>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="code-dot red"></span>
+            <span class="code-dot yellow"></span>
+            <span class="code-dot green"></span>
+            <span class="code-filename">generateArt.controller.js</span>
+          </div>
+          <div class="code-body">
+<span class="line-num"> 1</span><span class="kw">const</span> <span class="fn">generateArt</span> = <span class="kw">async</span> (req, res) => {<br>
+<span class="line-num"> 2</span>  <span class="kw">try</span> {<br>
+<span class="line-num"> 3</span>    <span class="kw">const</span> { <span class="var">prompt</span>, <span class="var">style</span>, <span class="var">size</span> } = req.<span class="obj">body</span>;<br>
+<span class="line-num"> 4</span><br>
+<span class="line-num"> 5</span>    <span class="cm">// Validate input & sanitize prompt</span><br>
+<span class="line-num"> 6</span>    <span class="kw">const</span> <span class="var">sanitized</span> = <span class="fn">sanitizePrompt</span>(<span class="var">prompt</span>);<br>
+<span class="line-num"> 7</span><br>
+<span class="line-num"> 8</span>    <span class="cm">// Call OpenAI DALL·E API</span><br>
+<span class="line-num"> 9</span>    <span class="kw">const</span> <span class="var">response</span> = <span class="kw">await</span> <span class="obj">openai</span>.<span class="fn">createImage</span>({<br>
+<span class="line-num">10</span>      prompt: <span class="str">`${sanitized}, ${style} style`</span>,<br>
+<span class="line-num">11</span>      n: <span class="num">1</span>,<br>
+<span class="line-num">12</span>      size: size || <span class="str">"1024x1024"</span>,<br>
+<span class="line-num">13</span>    });<br>
+<span class="line-num">14</span><br>
+<span class="line-num">15</span>    <span class="cm">// Upload to Cloudinary & save to DB</span><br>
+<span class="line-num">16</span>    <span class="kw">const</span> <span class="var">imageUrl</span> = <span class="kw">await</span> <span class="fn">uploadToCloud</span>(<span class="var">response</span>);<br>
+<span class="line-num">17</span>    <span class="kw">await</span> <span class="obj">Art</span>.<span class="fn">create</span>({ user: req.<span class="obj">userId</span>, <span class="var">prompt</span>, <span class="var">imageUrl</span> });<br>
+<span class="line-num">18</span><br>
+<span class="line-num">19</span>    res.<span class="fn">status</span>(<span class="num">201</span>).<span class="fn">json</span>({ success: <span class="num">true</span>, <span class="var">imageUrl</span> });<br>
+<span class="line-num">20</span>  } <span class="kw">catch</span> (err) {<br>
+<span class="line-num">21</span>    res.<span class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({ error: err.<span class="obj">message</span> });<br>
+<span class="line-num">22</span>  }<br>
+<span class="line-num">23</span>};<br>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="text-center reveal">
+        <a href="<%= project.liveLink %>" class="btn-glow-green me-3" style="margin-bottom:16px;">
+          <i class="fas fa-external-link-alt"></i> Live Demo
+        </a>
+        <a href="<%= project.repoLink %>" class="btn-glow-purple" style="margin-bottom:16px;">
+          <i class="fab fa-github"></i> GitHub Repo
+        </a>
+      </div>
+
+    </div>
+  </section>
+  <% }) %>
+
+<%- include("../partials/public-footer") %>
