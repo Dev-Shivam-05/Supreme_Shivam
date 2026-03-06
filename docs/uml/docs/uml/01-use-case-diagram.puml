@@ -1,0 +1,98 @@
+@startuml Shivam_Portfolio_UseCase
+!define RECTANGLE class
+
+skinparam actorStyle awesome
+skinparam backgroundColor #1a1a1a
+skinparam arrowColor #00FF7F
+skinparam actorBorderColor #00FF7F
+skinparam actorBackgroundColor #1a1a1a
+skinparam actorFontColor #00FF7F
+skinparam usecaseBorderColor #8A2BE2
+skinparam usecaseBackgroundColor #2d2d2d
+skinparam usecaseFontColor #ffffff
+skinparam packageBackgroundColor #333333
+skinparam packageBorderColor #8A2BE2
+
+left to right direction
+
+actor "Anonymous Visitor" as V #grey
+actor "Potential Client" as C #gold
+actor "Shivam (Admin)" as A #red
+actor "System Bot" as S #lightblue
+
+rectangle "Shivam's Digital Empire (System)" #line.dashed {
+
+  package "Public Facade (Portfolio)" {
+    usecase "View 'Beast Mode' Stats" as UC1
+    usecase "Explore 'Art Generator' Project" as UC2
+    usecase "Verify 300-Day Streak" as UC3
+    usecase "Download Resume (ATS Optimized)" as UC4
+    usecase "Filter Projects (MERN/Open Source)" as UC5
+  }
+
+  package "Freelance Engine (Conversion)" {
+    usecase "View Service Packages" as UC6
+    usecase "Calculate Project Cost (Estimator)" as UC7
+    usecase "Submit Priority Inquiry" as UC8
+    usecase "Schedule Meeting (Calendly)" as UC9
+  }
+
+  package "The Panopticon (Tracking)" {
+    usecase "Log IP & Location" as UC10
+    usecase "Track Scroll Depth" as UC11
+    usecase "Record User Journey" as UC12
+  }
+
+  package "God Mode (Admin Dashboard)" {
+    usecase "Login (2FA Secured)" as UC13
+    usecase "View Live Visitor Map" as UC14
+    usecase "Manage Projects (CRUD)" as UC15
+    usecase "Approve/Reject Inquiries" as UC16
+    usecase "Update 'Streak' Manually" as UC17
+    usecase "Upload Case Studies" as UC18
+  }
+}
+
+' Visitor Actions
+V --> UC1
+V --> UC2
+V --> UC3
+V --> UC4
+V --> UC5
+V --> UC6
+
+' Tracking happens automatically for everyone
+V ..> UC10 : <<includes>>
+V ..> UC11 : <<includes>>
+
+' Client Actions (Inherits Visitor)
+C --|> V
+C --> UC7
+C --> UC8
+C --> UC9
+
+' Admin Actions
+A --> UC13
+A --> UC14
+A --> UC15
+A --> UC16
+A --> UC17
+A --> UC18
+
+' System Automation
+S --> UC10 : Auto-Trigger
+S --> UC3 : Fetch GitHub API
+
+note right of UC14
+  **The Spy Dashboard**
+  Real-time analytics of
+  who is looking at you.
+end note
+
+note right of UC8
+  **High Ticket**
+  Clients fill detailed
+  requirements here.
+end note
+
+@enduml

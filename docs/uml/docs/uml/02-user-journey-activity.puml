@@ -1,0 +1,94 @@
+@startuml Complete User Journey - Activity Diagram
+
+skinparam backgroundColor #FEFEFE
+skinparam activityBorderColor #667eea
+skinparam activityBackgroundColor #f8f9ff
+skinparam activityDiamondBorderColor #764ba2
+skinparam activityDiamondBackgroundColor #ffd6e8
+
+title User Journey - From Visitor to Paying Client
+
+start
+
+:Visitor Lands on Homepage;
+note right
+  **Spy System Triggered**
+  - Log IP
+  - Detect Device
+  - Fetch Location
+end note
+
+if (Is User Admin?) then (yes)
+  #LightPink:Redirect to /admin/login;
+  stop
+else (no)
+  :Display "Hero Section";
+  :Show "300-Day Streak" Badge;
+endif
+
+:Visitor Scrolls Down;
+
+if (User Intent?) then (Hire/Business)
+
+  #LightCyan:Click "Services" or "Hire Me";
+  :View Service Packages;
+  note right
+    - Backend API Dev
+    - Full Stack App
+    - MVP Builder
+  end note
+
+  if (Needs Custom Solution?) then (yes)
+    :Click "Request Quote";
+    :Fill **Detailed Inquiry Form**;
+    note right
+      - Budget
+      - Timeline
+      - Tech Stack
+    end note
+
+    if (Form Valid?) then (yes)
+      :Submit Inquiry;
+      #LightGreen:Show Success Modal;
+      :Send Auto-Email to Client;
+      :Send WhatsApp Alert to Shivam;
+    else (no)
+      #Pink:Show Validation Errors;
+      :Correction Loop;
+    endif
+
+  else (Direct Contact)
+    :Click "Schedule Meeting";
+    :Redirect to Calendly;
+  endif
+
+else (Browsing/Recruiter)
+  
+  :Click "Portfolio";
+  :Filter Projects (Node/JS/React);
+
+  if (Selects "Art Generator"?) then (yes)
+    :View Case Study;
+    :See Live Demo Link;
+    :View GitHub Repository;
+    note right
+      **High Value Action**
+      Recruiter likely
+    end note
+  else (Selects Weather/Recipe)
+    :View Project Details;
+  endif
+
+  if (Interested in Code?) then (yes)
+    :Click GitHub Profile;
+    :Redirect to GitHub;
+  else (Interested in Resume?)
+    :Click "Download CV";
+    :Capture Download Event;
+  endif
+
+endif
+
+stop
+
+@enduml

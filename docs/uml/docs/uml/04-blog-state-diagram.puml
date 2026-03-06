@@ -1,0 +1,67 @@
+@startuml Inquiry Submission - Sequence Diagram
+
+skinparam backgroundColor #FEFEFE
+skinparam sequenceParticipantBorderColor #667eea
+skinparam sequenceParticipantBackgroundColor #f8f9ff
+skinparam sequenceLifeLineBorderColor #764ba2
+
+title Client Inquiry & Notification Flow
+
+actor "Client" as C
+participant "Portfolio UI" as UI
+participant "Inquiry\nController" as IC
+participant "Validation\nLayer" as VL
+participant "MongoDB" as DB
+participant "Email\nService" as ES
+participant "Shivam's Phone" as SP
+
+== FORM SUBMISSION ==
+
+C -> UI: Fills "Hire Me" Form
+note right: Name, Email, Budget, Message
+activate UI
+
+C -> UI: Clicks "Send Proposal"
+UI -> VL: Client-Side Validation
+VL --> UI: Valid ✓
+
+UI -> IC: POST /api/inquiry/new
+activate IC
+
+IC -> VL: Server-Side Validation (Sanitize)
+activate VL
+VL --> IC: Safe Data ✓
+deactivate VL
+
+IC -> DB: Create Inquiry Document
+activate DB
+DB --> IC: Inquiry ID: #9921
+deactivate DB
+
+== NOTIFICATION SYSTEM ==
+
+par Notify Client
+  IC -> ES: sendAutoReply(clientEmail)
+  activate ES
+  ES -> ES: Render HTML Template
+  ES -> C: Email: "Received! I'll reply in 24h"
+  deactivate ES
+end
+
+par Notify Shivam (URGENT)
+  IC -> ES: sendAdminAlert(details)
+  activate ES
+  ES -> SP: Email: "New Lead: $500 Budget"
+  deactivate ES
+end
+
+== RESPONSE ==
+
+IC --> UI: 201 Created
+deactivate IC
+
+UI -> UI: Show Success Animation
+UI --> C: "Message Sent Successfully"
+deactivate UI
+
+@enduml

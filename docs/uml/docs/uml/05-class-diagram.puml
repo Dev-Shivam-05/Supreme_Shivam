@@ -1,0 +1,159 @@
+@startuml Shivam Portfolio - Class Diagram
+
+skinparam backgroundColor #FEFEFE
+skinparam classBorderColor #667eea
+skinparam classBackgroundColor #f8f9ff
+skinparam classAttributeIconSize 0
+
+title Shivam Portfolio Platform - **Class** Diagram
+
+class AdminUser {
+  - _id: ObjectId
+  - username: String
+  - password: String (hashed)
+  - email: String
+  - twoFactorSecret: String
+  - lastLoginIP: String
+  - loginAttempts: Number
+  - lockUntil: Date
+  - createdAt: Date
+  __
+  + login(): Promise<Token>
+  + enable2FA(): Promise<QRCode>
+  + verify2FA(): Boolean
+  + updateProfile(): Promise
+  + generateBackupCodes(): Array<String>
+}
+
+class Project {
+  - _id: ObjectId
+  - title: String
+  - slug: String
+  - description: String
+  - content: String (Markdown)
+  - techStack: Array<String>
+  - liveLink: String
+  - repoLink: String
+  - images: Array<String>
+  - category: Enum
+  - isFeatured: Boolean
+  - isOpenSource: Boolean
+  - viewCount: Number
+  - githubStars: Number (Synced)
+  - publishedAt: Date
+  - createdAt: Date
+  __
+  + create(): Promise
+  + update(): Promise
+  + delete(): Promise
+  + toggleFeature(): Promise
+  + syncGithubStats(): Promise
+}
+
+class Service {
+  - _id: ObjectId
+  - name: String
+  - description: String
+  - startingPrice: Number
+  - deliveryDays: Number
+  - features: Array<String>
+  - isActive: Boolean
+  __
+  + updatePrice(): Promise
+  + toggleAvailability(): Promise
+}
+
+class Inquiry {
+  - _id: ObjectId
+  - clientName: String
+  - clientEmail: String
+  - companyName: String (Optional)
+  - serviceType: ObjectId
+  - budgetRange: String
+  - message: String
+  - attachments: Array<String>
+  - status: Enum
+  - ipAddress: String
+  - readByAdmin: Boolean
+  - createdAt: Date
+  __
+  + submit(): Promise
+  + markAsRead(): Promise
+  + updateStatus(): Promise
+  + archive(): Promise
+}
+
+class VisitorLog {
+  - _id: ObjectId
+  - ipAddress: String
+  - city: String
+  - country: String
+  - userAgent: String
+  - deviceType: String
+  - browser: String
+  - entryPage: String
+  - exitPage: String
+  - sessionDuration: Number
+  - pagesVisited: Array<String>
+  - timestamp: Date
+  __
+  + logHit(): Promise
+  + updateDuration(): Promise
+  + getHeatmapData(): Object
+}
+
+class GitHubStats {
+  - _id: ObjectId
+  - totalCommits: Number
+  - currentStreak: Number
+  - longestStreak: Number
+  - contributionsLastYear: Number
+  - lastSyncedAt: Date
+  __
+  + fetchFromAPI(): Promise
+  + getBeastModeStatus(): Boolean
+}
+
+' Relationships
+
+AdminUser "1" --> "*" Project : manages >
+AdminUser "1" --> "*" Service : manages >
+AdminUser "1" --> "*" Inquiry : responds >
+AdminUser "1" --> "1" GitHubStats : monitors >
+
+Project "1" --> "0..*" VisitorLog : tracks interest >
+Inquiry "0..*" --> "1" Service : requests >
+
+' Enumerations
+
+enum ProjectCategory {
+  FULL_STACK
+  BACKEND_API
+  OPEN_SOURCE
+  UI_UX
+}
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  NEGOTIATING
+  WON
+  LOST
+}
+
+note right of VisitorLog
+  **The Spy Module**
+  Captures detailed analytics
+  to identify high-value
+  clients based on location
+  and behavior.
+end note
+
+note right of Inquiry
+  **The Money Module**
+  Tracks potential leads
+  from initial contact
+  to final payment.
+end note
+
+@enduml

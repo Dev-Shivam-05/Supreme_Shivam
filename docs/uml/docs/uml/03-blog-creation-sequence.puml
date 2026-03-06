@@ -1,0 +1,82 @@
+@startuml Admin Dashboard - Sequence Diagram
+
+skinparam backgroundColor #FEFEFE
+skinparam sequenceParticipantBorderColor #667eea
+skinparam sequenceParticipantBackgroundColor #f8f9ff
+
+title Admin Login & Dashboard Initialization
+
+actor "Shivam" as A
+participant "Browser" as B
+participant "Auth Middleware" as AM
+participant "Admin Controller" as AC
+participant "Visitor Service" as VS
+participant "Inquiry Service" as IS
+participant "MongoDB" as DB
+
+== SECURE LOGIN ==
+
+A -> B: Access /admin
+activate B
+B -> AM: GET /admin
+activate AM
+AM --> B: Redirect to Login (No Token)
+deactivate AM
+
+A -> B: Enter Credentials
+B -> AC: POST /api/auth/admin-login
+activate AC
+
+AC -> DB: Find User (Username)
+activate DB
+DB --> AC: User Found + Hash
+deactivate DB
+
+AC -> AC: Compare Password (Bcrypt)
+
+alt Password Invalid
+  AC --> B: 401 Unauthorized
+  B --> A: "Access Denied"
+else Password Valid
+  AC -> AC: Generate JWT Token
+  AC --> B: Set HTTP-Only Cookie
+  deactivate AC
+  B -> A: Redirect to Dashboard
+end
+
+== DASHBOARD LOADING (GOD MODE) ==
+
+A -> B: Dashboard Loads
+activate B
+B -> AC: GET /api/admin/stats
+activate AC
+
+par Fetch Visitor Intelligence
+  AC -> VS: getRealTimeVisitors()
+  activate VS
+  VS -> DB: Aggregate({ timestamp: last_10_min })
+  activate DB
+  DB --> VS: Active Users (e.g., 3)
+  deactivate DB
+  VS --> AC: Visitor Data
+  deactivate VS
+end
+
+par Fetch Money Stats
+  AC -> IS: getPendingInquiries()
+  activate IS
+  IS -> DB: Count({ status: 'NEW' })
+  activate DB
+  DB --> IS: New Leads (e.g., 2)
+  deactivate DB
+  IS --> AC: Inquiry Data
+  deactivate IS
+end
+
+AC --> B: JSON { visitors, leads, revenue }
+deactivate AC
+
+B -> A: Render **Live Charts & Maps**
+deactivate B
+
+@enduml
