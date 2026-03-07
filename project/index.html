@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+    <div id="preloader">
+        <div class="loader-ring"></div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- Floating Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Particles -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- ===================== NAVBAR ===================== -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="nav-logo" href="index.html">SB<span>.</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="mainNav">
+                <ul class="navbar-nav mx-auto gap-1">
+                    <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="project.html">Project</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+                <a href="./contact.html" class="nav-link nav-cta">Hire Me</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===================== HERO SECTION ===================== -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7 hero-content">
+                    <div class="hero-label reveal">
+                        <span></span> Available for Work
+                    </div>
+                    <h1 class="hero-name reveal reveal-delay-1">
+                        SHIVAM<br><span class="highlight">BHADORIYA</span>
+                    </h1>
+                    <div class="typing-container reveal reveal-delay-2">
+                        I'm a <span class="typing-text"></span>
+                    </div>
+                    <div class="hero-buttons reveal reveal-delay-3">
+                        <a href="contact.html" class="btn-glow-green">
+                            <i class="fas fa-rocket"></i> Hire Me
+                        </a>
+                        <a href="project.html" class="btn-glow-purple">
+                            <i class="fas fa-eye"></i> View Work
+                        </a>
+                    </div>
+                    <div class="hero-stats reveal reveal-delay-4">
+                        <div class="hero-stat">
+                            <div class="hero-stat-number counter" data-target="300" data-suffix="+">0</div>
+                            <div class="hero-stat-label">Day Streak</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-number counter" data-target="50" data-suffix="+">0</div>
+                            <div class="hero-stat-label">project</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-number counter" data-target="25" data-suffix="+">0</div>
+                            <div class="hero-stat-label">Clients</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 d-none d-lg-flex hero-image-wrapper">
+                    <div class="hero-image-glow"></div>
+                    <div class="hero-image-box">
+                        <div class="code-lines">
+                            <span class="kw">const</span> <span class="fn">developer</span> = {<br>
+                            &nbsp;&nbsp;name: <span class="str">"Shivam"</span>,<br>
+                            &nbsp;&nbsp;skills: [<span class="str">"Node"</span>, <span class="str">"Mongo"</span>],<br>
+                            &nbsp;&nbsp;passion: <span class="str">"∞"</span>,<br>
+                            &nbsp;&nbsp;streak: <span class="num">300</span>,<br>
+                            &nbsp;&nbsp;<span class="fn">build</span>: () => {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="str">"The
+                                Future"</span>;<br>
+                            &nbsp;&nbsp;}<br>
+                            };
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-mouse"></div>
+            <span>Scroll</span>
+        </div>
+    </section>
+
+    <!-- ===================== LIVE BAR ===================== -->
+    <section class="section" style="padding-top:40px; padding-bottom:80px;">
+        <div class="container">
+            <div class="live-bar reveal">
+                <div class="live-bar-item">
+                    <div class="live-pulse"></div>
+                    <span>Status:</span>
+                    <span class="live-bar-value">Beast Mode 🔥</span>
+                </div>
+                <div class="live-bar-item">
+                    <i class="fas fa-fire text-green"></i>
+                    <span>Streak:</span>
+                    <span class="live-bar-value">300+ Days</span>
+                </div>
+                <div class="live-bar-item">
+                    <i class="fas fa-code text-purple"></i>
+                    <span>Current Project:</span>
+                    <span class="live-bar-value">Art Generator v2.0</span>
+                </div>
+                <div class="live-bar-item">
+                    <i class="fas fa-clock text-cyan"></i>
+                    <span>Response:</span>
+                    <span class="live-bar-value">&lt; 2 hrs</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FEATURED PROJECT ===================== -->
+    <section class="section featured-project" id="featured">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6 reveal">
+                    <span class="section-label"><span class="dot"></span> Featured Project</span>
+                    <h2 class="section-title">AI Art <span class="gradient-text">Generator</span></h2>
+                    <p class="section-subtitle" style="margin-bottom:24px;">
+                        A full-stack application that harnesses artificial intelligence to generate stunning artwork
+                        from text prompts.
+                        Built with a robust Node.js backend, MongoDB for persistent storage, and a buttery-smooth React
+                        frontend.
+                    </p>
+                    <div style="margin-bottom:28px;">
+                        <span class="tech-tag">Node.js</span>
+                        <span class="tech-tag purple">React</span>
+                        <span class="tech-tag cyan">OpenAI API</span>
+                        <span class="tech-tag orange">MongoDB</span>
+                    </div>
+                    <a href="project-single.html" class="btn-glow-green">
+                        <i class="fas fa-arrow-right"></i> View Case Study
+                    </a>
+                </div>
+                <div class="col-lg-6 reveal reveal-delay-2">
+                    <div class="featured-img-wrapper">
+                        <div class="featured-img-placeholder">
+                            <div style="text-align:center; position:relative; z-index:1;">
+                                <i class="fas fa-palette"
+                                    style="font-size:4rem; color:var(--green); opacity:0.3; margin-bottom:16px; display:block;"></i>
+                                <span>AI Art Generator Preview</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== TESTIMONIAL / QUOTE ===================== -->
+    <section class="section quote-section">
+        <div class="container text-center">
+            <div class="reveal">
+                <div class="quote-icon">"</div>
+                <p class="quote-text mx-auto">
+                    I don't build software to survive — I build it to <span
+                        class="text-green glow-green">dominate</span>.
+                    Every line of code is a brick in the empire I'm constructing. Relentless effort is not a phase —
+                    it's my identity.
+                </p>
+                <p class="quote-author">— <span>Shivam Bhadoriya</span>, on why sleep is optional</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== TECH STACK ===================== -->
+    <section class="section">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="section-label justify-content-center"><span class="dot"></span> Arsenal</span>
+                <h2 class="section-title">Tech <span class="gradient-text">Stack</span></h2>
+            </div>
+        </div>
+        <div class="marquee-wrapper reveal">
+            <div class="marquee-track">
+                <!-- Set 1 -->
+                <div class="tech-icon-card"><i class="devicon-nodejs-plain"></i><span>Node.js</span></div>
+                <div class="tech-icon-card"><i class="devicon-mongodb-plain"></i><span>MongoDB</span></div>
+                <div class="tech-icon-card"><i class="devicon-react-original"></i><span>React</span></div>
+                <div class="tech-icon-card"><i class="devicon-javascript-plain"></i><span>JavaScript</span></div>
+                <div class="tech-icon-card"><i class="devicon-express-original"></i><span>Express</span></div>
+                <div class="tech-icon-card"><i class="devicon-html5-plain"></i><span>HTML5</span></div>
+                <div class="tech-icon-card"><i class="devicon-css3-plain"></i><span>CSS3</span></div>
+                <div class="tech-icon-card"><i class="devicon-bootstrap-plain"></i><span>Bootstrap</span></div>
+                <div class="tech-icon-card"><i class="devicon-git-plain"></i><span>Git</span></div>
+                <div class="tech-icon-card"><i class="devicon-python-plain"></i><span>Python</span></div>
+                <div class="tech-icon-card"><i class="devicon-docker-plain"></i><span>Docker</span></div>
+                <div class="tech-icon-card"><i class="devicon-firebase-plain"></i><span>Firebase</span></div>
+                <!-- Set 2 (duplicate for seamless loop) -->
+                <div class="tech-icon-card"><i class="devicon-nodejs-plain"></i><span>Node.js</span></div>
+                <div class="tech-icon-card"><i class="devicon-mongodb-plain"></i><span>MongoDB</span></div>
+                <div class="tech-icon-card"><i class="devicon-react-original"></i><span>React</span></div>
+                <div class="tech-icon-card"><i class="devicon-javascript-plain"></i><span>JavaScript</span></div>
+                <div class="tech-icon-card"><i class="devicon-express-original"></i><span>Express</span></div>
+                <div class="tech-icon-card"><i class="devicon-html5-plain"></i><span>HTML5</span></div>
+                <div class="tech-icon-card"><i class="devicon-css3-plain"></i><span>CSS3</span></div>
+                <div class="tech-icon-card"><i class="devicon-bootstrap-plain"></i><span>Bootstrap</span></div>
+                <div class="tech-icon-card"><i class="devicon-git-plain"></i><span>Git</span></div>
+                <div class="tech-icon-card"><i class="devicon-python-plain"></i><span>Python</span></div>
+                <div class="tech-icon-card"><i class="devicon-docker-plain"></i><span>Docker</span></div>
+                <div class="tech-icon-card"><i class="devicon-firebase-plain"></i><span>Firebase</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-brand">SB.</div>
+                    <p class="footer-desc">Building the future one commit at a time. Full-stack developer based in India
+                        with a 300+ day coding streak and no plans to stop.</p>
+                    <div class="contact-social" style="margin-top:20px;">
+                        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <h5 class="footer-title">Navigate</h5>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="project.html">project</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="footer-title">Services</h5>
+                    <ul class="footer-links">
+                        <li><a href="services.html">Full Stack Development</a></li>
+                        <li><a href="services.html">REST API Design</a></li>
+                        <li><a href="services.html">MVP Development</a></li>
+                        <li><a href="services.html">Database Architecture</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="footer-title">Get in Touch</h5>
+                    <ul class="footer-links">
+                        <li><a href="mailto:shivam@example.com"><i
+                                    class="fas fa-envelope me-2"></i>shivam@example.com</a></li>
+                        <li><a href="#"><i class="fab fa-github me-2"></i>github.com/shivam</a></li>
+                        <li><a href="#"><i class="fab fa-linkedin me-2"></i>LinkedIn Profile</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2024 <a href="#">Shivam Bhadoriya</a>. All rights reserved.</span>
+                <span>Crafted with <i class="fas fa-heart text-green"></i> and relentless ambition.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+    <script src="./js/script.js"></script>
+</body>
+
+</html>

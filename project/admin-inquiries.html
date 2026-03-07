@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inquiries — Admin Fortress</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./css/admin.style.css">
+</head>
+<body>
+  <div id="preloader"><div class="loader-ring"></div></div>
+  <div class="cursor-dot"></div>
+  <div class="cursor-outline"></div>
+  <canvas id="particles-canvas"></canvas>
+  <div class="sidebar-overlay"></div>
+
+  <div class="admin-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">SB.<small>Admin Fortress</small></div>
+        <button class="sidebar-close"><i class="fas fa-times"></i></button>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-title">Main</div>
+        <a href="admin-dashboard.html" class="sidebar-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="admin-projects.html" class="sidebar-link"><i class="fas fa-folder-open"></i> Projects <span class="badge-count">12</span></a>
+        <a href="admin-inquiries.html" class="sidebar-link active"><i class="fas fa-envelope"></i> Inquiries <span class="badge-count red">5</span></a>
+        <div class="sidebar-section-title">Content</div>
+        <a href="blog.html" class="sidebar-link"><i class="fas fa-pen-fancy"></i> Blog Posts</a>
+        <a href="#" class="sidebar-link"><i class="fas fa-image"></i> Media</a>
+        <div class="sidebar-section-title">System</div>
+        <a href="#" class="sidebar-link"><i class="fas fa-cog"></i> Settings</a>
+        <a href="index.html" class="sidebar-link"><i class="fas fa-globe"></i> View Site</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user"><div class="sidebar-avatar">SB</div><div class="sidebar-user-info"><h5>Shivam B.</h5><span>● Online</span></div></div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button class="topbar-burger"><i class="fas fa-bars"></i></button>
+          <div class="topbar-title">
+            <h2>Inquiry Inbox</h2>
+            <p>5 unread messages from potential clients.</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <span style="font-family:var(--font-mono); font-size:0.82rem; color:var(--green); font-weight:600;" id="realtime-clock"></span>
+          <button class="topbar-btn"><i class="fas fa-bell"></i><span class="notification-dot"></span></button>
+          <a href="login.html" class="topbar-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+      </header>
+
+      <div class="admin-content">
+
+        <!-- ===== INBOX ===== -->
+        <div class="inbox-wrapper reveal">
+
+          <!-- === MESSAGE LIST === -->
+          <div class="inbox-list">
+            <div class="inbox-list-header">
+              <h3><i class="fas fa-inbox me-2 text-green"></i> Messages</h3>
+              <span style="font-size:0.78rem; color:var(--text-muted);">5 unread</span>
+            </div>
+            <div style="padding:12px 20px; border-bottom:1px solid var(--glass-border);">
+              <input type="text" class="inbox-search" placeholder="Search messages...">
+            </div>
+
+            <!-- Message 1 (unread, active) -->
+            <div class="inbox-item unread active" data-message="msg-1">
+              <div class="inbox-item-header">
+                <span class="inbox-item-name">Sarah Mitchell</span>
+                <span class="inbox-item-time">2h ago</span>
+              </div>
+              <div class="inbox-item-subject">Full Stack SaaS Development</div>
+              <div class="inbox-item-preview">Hi Shivam, I came across your portfolio and I'm extremely impressed with your work on the AI Art Generator...</div>
+            </div>
+
+            <!-- Message 2 (unread) -->
+            <div class="inbox-item unread" data-message="msg-2">
+              <div class="inbox-item-header">
+                <span class="inbox-item-name">Alex Thompson</span>
+                <span class="inbox-item-time">5h ago</span>
+              </div>
+              <div class="inbox-item-subject">API Development for Startup</div>
+              <div class="inbox-item-preview">We're a Y-Combinator backed startup looking for a backend developer to architect our REST API...</div>
+            </div>
+
+            <!-- Message 3 (unread) -->
+            <div class="inbox-item unread" data-message="msg-3">
+              <div class="inbox-item-header">
+                <span class="inbox-item-name">Priya Sharma</span>
+                <span class="inbox-item-time">1d ago</span>
+              </div>
+              <div class="inbox-item-subject">E-Commerce MVP Needed</div>
+              <div class="inbox-item-preview">I need an MVP built for my fashion brand. Budget is flexible but timeline is tight — 6 weeks...</div>
+            </div>
+
+            <!-- Message 4 (read) -->
+            <div class="inbox-item" data-message="msg-4">
+              <div class="inbox-item-header">
+                <span class="inbox-item-name">Marcus Chen</span>
+                <span class="inbox-item-time">3d ago</span>
+              </div>
+              <div class="inbox-item-subject">Open Source Collaboration</div>
+              <div class="inbox-item-preview">Hey! I saw your CLI Task Manager on GitHub. I'd love to collaborate on adding plugin support...</div>
+            </div>
+
+            <!-- Message 5 (unread) -->
+            <div class="inbox-item unread" data-message="msg-5">
+              <div class="inbox-item-header">
+                <span class="inbox-item-name">Jessica Park</span>
+                <span class="inbox-item-time">4d ago</span>
+              </div>
+              <div class="inbox-item-subject">Technical Consultation</div>
+              <div class="inbox-item-preview">We're considering migrating our PHP monolith to a Node.js microservices architecture...</div>
+            </div>
+
+            <!-- Message 6 (read) -->
+            <div class="inbox-item" data-message="msg-6">
+              <div class="inbox-item-header">
+                <span class="inbox-item-name">David Kim</span>
+                <span class="inbox-item-time">1w ago</span>
+              </div>
+              <div class="inbox-item-subject">RE: Portfolio Website Quote</div>
+              <div class="inbox-item-preview">Thanks for the proposal, Shivam. The pricing looks fair. Can we schedule a call this week?</div>
+            </div>
+
+          </div>
+
+          <!-- === MESSAGE DETAIL === -->
+          <div class="inbox-detail">
+
+            <!-- Message 1 Detail (Default View) -->
+            <div class="inbox-detail-view" id="msg-1" style="display:flex; flex-direction:column; height:100%;">
+              <div class="inbox-detail-header">
+                <h3>Full Stack SaaS Development</h3>
+                <div class="inbox-detail-meta">
+                  <span><i class="fas fa-user text-green"></i> Sarah Mitchell</span>
+                  <span><i class="fas fa-envelope text-purple"></i> sarah@techstartup.io</span>
+                  <span><i class="fas fa-clock"></i> Dec 15, 2024 — 2:34 PM</span>
+                  <span><i class="fas fa-dollar-sign text-green"></i> Budget: $5,000-$10,000</span>
+                  <span><i class="fas fa-tag text-cyan"></i> Service: Full Stack Website</span>
+                </div>
+              </div>
+              <div class="inbox-detail-body" style="flex:1;">
+                <p>Hi Shivam,</p>
+                <p>
+                  I came across your portfolio and I'm extremely impressed with your work on the AI Art Generator project. 
+                  The architecture decisions, clean code, and attention to detail are exactly what we're looking for.
+                </p>
+                <p>
+                  We're building a SaaS platform for project management — think Notion meets Linear but specifically 
+                  for freelance agencies. We need someone who can handle:
+                </p>
+                <ul style="margin:16px 0; padding-left:20px; list-style:disc;">
+                  <li style="margin-bottom:8px;">Full backend API with Node.js/Express</li>
+                  <li style="margin-bottom:8px;">MongoDB database design with complex relations</li>
+                  <li style="margin-bottom:8px;">Real-time collaboration features (Socket.io)</li>
+                  <li style="margin-bottom:8px;">Stripe subscription billing</li>
+                  <li style="margin-bottom:8px;">React frontend with responsive design</li>
+                </ul>
+                <p>
+                  Our budget is in the $5,000-$10,000 range and we'd like to start as soon as possible. 
+                  Would you be available for a discovery call this week?
+                </p>
+                <p>Looking forward to hearing from you!</p>
+                <p style="margin-top:24px;">
+                  Best regards,<br>
+                  <strong>Sarah Mitchell</strong><br>
+                  <span style="color:var(--text-muted);">CEO, TechStartup.io</span>
+                </p>
+              </div>
+              <div class="inbox-detail-actions">
+                <select class="inbox-status-select">
+                  <option value="unread" selected>⚪ Unread</option>
+                  <option value="read">📖 Read</option>
+                  <option value="replied">✅ Replied</option>
+                  <option value="archived">📦 Archived</option>
+                  <option value="starred">⭐ Starred</option>
+                </select>
+                <button class="btn-glow-green" style="padding:10px 24px; font-size:0.85rem;">
+                  <i class="fas fa-reply"></i> Reply
+                </button>
+                <button class="btn-outline-subtle" style="padding:10px 20px; font-size:0.85rem;">
+                  <i class="fas fa-forward"></i> Forward
+                </button>
+                <button class="action-btn delete" title="Delete" style="width:40px; height:40px;">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Message 2 Detail -->
+            <div class="inbox-detail-view" id="msg-2" style="display:none; flex-direction:column; height:100%;">
+              <div class="inbox-detail-header">
+                <h3>API Development for Startup</h3>
+                <div class="inbox-detail-meta">
+                  <span><i class="fas fa-user text-green"></i> Alex Thompson</span>
+                  <span><i class="fas fa-envelope text-purple"></i> alex@ycstartup.com</span>
+                  <span><i class="fas fa-clock"></i> Dec 15, 2024 — 11:15 AM</span>
+                  <span><i class="fas fa-dollar-sign text-green"></i> Budget: $3,000-$5,000</span>
+                  <span><i class="fas fa-tag text-cyan"></i> Service: REST API</span>
+                </div>
+              </div>
+              <div class="inbox-detail-body" style="flex:1;">
+                <p>Hey Shivam,</p>
+                <p>
+                  We're a Y-Combinator backed startup looking for a backend developer to architect our REST API 
+                  from the ground up. We need someone who truly understands scalable API design, proper authentication 
+                  patterns, and MongoDB optimization.
+                </p>
+                <p>
+                  After reviewing several portfolios, yours stood out — especially the microservice project. 
+                  Your approach to rate-limiting and JWT refresh tokens is exactly the level of detail we need.
+                </p>
+                <p>Can we set up a 30-minute call to discuss scope and timeline?</p>
+                <p style="margin-top:24px;">
+                  Cheers,<br><strong>Alex Thompson</strong><br>
+                  <span style="color:var(--text-muted);">CTO, YCStartup</span>
+                </p>
+              </div>
+              <div class="inbox-detail-actions">
+                <select class="inbox-status-select">
+                  <option value="unread" selected>⚪ Unread</option>
+                  <option value="read">📖 Read</option>
+                  <option value="replied">✅ Replied</option>
+                  <option value="archived">📦 Archived</option>
+                </select>
+                <button class="btn-glow-green" style="padding:10px 24px; font-size:0.85rem;"><i class="fas fa-reply"></i> Reply</button>
+                <button class="btn-outline-subtle" style="padding:10px 20px; font-size:0.85rem;"><i class="fas fa-forward"></i> Forward</button>
+              </div>
+            </div>
+
+            <!-- Message 3 Detail -->
+            <div class="inbox-detail-view" id="msg-3" style="display:none; flex-direction:column; height:100%;">
+              <div class="inbox-detail-header">
+                <h3>E-Commerce MVP Needed</h3>
+                <div class="inbox-detail-meta">
+                  <span><i class="fas fa-user text-green"></i> Priya Sharma</span>
+                  <span><i class="fas fa-envelope text-purple"></i> priya@fashionbrand.in</span>
+                  <span><i class="fas fa-clock"></i> Dec 14, 2024 — 3:42 PM</span>
+                  <span><i class="fas fa-dollar-sign text-green"></i> Budget: $1,000-$3,000</span>
+                </div>
+              </div>
+              <div class="inbox-detail-body" style="flex:1;">
+                <p>Hi Shivam,</p>
+                <p>
+                  I need an MVP built for my fashion brand. Budget is flexible but timeline is tight — 6 weeks. 
+                  I need a product catalog, shopping cart, and checkout with Razorpay integration. 
+                  A basic admin panel to manage products would be ideal.
+                </p>
+                <p>Are you available to start next week?</p>
+                <p style="margin-top:24px;"><strong>Priya Sharma</strong><br><span style="color:var(--text-muted);">Founder, FashionBrand.in</span></p>
+              </div>
+              <div class="inbox-detail-actions">
+                <select class="inbox-status-select"><option>⚪ Unread</option><option>📖 Read</option><option>✅ Replied</option></select>
+                <button class="btn-glow-green" style="padding:10px 24px; font-size:0.85rem;"><i class="fas fa-reply"></i> Reply</button>
+              </div>
+            </div>
+
+            <!-- Message 4 Detail -->
+            <div class="inbox-detail-view" id="msg-4" style="display:none; flex-direction:column; height:100%;">
+              <div class="inbox-detail-header">
+                <h3>Open Source Collaboration</h3>
+                <div class="inbox-detail-meta">
+                  <span><i class="fas fa-user text-green"></i> Marcus Chen</span>
+                  <span><i class="fas fa-envelope text-purple"></i> marcus@devmail.com</span>
+                  <span><i class="fas fa-clock"></i> Dec 12, 2024 — 9:20 AM</span>
+                </div>
+              </div>
+              <div class="inbox-detail-body" style="flex:1;">
+                <p>Hey Shivam!</p>
+                <p>
+                  I saw your CLI Task Manager on GitHub and I'm a huge fan. I'd love to collaborate on adding 
+                  plugin support and a TUI (Terminal User Interface) using Ink. I've already forked the repo and 
+                  started experimenting. Would you be open to reviewing a PR?
+                </p>
+                <p style="margin-top:24px;"><strong>Marcus Chen</strong><br><span style="color:var(--text-muted);">Open Source Contributor</span></p>
+              </div>
+              <div class="inbox-detail-actions">
+                <select class="inbox-status-select"><option>📖 Read</option><option>✅ Replied</option></select>
+                <button class="btn-glow-green" style="padding:10px 24px; font-size:0.85rem;"><i class="fas fa-reply"></i> Reply</button>
+              </div>
+            </div>
+
+            <!-- Message 5 Detail -->
+            <div class="inbox-detail-view" id="msg-5" style="display:none; flex-direction:column; height:100%;">
+              <div class="inbox-detail-header">
+                <h3>Technical Consultation</h3>
+                <div class="inbox-detail-meta">
+                  <span><i class="fas fa-user text-green"></i> Jessica Park</span>
+                  <span><i class="fas fa-envelope text-purple"></i> jessica@enterprise.co</span>
+                  <span><i class="fas fa-clock"></i> Dec 11, 2024 — 4:15 PM</span>
+                  <span><i class="fas fa-dollar-sign text-green"></i> Budget: $10,000+</span>
+                </div>
+              </div>
+              <div class="inbox-detail-body" style="flex:1;">
+                <p>Hi Shivam,</p>
+                <p>
+                  We're considering migrating our PHP monolith to a Node.js microservices architecture. 
+                  We need an experienced developer to audit our current system, design the new architecture, 
+                  and lead the migration. This would be a 3-4 month engagement.
+                </p>
+                <p>Would you be interested in a consultation call to discuss this further?</p>
+                <p style="margin-top:24px;"><strong>Jessica Park</strong><br><span style="color:var(--text-muted);">VP Engineering, Enterprise.co</span></p>
+              </div>
+              <div class="inbox-detail-actions">
+                <select class="inbox-status-select"><option>⚪ Unread</option><option>📖 Read</option><option>✅ Replied</option></select>
+                <button class="btn-glow-green" style="padding:10px 24px; font-size:0.85rem;"><i class="fas fa-reply"></i> Reply</button>
+              </div>
+            </div>
+
+            <!-- Message 6 Detail -->
+            <div class="inbox-detail-view" id="msg-6" style="display:none; flex-direction:column; height:100%;">
+              <div class="inbox-detail-header">
+                <h3>RE: Portfolio Website Quote</h3>
+                <div class="inbox-detail-meta">
+                  <span><i class="fas fa-user text-green"></i> David Kim</span>
+                  <span><i class="fas fa-envelope text-purple"></i> david@freelancer.com</span>
+                  <span><i class="fas fa-clock"></i> Dec 8, 2024 — 10:30 AM</span>
+                </div>
+              </div>
+              <div class="inbox-detail-body" style="flex:1;">
+                <p>Thanks for the proposal, Shivam.</p>
+                <p>
+                  The pricing looks fair. Can we schedule a call this week to finalize the requirements? 
+                  I'd like to discuss the timeline and any additional features we might want to add later.
+                </p>
+                <p style="margin-top:24px;"><strong>David Kim</strong></p>
+              </div>
+              <div class="inbox-detail-actions">
+                <select class="inbox-status-select"><option>✅ Replied</option><option>📦 Archived</option></select>
+                <button class="btn-glow-green" style="padding:10px 24px; font-size:0.85rem;"><i class="fas fa-reply"></i> Reply</button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./js/admin.js"></script>
+</body>
+</html>

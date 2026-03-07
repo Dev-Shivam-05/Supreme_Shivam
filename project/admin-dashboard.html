@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Admin Fortress</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./css/admin.style.css">
+</head>
+<body>
+  <div id="preloader"><div class="loader-ring"></div></div>
+  <div class="cursor-dot"></div>
+  <div class="cursor-outline"></div>
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay"></div>
+
+  <div class="admin-wrapper">
+
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          SB.
+          <small>Admin Fortress</small>
+        </div>
+        <button class="sidebar-close"><i class="fas fa-times"></i></button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-title">Main</div>
+        <a href="admin-dashboard.html" class="sidebar-link active">
+          <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+        <a href="admin-projects.html" class="sidebar-link">
+          <i class="fas fa-folder-open"></i> Projects
+          <span class="badge-count">12</span>
+        </a>
+        <a href="admin-inquiries.html" class="sidebar-link">
+          <i class="fas fa-envelope"></i> Inquiries
+          <span class="badge-count red">5</span>
+        </a>
+
+        <div class="sidebar-section-title">Content</div>
+        <a href="blog.html" class="sidebar-link">
+          <i class="fas fa-pen-fancy"></i> Blog Posts
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-image"></i> Media
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-comment-dots"></i> Testimonials
+        </a>
+
+        <div class="sidebar-section-title">System</div>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-cog"></i> Settings
+        </a>
+        <a href="#" class="sidebar-link">
+          <i class="fas fa-shield-alt"></i> Security
+        </a>
+        <a href="index.html" class="sidebar-link">
+          <i class="fas fa-globe"></i> View Site
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar">SB</div>
+          <div class="sidebar-user-info">
+            <h5>Shivam B.</h5>
+            <span>● Online</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="admin-main">
+
+      <!-- Topbar -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button class="topbar-burger"><i class="fas fa-bars"></i></button>
+          <div class="topbar-title">
+            <h2>Dashboard</h2>
+            <p>Welcome back, Commander. Here's your empire overview.</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <span style="font-family:var(--font-mono); font-size:0.82rem; color:var(--green); font-weight:600;" id="realtime-clock"></span>
+          <button class="topbar-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-dot"></span>
+          </button>
+          <button class="topbar-btn"><i class="fas fa-search"></i></button>
+          <a href="login.html" class="topbar-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+      </header>
+
+      <div class="admin-content">
+
+        <!-- ===== STAT CARDS ===== -->
+        <div class="row g-4 mb-4 reveal">
+          <!-- Total Views -->
+          <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon green"><i class="fas fa-eye"></i></div>
+                <span class="stat-card-trend up"><i class="fas fa-arrow-up"></i> 12%</span>
+              </div>
+              <div class="stat-card-number counter" data-target="24853" data-suffix="">0</div>
+              <div class="stat-card-label">Total Views</div>
+              <div class="stat-card-sparkline">
+                <div class="sparkline-bar" style="left:2%; width:7%;" data-height="40%"></div>
+                <div class="sparkline-bar" style="left:12%; width:7%;" data-height="65%"></div>
+                <div class="sparkline-bar" style="left:22%; width:7%;" data-height="45%"></div>
+                <div class="sparkline-bar" style="left:32%; width:7%;" data-height="80%"></div>
+                <div class="sparkline-bar" style="left:42%; width:7%;" data-height="55%"></div>
+                <div class="sparkline-bar" style="left:52%; width:7%;" data-height="90%"></div>
+                <div class="sparkline-bar" style="left:62%; width:7%;" data-height="70%"></div>
+                <div class="sparkline-bar" style="left:72%; width:7%;" data-height="85%"></div>
+                <div class="sparkline-bar" style="left:82%; width:7%;" data-height="95%"></div>
+                <div class="sparkline-bar" style="left:92%; width:7%;" data-height="100%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- New Inquiries -->
+          <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon purple"><i class="fas fa-envelope-open-text"></i></div>
+                <span class="stat-card-trend up"><i class="fas fa-arrow-up"></i> 8%</span>
+              </div>
+              <div class="stat-card-number counter" data-target="47" data-suffix="">0</div>
+              <div class="stat-card-label">New Inquiries</div>
+              <div class="stat-card-sparkline">
+                <div class="sparkline-bar" style="left:2%; width:7%; background:linear-gradient(to top, var(--purple), rgba(139,92,246,0.3));" data-height="50%"></div>
+                <div class="sparkline-bar" style="left:12%; width:7%; background:linear-gradient(to top, var(--purple), rgba(139,92,246,0.3));" data-height="30%"></div>
+                <div class="sparkline-bar" style="left:22%; width:7%; background:linear-gradient(to top, var(--purple), rgba(139,92,246,0.3));" data-height="70%"></div>
+                <div class="sparkline-bar" style="left:32%; width:7%; background:linear-gradient(to top, var(--purple), rgba(139,92,246,0.3));" data-height="45%"></div>
+                <div class="sparkline-bar" style="left:42%; width:7%; background:linear-gradient(to top, var(--purple), rgba(139,92,246,0.3));" data-height="85%"></div>
+                <div class="sparkline-bar" style="left:52%; width:7%; background:linear-gradient(to top, var(--purple), rgba(139,92,246,0.3));" data-height="60%"></div>
+                <div class="sparkline-bar" style="left:62%; width:7%; background:linear-gradient(to top, var(--purple), rgba(139,92,246,0.3));" data-height="90%"></div>
+                <div class="sparkline-bar" style="left:72%; width:7%; background:linear-gradient(to top, var(--purple), rgba(139,92,246,0.3));" data-height="75%"></div>
+                <div class="sparkline-bar" style="left:82%; width:7%; background:linear-gradient(to top, var(--purple), rgba(139,92,246,0.3));" data-height="80%"></div>
+                <div class="sparkline-bar" style="left:92%; width:7%; background:linear-gradient(to top, var(--purple), rgba(139,92,246,0.3));" data-height="95%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Projects -->
+          <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon cyan"><i class="fas fa-code-branch"></i></div>
+                <span class="stat-card-trend up"><i class="fas fa-arrow-up"></i> 3</span>
+              </div>
+              <div class="stat-card-number counter" data-target="8" data-suffix="">0</div>
+              <div class="stat-card-label">Active Projects</div>
+              <div class="stat-card-sparkline">
+                <div class="sparkline-bar" style="left:5%; width:12%; background:linear-gradient(to top, var(--cyan), rgba(6,182,212,0.3));" data-height="60%"></div>
+                <div class="sparkline-bar" style="left:22%; width:12%; background:linear-gradient(to top, var(--cyan), rgba(6,182,212,0.3));" data-height="80%"></div>
+                <div class="sparkline-bar" style="left:39%; width:12%; background:linear-gradient(to top, var(--cyan), rgba(6,182,212,0.3));" data-height="50%"></div>
+                <div class="sparkline-bar" style="left:56%; width:12%; background:linear-gradient(to top, var(--cyan), rgba(6,182,212,0.3));" data-height="90%"></div>
+                <div class="sparkline-bar" style="left:73%; width:12%; background:linear-gradient(to top, var(--cyan), rgba(6,182,212,0.3));" data-height="100%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GitHub Streak -->
+          <div class="col-xl-3 col-md-6">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon orange"><i class="fas fa-fire"></i></div>
+                <span class="stat-card-trend up"><i class="fas fa-arrow-up"></i> 1</span>
+              </div>
+              <div class="stat-card-number counter" data-target="312" data-suffix=" days">0</div>
+              <div class="stat-card-label">GitHub Streak</div>
+              <div class="stat-card-sparkline">
+                <div class="sparkline-bar" style="left:0%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="80%"></div>
+                <div class="sparkline-bar" style="left:7%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="82%"></div>
+                <div class="sparkline-bar" style="left:14%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="85%"></div>
+                <div class="sparkline-bar" style="left:21%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="83%"></div>
+                <div class="sparkline-bar" style="left:28%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="88%"></div>
+                <div class="sparkline-bar" style="left:35%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="86%"></div>
+                <div class="sparkline-bar" style="left:42%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="90%"></div>
+                <div class="sparkline-bar" style="left:49%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="89%"></div>
+                <div class="sparkline-bar" style="left:56%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="92%"></div>
+                <div class="sparkline-bar" style="left:63%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="91%"></div>
+                <div class="sparkline-bar" style="left:70%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="95%"></div>
+                <div class="sparkline-bar" style="left:77%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="93%"></div>
+                <div class="sparkline-bar" style="left:84%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="97%"></div>
+                <div class="sparkline-bar" style="left:91%; width:5%; background:linear-gradient(to top, var(--orange), rgba(249,115,22,0.3));" data-height="100%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== VISITOR MAP ===== -->
+        <div class="row g-4 mb-4">
+          <div class="col-12 reveal">
+            <div class="admin-table-wrapper">
+              <div class="admin-table-header">
+                <h3><span class="dot-live"></span> Global Visitor Map</h3>
+                <span style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-muted);">Live Data Feed</span>
+              </div>
+              <div class="map-placeholder">
+                <div class="map-grid"></div>
+                <!-- Simulated dots representing visitors -->
+                <div class="map-dot" style="top:30%; left:22%;"></div>
+                <div class="map-dot" style="top:25%; left:48%;"></div>
+                <div class="map-dot" style="top:45%; left:75%;"></div>
+                <div class="map-dot" style="top:60%; left:35%;"></div>
+                <div class="map-dot" style="top:35%; left:60%;"></div>
+                <div class="map-dot" style="top:55%; left:15%;"></div>
+                <div class="map-dot" style="top:20%; left:80%; background:var(--yellow); box-shadow:0 0 15px rgba(250,204,21,0.3);"></div>
+                <div class="map-dot" style="top:70%; left:55%; background:var(--green);"></div>
+                <div class="map-label">
+                  <i class="fas fa-globe-americas"></i>
+                  <span>Interactive visitor map — integrate with analytics API</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== RECENT ACTIVITY TABLE ===== -->
+        <div class="row g-4">
+          <div class="col-12 reveal">
+            <div class="admin-table-wrapper">
+              <div class="admin-table-header">
+                <h3><span class="dot-live"></span> Recent Visitor Activity</h3>
+                <button class="btn-outline-subtle" style="padding:8px 20px; font-size:0.8rem;">
+                  <i class="fas fa-download"></i> Export
+                </button>
+              </div>
+              <div class="table-responsive-custom">
+                <table class="table-admin">
+                  <thead>
+                    <tr>
+                      <th>IP Address</th>
+                      <th>Page Visited</th>
+                      <th>Country</th>
+                      <th>Device</th>
+                      <th>Time</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="ip-badge">192.168.1.47</span></td>
+                      <td><span class="page-badge">/projects</span></td>
+                      <td>🇺🇸 United States</td>
+                      <td><i class="fas fa-desktop me-1"></i> Desktop</td>
+                      <td><span class="time-badge">2 min ago</span></td>
+                      <td><span class="status-badge active">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">10.0.0.128</span></td>
+                      <td><span class="page-badge">/contact</span></td>
+                      <td>🇬🇧 United Kingdom</td>
+                      <td><i class="fas fa-mobile-alt me-1"></i> Mobile</td>
+                      <td><span class="time-badge">5 min ago</span></td>
+                      <td><span class="status-badge active">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">172.16.0.55</span></td>
+                      <td><span class="page-badge">/about</span></td>
+                      <td>🇮🇳 India</td>
+                      <td><i class="fas fa-laptop me-1"></i> Laptop</td>
+                      <td><span class="time-badge">12 min ago</span></td>
+                      <td><span class="status-badge pending">Idle</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">203.0.113.22</span></td>
+                      <td><span class="page-badge">/services</span></td>
+                      <td>🇩🇪 Germany</td>
+                      <td><i class="fas fa-desktop me-1"></i> Desktop</td>
+                      <td><span class="time-badge">18 min ago</span></td>
+                      <td><span class="status-badge completed">Left</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">198.51.100.8</span></td>
+                      <td><span class="page-badge">/blog</span></td>
+                      <td>🇨🇦 Canada</td>
+                      <td><i class="fas fa-tablet-alt me-1"></i> Tablet</td>
+                      <td><span class="time-badge">25 min ago</span></td>
+                      <td><span class="status-badge completed">Left</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">192.0.2.100</span></td>
+                      <td><span class="page-badge">/project-single</span></td>
+                      <td>🇦🇺 Australia</td>
+                      <td><i class="fas fa-desktop me-1"></i> Desktop</td>
+                      <td><span class="time-badge">32 min ago</span></td>
+                      <td><span class="status-badge completed">Left</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="ip-badge">100.24.56.78</span></td>
+                      <td><span class="page-badge">/index</span></td>
+                      <td>🇯🇵 Japan</td>
+                      <td><i class="fas fa-mobile-alt me-1"></i> Mobile</td>
+                      <td><span class="time-badge">45 min ago</span></td>
+                      <td><span class="status-badge completed">Left</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>contact — Shivam Bhadoriya</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <div id="preloader"><div class="loader-ring"></div></div>
+  <div class="cursor-dot"></div>
+  <div class="cursor-outline"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+      <a class="nav-logo" href="./index.html">SB<span>.</span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-center" id="mainNav">
+        <ul class="navbar-nav mx-auto gap-1">
+          <li class="nav-item"><a class="nav-link" href="./index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="./project.html">Projects</a></li>
+          <li class="nav-item"><a class="nav-link" href="./about.html">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="./services.html">Services</a></li>
+          <li class="nav-item"><a class="nav-link active" href="./contact.html">contact</a></li>
+        </ul>
+        <a href="./contact.html" class="nav-link nav-cta">Hire Me</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <section class="page-header">
+    <div class="container">
+      <h1 class="page-header-title reveal">Let's <span class="gradient-text">Talk</span></h1>
+      <p class="page-header-subtitle reveal reveal-delay-1">Have a project in mind? Let's turn your idea into a product that makes an impact.</p>
+      <div class="breadcrumb-custom reveal reveal-delay-2">
+        <a href="./index.html">Home</a><span>/</span><span>contact</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- contact SECTION -->
+  <section class="section" style="padding-top:20px;">
+    <div class="container">
+      <div class="row g-5">
+
+        <!-- contact Info -->
+        <div class="col-lg-5 reveal">
+          <div class="contact-info-card">
+            <h3 style="font-size:1.5rem; margin-bottom:8px;">Get in Touch</h3>
+            <p style="color:var(--text-secondary); margin-bottom:32px; font-size:0.92rem;">
+              I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.
+            </p>
+
+            <div class="contact-info-item">
+              <div class="contact-icon-box"><i class="fas fa-envelope"></i></div>
+              <div>
+                <h4>Email</h4>
+                <p><a href="mailto:shivam@example.com">shivam@example.com</a></p>
+              </div>
+            </div>
+
+            <div class="contact-info-item">
+              <div class="contact-icon-box" style="background:var(--purple-glow); border-color:rgba(139,92,246,0.15); color:var(--purple);">
+                <i class="fab fa-linkedin-in"></i>
+              </div>
+              <div>
+                <h4>LinkedIn</h4>
+                <p><a href="#">linkedin.com/in/shivam-bhadoriya</a></p>
+              </div>
+            </div>
+
+            <div class="contact-info-item">
+              <div class="contact-icon-box" style="background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.08); color:var(--text);">
+                <i class="fab fa-github"></i>
+              </div>
+              <div>
+                <h4>GitHub</h4>
+                <p><a href="#">github.com/shivam-bhadoriya</a></p>
+              </div>
+            </div>
+
+            <div class="contact-info-item" style="margin-bottom:0;">
+              <div class="contact-icon-box" style="background:rgba(6,182,212,0.15); border-color:rgba(6,182,212,0.15); color:var(--cyan);">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <div>
+                <h4>Location</h4>
+                <p>India 🇮🇳 (Remote Worldwide)</p>
+              </div>
+            </div>
+
+            <hr style="border-color:var(--glass-border); margin:28px 0;">
+
+            <div>
+              <p style="font-size:0.82rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:12px; font-weight:600;">Follow Me</p>
+              <div class="contact-social">
+                <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-dev"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- contact Form -->
+        <div class="col-lg-7 reveal reveal-delay-2">
+          <div class="glass-card" style="padding:40px; border-radius:var(--radius-lg);">
+            <h3 style="font-size:1.5rem; margin-bottom:8px;">Send a Proposal</h3>
+            <p style="color:var(--text-secondary); margin-bottom:32px; font-size:0.92rem;">
+              Fill out the form below and I'll get back to you within 24 hours. Let's build something amazing.
+            </p>
+
+            <form id="contactForm">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label-custom">Your Name</label>
+                  <input type="text" class="form-control-custom" placeholder="John Doe" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Your Email</label>
+                  <input type="email" class="form-control-custom" placeholder="john@company.com" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Service Type</label>
+                  <select class="form-select-custom" required>
+                    <option value="" disabled selected>Select a service</option>
+                    <option value="api">REST API Development</option>
+                    <option value="fullsite">Full Stack Website</option>
+                    <option value="mvp">MVP / SaaS Product</option>
+                    <option value="backend">Backend Architecture</option>
+                    <option value="consult">Technical Consultation</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Budget Range</label>
+                  <select class="form-select-custom" required>
+                    <option value="" disabled selected>Select budget</option>
+                    <option value="500-1000">$500 — $1,000</option>
+                    <option value="1000-3000">$1,000 — $3,000</option>
+                    <option value="3000-5000">$3,000 — $5,000</option>
+                    <option value="5000-10000">$5,000 — $10,000</option>
+                    <option value="10000+">$10,000+</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label-custom">Project Details</label>
+                  <textarea class="form-control-custom" placeholder="Tell me about your project — goals, features, timeline, anything relevant..." required></textarea>
+                </div>
+                <div class="col-12" style="margin-top:12px;">
+                  <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Send Proposal
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK CTA -->
+  <section class="section" style="padding-top:20px;">
+    <div class="container">
+      <div class="cta-section reveal">
+        <div class="row align-items-center">
+          <div class="col-lg-8 text-center text-lg-start">
+            <h3 style="font-size:1.5rem; margin-bottom:8px;">Prefer a quick chat instead?</h3>
+            <p style="color:var(--text-secondary); margin:0;">Schedule a free 30-minute discovery call to discuss your project.</p>
+          </div>
+          <div class="col-lg-4 text-center text-lg-end mt-4 mt-lg-0">
+            <a href="#" class="btn-glow-purple"><i class="fas fa-calendar-alt"></i> Book a Call</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="footer-brand">SB.</div>
+          <p class="footer-desc">Building the future one commit at a time.</p>
+          <div class="contact-social" style="margin-top:20px;">
+            <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4">
+          <h5 class="footer-title">Navigate</h5>
+          <ul class="footer-links">
+            <li><a href="./index.html">Home</a></li><li><a href="./projects.html">Projects</a></li>
+            <li><a href="./about.html">About</a></li><li><a href="./services.html">Services</a></li>
+            <li><a href="./contact.html">contact</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-4">
+          <h5 class="footer-title">Services</h5>
+          <ul class="footer-links">
+            <li><a href="./services.html">Full Stack Dev</a></li><li><a href="./services.html">API Design</a></li>
+            <li><a href="./services.html">MVP Development</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-4">
+          <h5 class="footer-title">contact</h5>
+          <ul class="footer-links">
+            <li><a href="mailto:shivam@example.com">shivam@example.com</a></li>
+            <li><a href="#">github.com/shivam</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2024 <a href="#">Shivam Bhadoriya</a>.</span>
+        <span>Crafted with <i class="fas fa-heart text-green"></i></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./js/script.js"></script>
+</body>
+</html>

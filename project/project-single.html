@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Art Generator — Case Study | Shivam Bhadoriya</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+
+    <style>
+        /* ===== PROJECT SINGLE ENHANCEMENTS ===== */
+
+        /* Hero Banner */
+        .project-hero {
+            position: relative;
+            padding: 180px 0 80px;
+            overflow: hidden;
+        }
+
+        .project-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 30% 20%, rgba(0, 255, 136, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 60%);
+        }
+
+        .project-hero-banner {
+            width: 100%;
+            height: 450px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 50%, rgba(0, 255, 136, 0.02) 100%);
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .project-hero-banner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, var(--bg-primary) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        /* Mock browser chrome */
+        .browser-chrome {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 42px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 8px;
+            z-index: 2;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .browser-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .browser-dot.r {
+            background: #f38ba8;
+        }
+
+        .browser-dot.y {
+            background: #f9e2af;
+        }
+
+        .browser-dot.g {
+            background: #a6e3a1;
+        }
+
+        .browser-url {
+            margin-left: 12px;
+            flex: 1;
+            max-width: 400px;
+            height: 26px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            gap: 6px;
+        }
+
+        .browser-url i {
+            color: var(--green);
+            font-size: 0.6rem;
+        }
+
+        /* Screenshot mockup area */
+        .screenshot-area {
+            position: absolute;
+            top: 42px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 0;
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            opacity: 0.15;
+        }
+
+        .mock-card {
+            height: 80px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .mock-card:nth-child(1) {
+            grid-column: span 2;
+            height: 100px;
+        }
+
+        .mock-card:nth-child(4) {
+            grid-column: span 2;
+        }
+
+        .screenshot-label {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            text-align: center;
+        }
+
+        .screenshot-label i {
+            font-size: 3rem;
+            color: var(--green);
+            opacity: 0.15;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .screenshot-label span {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 6px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Project Title Area */
+        .project-title-area {
+            margin-top: -60px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .project-icon-badge {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--green-glow), rgba(139, 92, 246, 0.15));
+            border: 2px solid rgba(0, 255, 136, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: var(--green);
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .project-main-title {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .project-tagline {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 650px;
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .project-tags-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* Quick Stats Cards */
+        .quick-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 50px 0;
+        }
+
+        .qs-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qs-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--green), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .qs-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 255, 136, 0.15);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .qs-card:hover::before {
+            opacity: 1;
+        }
+
+        .qs-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            font-size: 1rem;
+        }
+
+        .qs-icon.g {
+            background: var(--green-glow);
+            color: var(--green);
+        }
+
+        .qs-icon.p {
+            background: var(--purple-glow);
+            color: var(--purple);
+        }
+
+        .qs-icon.c {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--cyan);
+        }
+
+        .qs-icon.o {
+            background: rgba(249, 115, 22, 0.15);
+            color: var(--orange);
+        }
+
+        .qs-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .qs-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* Story Section */
+        .story-block {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 36px;
+            height: 100%;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .story-block:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .story-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .story-block.problem::before {
+            background: linear-gradient(90deg, #ef4444, #f97316);
+        }
+
+        .story-block.solution::before {
+            background: linear-gradient(90deg, var(--green), var(--cyan));
+        }
+
+        .story-icon-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .story-icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .problem .story-icon-circle {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        .solution .story-icon-circle {
+            background: var(--green-glow);
+            color: var(--green);
+            border: 1px solid rgba(0, 255, 136, 0.15);
+        }
+
+        .story-label {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        .problem .story-label {
+            color: #ef4444;
+        }
+
+        .solution .story-label {
+            color: var(--green);
+        }
+
+        .story-heading {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .story-text {
+            color: var(--text-secondary);
+            line-height: 1.9;
+            font-size: 0.95rem;
+        }
+
+        .story-text ul {
+            margin: 12px 0;
+            padding-left: 0;
+        }
+
+        .story-text ul li {
+            padding: 6px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .story-text ul li i {
+            margin-top: 4px;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        .problem .story-text ul li i {
+            color: #ef4444;
+        }
+
+        .solution .story-text ul li i {
+            color: var(--green);
+        }
+
+        /* Enhanced Code Window */
+        .code-window {
+            background: #11111b;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        .code-window::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), transparent, rgba(139, 92, 246, 0.1));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .code-toolbar {
+            background: #181825;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .code-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .code-dot.r {
+            background: #f38ba8;
+        }
+
+        .code-dot.y {
+            background: #f9e2af;
+        }
+
+        .code-dot.g {
+            background: #a6e3a1;
+        }
+
+        .code-tabs {
+            display: flex;
+            margin-left: 20px;
+            gap: 0;
+        }
+
+        .code-tab {
+            padding: 6px 16px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .code-tab.active {
+            color: var(--text);
+            border-bottom-color: var(--green);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .code-tab:hover:not(.active) {
+            color: var(--text-secondary);
+        }
+
+        .code-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .code-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .code-action-btn:hover {
+            color: var(--green);
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        .code-body {
+            padding: 24px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            line-height: 2;
+            overflow-x: auto;
+            color: #cdd6f4;
+            counter-reset: line;
+            position: relative;
+        }
+
+        .code-line {
+            display: flex;
+            align-items: flex-start;
+            transition: background 0.2s;
+            padding: 0 8px;
+            margin: 0 -8px;
+            border-radius: 4px;
+        }
+
+        .code-line:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .code-line .ln {
+            color: #45475a;
+            min-width: 40px;
+            text-align: right;
+            margin-right: 24px;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .code-body .kw {
+            color: #cba6f7;
+        }
+
+        .code-body .fn {
+            color: #89b4fa;
+        }
+
+        .code-body .str {
+            color: #a6e3a1;
+        }
+
+        .code-body .cm {
+            color: #585b70;
+            font-style: italic;
+        }
+
+        .code-body .op {
+            color: #89dceb;
+        }
+
+        .code-body .num {
+            color: #fab387;
+        }
+
+        .code-body .var {
+            color: #f38ba8;
+        }
+
+        .code-body .obj {
+            color: #f9e2af;
+        }
+
+        .code-body .pr {
+            color: #94e2d5;
+        }
+
+        /* Action Buttons */
+        .project-actions {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 60px;
+        }
+
+        .action-large {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 40px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+            cursor: pointer;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-large.live {
+            background: linear-gradient(135deg, var(--green-dark), var(--green));
+            color: var(--bg-primary);
+            border: none;
+            box-shadow: 0 0 30px var(--green-glow);
+        }
+
+        .action-large.live:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 0 50px var(--green-glow);
+            color: var(--bg-primary);
+        }
+
+        .action-large.github {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--glass-border);
+        }
+
+        .action-large.github:hover {
+            border-color: var(--purple);
+            color: var(--purple);
+            background: rgba(139, 92, 246, 0.05);
+            transform: translateY(-4px);
+            box-shadow: 0 0 30px var(--purple-glow);
+        }
+
+        .action-large i {
+            font-size: 1.1rem;
+        }
+
+        .action-large::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .action-large:hover::before {
+            transform: translateX(100%);
+        }
+
+        /* Nav between projects */
+        .project-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 0;
+            margin-top: 40px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .project-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .project-nav-link:hover {
+            color: var(--green);
+            gap: 16px;
+        }
+
+        .project-nav-link i {
+            font-size: 0.8rem;
+        }
+
+        @media(max-width:768px) {
+            .project-hero-banner {
+                height: 280px;
+            }
+
+            .browser-url {
+                display: none;
+            }
+
+            .quick-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .project-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-large {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader-ring"></div>
+    </div>
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="nav-logo" href="index.html">SB<span>.</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="mainNav">
+                <ul class="navbar-nav mx-auto gap-1">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="projects.html">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="services.html">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="blog.html">Blog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+                <a href="contact.html" class="nav-link nav-cta">Hire Me</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== PROJECT HERO ==================== -->
+    <section class="project-hero">
+        <div class="container">
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb-custom mb-4 reveal" style="justify-content:flex-start;">
+                <a href="index.html">Home</a><span>/</span><a href="projects.html">Projects</a><span>/</span><span>AI
+                    Art Generator</span>
+            </div>
+
+            <!-- Banner Image -->
+            <div class="project-hero-banner reveal">
+                <div class="browser-chrome">
+                    <span class="browser-dot r"></span>
+                    <span class="browser-dot y"></span>
+                    <span class="browser-dot g"></span>
+                    <div class="browser-url">
+                        <i class="fas fa-lock"></i>
+                        artgen.shivambhadoriya.dev
+                    </div>
+                </div>
+                <div class="screenshot-area">
+                    <div class="screenshot-grid">
+                        <div class="mock-card"></div>
+                        <div class="mock-card"></div>
+                        <div class="mock-card"></div>
+                        <div class="mock-card"></div>
+                        <div class="mock-card"></div>
+                    </div>
+                </div>
+                <div class="screenshot-label">
+                    <i class="fas fa-palette"></i>
+                    <span>AI Art Generator — Live Application</span>
+                </div>
+            </div>
+
+            <!-- Title Area -->
+            <div class="project-title-area reveal">
+                <div class="project-icon-badge">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h1 class="project-main-title">AI Art <span class="gradient-text">Generator</span></h1>
+                <p class="project-tagline">
+                    A production-grade full-stack application that harnesses artificial intelligence to generate
+                    stunning,
+                    unique artwork from text prompts — complete with user auth, galleries, community sharing,
+                    and a blazing-fast API powered by OpenAI's DALL·E.
+                </p>
+                <div class="project-tags-row">
+                    <span class="tech-tag">Node.js</span>
+                    <span class="tech-tag purple">React</span>
+                    <span class="tech-tag cyan">OpenAI API</span>
+                    <span class="tech-tag orange">MongoDB</span>
+                    <span class="tech-tag"
+                        style="background:rgba(236,72,153,0.15); color:#ec4899; border-color:rgba(236,72,153,0.2);">Cloudinary</span>
+                    <span class="tech-tag purple">JWT Auth</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== QUICK STATS ==================== -->
+    <section style="padding:0 0 60px;">
+        <div class="container">
+            <div class="quick-stats-grid reveal">
+                <div class="qs-card">
+                    <div class="qs-icon g"><i class="fas fa-user"></i></div>
+                    <div class="qs-label">Client / Type</div>
+                    <div class="qs-value">Personal SaaS</div>
+                </div>
+                <div class="qs-card">
+                    <div class="qs-icon p"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="qs-label">Date</div>
+                    <div class="qs-value">October 2024</div>
+                </div>
+                <div class="qs-card">
+                    <div class="qs-icon c"><i class="fas fa-layer-group"></i></div>
+                    <div class="qs-label">Tech Stack</div>
+                    <div class="qs-value">MERN + OpenAI</div>
+                </div>
+                <div class="qs-card">
+                    <div class="qs-icon o"><i class="fas fa-crown"></i></div>
+                    <div class="qs-label">Role</div>
+                    <div class="qs-value">Solo Full Stack</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== THE STORY ==================== -->
+    <section class="section" style="padding-top:20px;">
+        <div class="container">
+            <div class="text-center mb-5 reveal">
+                <span class="section-label justify-content-center"><span class="dot"></span> Case Study</span>
+                <h2 class="section-title">The <span class="gradient-text">Story</span></h2>
+                <p class="section-subtitle mx-auto">Every great product begins with a real problem and ends with an
+                    elegant solution.</p>
+            </div>
+
+            <div class="row g-4 mb-80">
+                <!-- The Problem -->
+                <div class="col-lg-6 reveal">
+                    <div class="story-block problem">
+                        <div class="story-icon-row">
+                            <div class="story-icon-circle"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div>
+                                <div class="story-label">The Problem</div>
+                            </div>
+                        </div>
+                        <h3 class="story-heading">AI Art Was Gatekept</h3>
+                        <div class="story-text">
+                            <p>
+                                Existing AI art platforms were broken for average users. After extensive research,
+                                I identified the core frustrations:
+                            </p>
+                            <ul>
+                                <li><i class="fas fa-times-circle"></i> Prohibitively expensive — $20-50/month for basic
+                                    usage</li>
+                                <li><i class="fas fa-times-circle"></i> Overly complex interfaces designed for ML
+                                    engineers, not creators</li>
+                                <li><i class="fas fa-times-circle"></i> No community features — art was generated in
+                                    isolation</li>
+                                <li><i class="fas fa-times-circle"></i> No personal galleries or organization tools</li>
+                                <li><i class="fas fa-times-circle"></i> Slow generation with poor queue management</li>
+                            </ul>
+                            <p style="margin-top:16px;">
+                                Users needed a platform that was <strong>simple, affordable, and social</strong> —
+                                one that treated art generation as a creative experience, not a technical challenge.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- The Solution -->
+                <div class="col-lg-6 reveal reveal-delay-2">
+                    <div class="story-block solution">
+                        <div class="story-icon-row">
+                            <div class="story-icon-circle"><i class="fas fa-check-circle"></i></div>
+                            <div>
+                                <div class="story-label">The Solution</div>
+                            </div>
+                        </div>
+                        <h3 class="story-heading">Build It Right. Build It Once.</h3>
+                        <div class="story-text">
+                            <p>
+                                I architected a full-stack MERN application with a relentless focus on UX and
+                                performance:
+                            </p>
+                            <ul>
+                                <li><i class="fas fa-check-circle"></i> <strong>Node.js + Express</strong> backend
+                                    proxying OpenAI DALL·E API</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>MongoDB + Mongoose</strong> for user
+                                    data, art storage, and social features</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>JWT authentication</strong> with refresh
+                                    token rotation and rate limiting</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>Cloudinary CDN</strong> for optimized
+                                    image delivery (WebP, lazy loading)</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>React frontend</strong> with skeleton
+                                    loading, infinite scroll gallery</li>
+                                <li><i class="fas fa-check-circle"></i> <strong>Queue system</strong> with Redis for
+                                    managing concurrent generations</li>
+                            </ul>
+                            <p style="margin-top:16px;">
+                                Result: <strong style="color:var(--green);">Sub-3-second generation</strong>,
+                                <strong style="color:var(--green);">99.9% uptime</strong>, and a community gallery
+                                with 500+ shared artworks in the first month.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CODE SNIPPET ==================== -->
+    <section class="section" style="padding-top:0;">
+        <div class="container">
+            <div class="mb-5 reveal">
+                <span class="section-label"><span class="dot"></span> Under the Hood</span>
+                <h2 class="section-title">Code <span class="gradient-text">Highlight</span></h2>
+                <p class="section-subtitle">The core controller that orchestrates AI art generation, caching, and
+                    storage.</p>
+            </div>
+
+            <div class="code-window reveal">
+                <div class="code-toolbar">
+                    <div class="code-dots">
+                        <span class="code-dot r"></span>
+                        <span class="code-dot y"></span>
+                        <span class="code-dot g"></span>
+                    </div>
+                    <div class="code-tabs">
+                        <div class="code-tab active">generateArt.controller.js</div>
+                        <div class="code-tab">auth.middleware.js</div>
+                        <div class="code-tab">Art.model.js</div>
+                    </div>
+                    <div class="code-actions">
+                        <button class="code-action-btn" title="Copy"><i class="fas fa-copy"></i></button>
+                        <button class="code-action-btn" title="Wrap lines"><i class="fas fa-text-width"></i></button>
+                    </div>
+                </div>
+                <div class="code-body">
+                    <div class="code-line"><span class="ln">1</span><span class="cm">// AI Art Generation Controller —
+                            Shivam Bhadoriya</span></div>
+                    <div class="code-line"><span class="ln">2</span><span class="kw">const</span> { <span
+                            class="fn">Configuration</span>, <span class="fn">OpenAIApi</span> } = <span
+                            class="fn">require</span>(<span class="str">'openai'</span>);</div>
+                    <div class="code-line"><span class="ln">3</span><span class="kw">const</span> <span
+                            class="obj">Art</span> = <span class="fn">require</span>(<span
+                            class="str">'../models/Art'</span>);</div>
+                    <div class="code-line"><span class="ln">4</span><span class="kw">const</span> { <span
+                            class="fn">uploadToCloudinary</span> } = <span class="fn">require</span>(<span
+                            class="str">'../utils/cloud'</span>);</div>
+                    <div class="code-line"><span class="ln">5</span><span class="kw">const</span> { <span
+                            class="fn">rateLimiter</span> } = <span class="fn">require</span>(<span
+                            class="str">'../middleware/rateLimit'</span>);</div>
+                    <div class="code-line"><span class="ln">6</span></div>
+                    <div class="code-line"><span class="ln">7</span><span class="kw">const</span> <span
+                            class="fn">generateArt</span> = <span class="kw">async</span> (<span class="var">req</span>,
+                        <span class="var">res</span>) => {</div>
+                    <div class="code-line"><span class="ln">8</span> <span class="kw">try</span> {</div>
+                    <div class="code-line"><span class="ln">9</span> <span class="kw">const</span> { <span
+                            class="var">prompt</span>, <span class="var">style</span>, <span class="var">size</span> } =
+                        <span class="var">req</span>.<span class="obj">body</span>;</div>
+                    <div class="code-line"><span class="ln">10</span></div>
+                    <div class="code-line"><span class="ln">11</span> <span class="cm">// Validate & sanitize user
+                            input</span></div>
+                    <div class="code-line"><span class="ln">12</span> <span class="kw">if</span> (!<span
+                            class="var">prompt</span> || <span class="var">prompt</span>.<span class="pr">length</span>
+                        > <span class="num">500</span>) {</div>
+                    <div class="code-line"><span class="ln">13</span> <span class="kw">return</span> <span
+                            class="var">res</span>.<span class="fn">status</span>(<span class="num">400</span>).<span
+                            class="fn">json</span>({</div>
+                    <div class="code-line"><span class="ln">14</span> <span class="pr">error</span>: <span
+                            class="str">'Prompt required (max 500 chars)'</span></div>
+                    <div class="code-line"><span class="ln">15</span> });</div>
+                    <div class="code-line"><span class="ln">16</span> }</div>
+                    <div class="code-line"><span class="ln">17</span></div>
+                    <div class="code-line"><span class="ln">18</span> <span class="kw">const</span> <span
+                            class="var">sanitized</span> = <span class="fn">sanitize</span>(<span
+                            class="var">prompt</span>);</div>
+                    <div class="code-line"><span class="ln">19</span> <span class="kw">const</span> <span
+                            class="var">fullPrompt</span> = <span class="str">`${<span class="var">sanitized</span>},
+                            ${<span class="var">style</span>} style, 8k`</span>;</div>
+                    <div class="code-line"><span class="ln">20</span></div>
+                    <div class="code-line"><span class="ln">21</span> <span class="cm">// Call OpenAI DALL·E API</span>
+                    </div>
+                    <div class="code-line"><span class="ln">22</span> <span class="kw">const</span> <span
+                            class="var">response</span> = <span class="kw">await</span> <span
+                            class="obj">openai</span>.<span class="fn">createImage</span>({</div>
+                    <div class="code-line"><span class="ln">23</span> <span class="pr">prompt</span>: <span
+                            class="var">fullPrompt</span>,</div>
+                    <div class="code-line"><span class="ln">24</span> <span class="pr">n</span>: <span
+                            class="num">1</span>,</div>
+                    <div class="code-line"><span class="ln">25</span> <span class="pr">size</span>: <span
+                            class="var">size</span> || <span class="str">"1024x1024"</span>,</div>
+                    <div class="code-line"><span class="ln">26</span> <span class="pr">response_format</span>: <span
+                            class="str">"b64_json"</span></div>
+                    <div class="code-line"><span class="ln">27</span> });</div>
+                    <div class="code-line"><span class="ln">28</span></div>
+                    <div class="code-line"><span class="ln">29</span> <span class="cm">// Upload to Cloudinary
+                            CDN</span></div>
+                    <div class="code-line"><span class="ln">30</span> <span class="kw">const</span> <span
+                            class="var">imageUrl</span> = <span class="kw">await</span> <span
+                            class="fn">uploadToCloudinary</span>(</div>
+                    <div class="code-line"><span class="ln">31</span> <span class="var">response</span>.<span
+                            class="obj">data</span>.<span class="obj">data</span>[<span class="num">0</span>].<span
+                            class="pr">b64_json</span></div>
+                    <div class="code-line"><span class="ln">32</span> );</div>
+                    <div class="code-line"><span class="ln">33</span></div>
+                    <div class="code-line"><span class="ln">34</span> <span class="cm">// Save to database</span></div>
+                    <div class="code-line"><span class="ln">35</span> <span class="kw">const</span> <span
+                            class="var">artwork</span> = <span class="kw">await</span> <span
+                            class="obj">Art</span>.<span class="fn">create</span>({</div>
+                    <div class="code-line"><span class="ln">36</span> <span class="pr">user</span>: <span
+                            class="var">req</span>.<span class="obj">userId</span>,</div>
+                    <div class="code-line"><span class="ln">37</span> <span class="var">prompt</span>, <span
+                            class="var">style</span>, <span class="var">imageUrl</span>,</div>
+                    <div class="code-line"><span class="ln">38</span> <span class="pr">metadata</span>: { <span
+                            class="var">size</span>, <span class="pr">model</span>: <span class="str">'dall-e-3'</span>
+                        }</div>
+                    <div class="code-line"><span class="ln">39</span> });</div>
+                    <div class="code-line"><span class="ln">40</span></div>
+                    <div class="code-line"><span class="ln">41</span> <span class="var">res</span>.<span
+                            class="fn">status</span>(<span class="num">201</span>).<span class="fn">json</span>({</div>
+                    <div class="code-line"><span class="ln">42</span> <span class="pr">success</span>: <span
+                            class="num">true</span>,</div>
+                    <div class="code-line"><span class="ln">43</span> <span class="pr">artwork</span>: <span
+                            class="var">artwork</span></div>
+                    <div class="code-line"><span class="ln">44</span> });</div>
+                    <div class="code-line"><span class="ln">45</span></div>
+                    <div class="code-line"><span class="ln">46</span> } <span class="kw">catch</span> (<span
+                            class="var">err</span>) {</div>
+                    <div class="code-line"><span class="ln">47</span> <span class="obj">logger</span>.<span
+                            class="fn">error</span>(<span class="str">'Art generation failed:'</span>, <span
+                            class="var">err</span>);</div>
+                    <div class="code-line"><span class="ln">48</span> <span class="var">res</span>.<span
+                            class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({</div>
+                    <div class="code-line"><span class="ln">49</span> <span class="pr">error</span>: <span
+                            class="str">'Generation failed. Try again.'</span></div>
+                    <div class="code-line"><span class="ln">50</span> });</div>
+                    <div class="code-line"><span class="ln">51</span> }</div>
+                    <div class="code-line"><span class="ln">52</span>};</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="project-actions reveal">
+                <a href="#" class="action-large live">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Live Demo</span>
+                </a>
+                <a href="#" class="action-large github">
+                    <i class="fab fa-github"></i>
+                    <span>View Source Code</span>
+                </a>
+            </div>
+
+            <!-- Project Navigation -->
+            <div class="project-nav reveal">
+                <a href="#" class="project-nav-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Previous Project</span>
+                </a>
+                <a href="projects.html" class="btn-outline-subtle" style="padding:10px 24px;">
+                    <i class="fas fa-th"></i> All Projects
+                </a>
+                <a href="#" class="project-nav-link">
+                    <span>Next Project</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-brand">SB.</div>
+                    <p class="footer-desc">Building the future one commit at a time. Full-stack developer with a 300+
+                        day streak.</p>
+                    <div class="contact-social" style="margin-top:20px;">
+                        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <h5 class="footer-title">Navigate</h5>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="projects.html">Projects</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="footer-title">Services</h5>
+                    <ul class="footer-links">
+                        <li><a href="services.html">Full Stack Dev</a></li>
+                        <li><a href="services.html">API Design</a></li>
+                        <li><a href="services.html">MVP Development</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="footer-title">Contact</h5>
+                    <ul class="footer-links">
+                        <li><a href="mailto:shivam@example.com">shivam@example.com</a></li>
+                        <li><a href="#">github.com/shivam</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2024 <a href="#">Shivam Bhadoriya</a>. All rights reserved.</span>
+                <span>Crafted with <i class="fas fa-heart text-green"></i></span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/script.js"></script>
+</body>
+
+</html>
