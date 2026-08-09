@@ -43,3 +43,6 @@ next-env.d.ts
 
 # legacy / stray projects — never commit (contained a leaked .env + node_modules)
 Extra/
+
+.vercel
+.env*
