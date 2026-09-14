@@ -144,6 +144,32 @@ export type SiteContent = {
  */
 export type PublicContent = Omit<SiteContent, "email">;
 
+/**
+ * The editable content, before any admin overrides.
+ *
+ * Lives here rather than in content.ts so that scripts/seed.mjs can import it
+ * without dragging in mongoose and the "@/" path alias. One source of truth for
+ * the app, the admin and the seed.
+ */
+export const contentDefaults: SiteContent = {
+  availability: site.availability,
+  status: site.status,
+  roleLong: site.roleLong,
+  tagline: site.tagline,
+  heroLead:
+    `I'm ${site.name} — an ${site.role} at ${site.company}, in ${site.address.locality}. In August 2026, AI made 99.77% of my line changes. In October 2025 it made 0%. What I do with the hours I no longer spend typing: specs, architecture, tests and reviews.`,
+  aboutParagraphs: [
+    `I'm ${site.name}, an ${site.role} at ${site.company}, based in ${site.address.locality}, ${site.address.region}. My job title changed in 2026, and so did the work behind it. I write the specification, direct the coding agents that implement it, and review and test what comes back. The judgement calls — what to build, how it should be shaped, whether the result is actually correct — stayed with me. The typing did not.`,
+    "The clearest way to describe the shift is with one number. In October 2025, AI wrote 0% of the lines I changed. In August 2026, it wrote 99.77% of them. Nothing about that makes the engineering easier; it moves where the engineering happens. A vague ticket used to produce slow code. Now it produces confident, well-formatted, wrong code — much faster. So the specification stopped being paperwork and became the actual deliverable.",
+    "What that looks like day to day: I write down the exact behaviour, the field names, the status values and the acceptance criteria before anything is generated. I keep the work in phases small enough to review properly. I read every diff. I write the tests myself, or I make sure the agent's tests fail for the right reasons before I trust them. When a path is going wrong, I stop and rewind rather than argue the build forward. Most of my value now sits in the review, and in knowing which 0.23% of the lines had to be mine.",
+    "I did not start here. Before this I shipped full-stack MERN products end-to-end — production Express and MongoDB backends with JWT auth, rate limiting, realtime sockets and structured logging, behind React front ends built to a performance budget. The habits came from there: 70% faster queries through indexing and aggregation, roughly 60% less bandwidth through caching, 98 Lighthouse. Numbers settle arguments that opinions cannot, and that has not changed just because something else is writing the lines.",
+    `I studied B.Sc. Information Technology at ${site.university}, and won a pair of inter-college technical competitions along the way. Outside the day job I run AI-PULSE — a YouTube channel that publishes itself, one video and one Short about a trending AI tool every day, entirely on GitHub Actions with no server and no bill. This site is the other proof: a Next.js front end, a MongoDB-backed API, a self-built analytics pipeline and an admin dashboard, all designed and engineered end-to-end and all inspectable from the outside.`,
+  ],
+  now: { ...now },
+  location: site.location,
+  email: site.email,
+};
+
 export type CoverPattern = "grid" | "wave" | "nodes" | "scan" | "orbit";
 
 export type Project = {
