@@ -1,14 +1,32 @@
 # Phases
 
+## Now
+
+**Phase 3e — inbound mail.** `contact@shivambhadoriya.com` is printed on five service pages and
+does not receive. Hostinger mailboxes are a paid add-on, so its panel shows the address created
+while nothing is delivered. `scripts/cloudflare-email.mjs` is written and waiting on a Cloudflare
+token that carries Email Routing permissions.
+
+## Next 3
+
+1. **Phase 3e — mail.** Cloudflare Email Routing for inbound, then SMTP so the contact form
+   notifies instead of only storing the lead.
+2. **Phase 4 — above-the-fold performance.** Mobile LCP ~5.3s against a 2.5s target. Paint and
+   compositing cost in the effects system, not bytes. Detail below.
+3. **Phase 5 — search results watch.** 4–8 weeks after indexing, check `shivam bhadoriya` and
+   `web developer navsari` logged-out, and decide what the data says to change.
+
+---
+
 | # | Phase | Status | Notes |
 |---|---|---|---|
 | 1 | SEO + identity rebuild | **Done** — 2026-09-14 | Implements `portfolio-implementation-brief.md`. |
 | 2 | DEV-HANDOVER: local SEO, services, legal | **Done** — 2026-09-14 | City settled as Navsari; `contact@shivambhadoriya.com`; five service/hire pages; `/privacy-policy` + `/terms`; cookieless analytics. |
 | 3 | Domain live on shivambhadoriya.com | **Done** — 2026-09-14 | DNS, SSL, www, 308 off the old host, production env vars, deploy. `npm run verify:domain` → 29 passed, 0 failed. |
-| 3b | Admin panel | **Done** — 2026-09-14 | Two passwords accepted, wrong ones rejected, verified against the live domain. Needs `MONGODB_URI` before it has data to show. |
-| 3c | Indexing | **Partly automated** | IndexNow done and submitted (Bing/Yandex/Seznam/Naver). Google has no sanctioned push API — sitemap is in robots.txt; Request Indexing in Search Console is manual. |
+| 3b | Admin panel | **Done** — 2026-09-14 | Two passwords accepted, wrong ones rejected, verified against the live domain. Database wired, so it has real data. |
+| 3c | Indexing | **Partly automated** | IndexNow done (Bing/Yandex/Seznam/Naver). Google has no sanctioned push API — sitemap is in robots.txt; Request Indexing is manual. GSC property verified by Shivam. |
 | 3d | Database | **Done** — 2026-09-14 | Dedicated `shivambhadoriya` database on Atlas. `projects` + `settings` seeded from lib/site.ts. Live `/api/stats` reports `configured: true`. |
-| 3e | Mailbox + SMTP | **Half done** | Mailbox `contact@shivambhadoriya.com` created at Hostinger; delivery not yet confirmed (port 25 blocked locally, so probing is inconclusive). `SMTP_*` still unset, so the contact form falls back to opening the visitor's mail client. Needs the mailbox password. |
+| 3e | Mailbox + SMTP | **Open — highest priority** | Inbound confirmed NOT working: Hostinger mailboxes are a paid add-on. Needs a Cloudflare token with Email Routing permissions, then SMTP credentials. |
 | 4 | Above-the-fold performance | **Not started** | Deliberately not absorbed. Detail below. |
 | 5 | Confirm unverified facts | **Done** — 2026-09-14 | Phone, timelines, app confidentiality, Instagram and the real AI-PULSE stack (read from the GitHub API, not guessed) are all in the code. |
 
@@ -17,7 +35,7 @@
 - **Identity settled on Navsari, Gujarat.** DEV-HANDOVER is the command file and it says Navsari
   throughout; the older implementation brief said Ahmedabad. Everything user-visible now reads from
   `site.address`. GitHub still says Ahmedabad and must be changed by hand.
-- **Five commercial pages** at 1,080–1,170 words each, with `ProfessionalService` + `FAQPage` +
+- **Five commercial pages** at 1,223–1,421 words each, with `ProfessionalService` + `FAQPage` +
   `BreadcrumbList` schema, targeting the local and specialist queries that are actually winnable.
 - **`/privacy-policy` and `/terms`**, written from the code rather than a template, linked in the
   footer of every page.
