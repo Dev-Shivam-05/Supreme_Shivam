@@ -214,6 +214,18 @@
     -webkit-backdrop-filter: blur(14px) saturate(1.2);
   }
 
+  /* The scrolled nav bar specifically.
+     .glass-panel is 3.5% white, which is fine over body copy and nowhere near
+     enough over poster-scale type — the hero and page headings read straight
+     through it and the nav links become unreadable against lime. This keeps the
+     blur but puts real ground behind it. */
+  .nav-panel {
+    background: color-mix(in oklch, var(--bg) 82%, transparent);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  }
+
   /* faint engineering grid */
   .grid-bg {
     background-image:

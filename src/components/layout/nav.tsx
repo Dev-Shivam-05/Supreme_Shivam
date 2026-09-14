@@ -72,7 +72,7 @@ export function Nav() {
           <div
             className={cn(
               "flex items-center justify-between px-5 py-3 transition-all duration-300",
-              scrolled ? "glass-panel" : "border border-transparent",
+              scrolled ? "nav-panel" : "border border-transparent",
             )}
           >
             {/* The accessible name has to contain the visible text ("Shivam Bhadoriya"),
