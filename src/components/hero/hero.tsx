@@ -44,7 +44,7 @@ export function Hero({ content }: { content: PublicContent }) {
         className="hero-fade container-x pointer-events-none absolute inset-x-0 top-24 z-10 hidden justify-between sm:flex"
         style={{ animationDelay: "0.8s" }}
       >
-        <span className="hud">{site.address.locality} · 23.0°N</span>
+        <span className="hud">{site.address.locality} · {site.latitude}</span>
         <span className="hud tick hud-accent">{content.availability}</span>
       </div>
 

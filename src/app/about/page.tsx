@@ -11,7 +11,7 @@ import { site } from "@/lib/site";
 export const metadata = pageMeta({
   title: "About",
   description:
-    "Shivam Bhadoriya is an AI Engineer at Aaziko Global LLP in Ahmedabad. He writes the spec, directs the coding agents, and reviews and tests what they build.",
+    "Shivam Bhadoriya is an AI Engineer at Aaziko Global LLP, based in Navsari, Gujarat. He writes the spec, directs the coding agents, and reviews and tests what they build.",
   path: "/about",
   image: site.images.avatar,
 });
@@ -22,7 +22,7 @@ export default async function AboutPage() {
     <>
       <JsonLd data={profilePageLd} />
       <PageHeader
-        index="02"
+        index="03"
         label="Off the grid"
         title="The engineer behind"
         accent="the work."

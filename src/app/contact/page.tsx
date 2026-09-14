@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 export const metadata = pageMeta({
   title: "Contact",
   description:
-    "Get in touch with Shivam Bhadoriya, AI Engineer in Ahmedabad — available for full-time roles and freelance projects. Replies within 24 hours.",
+    "Get in touch with Shivam Bhadoriya, AI Engineer in Navsari, Gujarat — web, mobile and AI automation projects from ₹30,000. Replies within 24 hours.",
   path: "/contact",
 });
 

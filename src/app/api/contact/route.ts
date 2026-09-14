@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { dbConnect } from "@/lib/db";
@@ -42,7 +43,12 @@ export async function POST(req: NextRequest) {
   const conn = await dbConnect();
   if (conn) {
     try {
-      await Lead.create({ ...lead, ip, userAgent: req.headers.get("user-agent") || "" });
+      // Hash rather than store the address — see the note on the model.
+      const ipHash = createHash("sha256")
+        .update(`${process.env.ANALYTICS_SALT || "sb-portfolio"}|${ip}`)
+        .digest("hex")
+        .slice(0, 32);
+      await Lead.create({ ...lead, ipHash, userAgent: req.headers.get("user-agent") || "" });
       stored = true;
     } catch (err) {
       console.error("[contact] store failed:", (err as Error).message);

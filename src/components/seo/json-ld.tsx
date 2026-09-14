@@ -69,8 +69,11 @@ const personNode = {
   knowsAbout: [
     "AI coding agents",
     "Specification-driven development",
+    "Web development",
+    "Mobile app development",
     "Next.js",
     "React",
+    "React Native",
     "TypeScript",
     "Node.js",
     "MongoDB",
@@ -79,10 +82,66 @@ const personNode = {
     "System architecture",
     "Web performance",
   ],
-  // Only public accounts that are verifiably his. Instagram and WakaTime are
-  // deliberately absent until the URLs are confirmed.
-  sameAs: [site.social.github, site.social.linkedin, site.social.x],
+  // Only public accounts that resolve and are actually his. Instagram stays out:
+  // the handle linked from GitHub (`__https.https`) could not be verified, and a
+  // sameAs pointing at a wrong profile is worse than omitting it.
+  sameAs: [site.social.github, site.social.linkedin, site.social.x, site.social.wakatime],
 };
+
+/**
+ * The services he sells, as a ProfessionalService node per page.
+ *
+ * `provider` points at the same @id as the Person, which is what ties the
+ * service listings to him as one entity rather than to an unrelated business.
+ * `telephone` is omitted entirely when no number is set — an empty string there
+ * is a schema error, not a blank field.
+ */
+export function professionalServiceLd(service: {
+  slug: string;
+  schemaName: string;
+  title: string;
+  description: string;
+  priceFrom?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "@id": `${site.url}${service.slug}#service`,
+    name: service.schemaName,
+    description: service.description,
+    image: abs(site.images.avatar),
+    url: `${site.url}${service.slug}`,
+    ...(site.phone ? { telephone: site.phone } : {}),
+    email: `mailto:${site.email}`,
+    priceRange: service.priceFrom ?? site.rateFrom,
+    areaServed: [
+      ...site.areaServed.map((name) => ({ "@type": "City", name })),
+      { "@type": "State", name: site.address.region },
+      { "@type": "Country", name: "India" },
+    ],
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: site.address.locality,
+      addressRegion: site.address.region,
+      addressCountry: site.address.country,
+    },
+    provider: { "@id": PERSON_ID },
+  };
+}
+
+/** FAQPage for the question block at the foot of each service page. */
+export function faqPageLd(slug: string, faqs: readonly { q: string; a: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${site.url}${slug}#faq`,
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+}
 
 
 /** `alternateName` is what lets Google render "Shivam Bhadoriya" as the site name. */

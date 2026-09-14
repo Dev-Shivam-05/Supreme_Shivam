@@ -8,8 +8,8 @@
  * It deliberately stays in the JSON-LD (see components/seo/json-ld.tsx) — there
  * it is a machine-readable property of the Person entity and it helps.
  */
-const LOCAL = "shivambhadoriya1605";
-const HOST = ["gmail", "com"].join(".");
+const LOCAL = "contact";
+const HOST = ["shivambhadoriya", "com"].join(".");
 
 /** The real address. Call it; do not inline it into markup at build time. */
 export function emailAddress() {
@@ -21,4 +21,4 @@ export function emailHref() {
 }
 
 /** Shown before hydration and to anyone without JavaScript. Readable, unharvestable. */
-export const EMAIL_MASKED = `${LOCAL} [at] ${["gmail", "dot", "com"].join(" ")}`;
+export const EMAIL_MASKED = `${LOCAL} [at] ${["shivambhadoriya", "dot", "com"].join(" ")}`;

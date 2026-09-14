@@ -13,11 +13,22 @@ const LeadSchema = new Schema(
       index: true,
     },
     source: { type: String, default: "portfolio" },
-    ip: { type: String, default: "" },
+    /**
+     * A salted hash of the sender's IP, never the address itself. It exists only
+     * to recognise a repeat spammer; nothing in the app reads it back, and a
+     * hash serves that purpose without retaining an identifier.
+     */
+    ipHash: { type: String, default: "" },
     userAgent: { type: String, default: "" },
   },
   { timestamps: true },
 );
+
+/**
+ * Enquiries auto-delete after 24 months. The privacy policy states that
+ * retention period, so it needs a mechanism behind it rather than a promise.
+ */
+LeadSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 730 });
 
 export type LeadDoc = InferSchemaType<typeof LeadSchema>;
 export const Lead = mongoose.models.Lead || mongoose.model("Lead", LeadSchema);

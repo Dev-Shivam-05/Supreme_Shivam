@@ -11,7 +11,7 @@ export const env = {
   SMTP_USER: process.env.SMTP_USER ?? "",
   SMTP_PASS: process.env.SMTP_PASS ?? "",
   SMTP_FROM: process.env.SMTP_FROM ?? process.env.SMTP_USER ?? "",
-  CONTACT_TO: process.env.CONTACT_TO ?? "shivambhadoriya1605@gmail.com",
+  CONTACT_TO: process.env.CONTACT_TO ?? "contact@shivambhadoriya.com",
 
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "",
   ADMIN_SECRET: process.env.ADMIN_SECRET ?? "",

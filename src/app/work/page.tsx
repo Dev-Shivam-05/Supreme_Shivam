@@ -33,7 +33,7 @@ export default async function WorkPage() {
     <>
       <JsonLd data={itemListLd} />
       <PageHeader
-        index="01"
+        index="02"
         label="The Grid"
         title="Selected"
         accent="work."

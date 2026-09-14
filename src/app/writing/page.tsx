@@ -44,7 +44,7 @@ export default function WritingPage() {
     <>
       <JsonLd data={blogLd} />
       <PageHeader
-        index="03"
+        index="04"
         label="In writing"
         title="Notes on the"
         accent="new job."

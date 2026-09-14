@@ -2,13 +2,30 @@
 
 | # | Phase | Status | Notes |
 |---|---|---|---|
-| 1 | SEO + identity rebuild | **Done** — 2026-09-14 | Implements `portfolio-implementation-brief.md`. Branch `seo-ai-engineer-identity`. See `docs/SEO.md` for the manual follow-ups. |
-| 2 | Hero / above-the-fold performance | **Not started** | Deliberately not absorbed into phase 1. Detail below. |
-| 3 | Confirm unverified facts | **Blocked on Shivam** | University spelling, WakaTime / Instagram URLs, the real AI-PULSE stack and repo. Listed in `docs/SEO.md` §2. |
+| 1 | SEO + identity rebuild | **Done** — 2026-09-14 | Implements `portfolio-implementation-brief.md`. |
+| 2 | DEV-HANDOVER: local SEO, services, legal | **Done** — 2026-09-14 | City settled as Navsari; `contact@shivambhadoriya.com`; five service/hire pages; `/privacy-policy` + `/terms`; cookieless analytics. |
+| 3 | Domain, console and profile setup | **Blocked on Shivam** | All clicks in `docs/DOMAIN-SETUP.md`. Domain bought; DNS, SSL, mailbox, Search Console, Bing and Google Business Profile outstanding. |
+| 4 | Above-the-fold performance | **Not started** | Deliberately not absorbed. Detail below. |
+| 5 | Confirm remaining unverified facts | **Blocked on Shivam** | Phone number, Instagram URL, the real AI-PULSE stack, and whether a React Native app has actually shipped. Listed in `docs/SEO.md` §2. |
+
+## Phase 2 — what shipped
+
+- **Identity settled on Navsari, Gujarat.** DEV-HANDOVER is the command file and it says Navsari
+  throughout; the older implementation brief said Ahmedabad. Everything user-visible now reads from
+  `site.address`. GitHub still says Ahmedabad and must be changed by hand.
+- **Five commercial pages** at 1,080–1,170 words each, with `ProfessionalService` + `FAQPage` +
+  `BreadcrumbList` schema, targeting the local and specialist queries that are actually winnable.
+- **`/privacy-policy` and `/terms`**, written from the code rather than a template, linked in the
+  footer of every page.
+- **No cookie banner, because there is nothing to consent to.** The analytics session id moved from
+  `sessionStorage` to a server-side daily-rotating salted hash of IP + user-agent; the contact form
+  stores a hash instead of the IP; enquiries auto-expire after 24 months and pageviews after 180
+  days, both enforced by TTL indexes so the policy's claims are true.
+- **Nav reordered** with Services first; Lab moved to the footer to keep the bar at six items.
 
 ---
 
-## Phase 2 — above-the-fold performance
+## Phase 4 — above-the-fold performance
 
 **Why it is its own phase:** the brief sets a target of mobile LCP < 2.5 s on throttled 4G. That
 target is not met and was not met before this work either. Reaching it means changing the motion
@@ -17,7 +34,7 @@ is more than eight files.
 
 ### Measured, local `next start`, Lighthouse mobile, simulated 4G
 
-| | Before (`main`) | After phase 1 |
+| | Before (`main`) | After phases 1–2 |
 |---|---|---|
 | Performance | 32 | 68 |
 | LCP | 5.1 s | 5.3 s |

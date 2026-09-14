@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { site } from "@/lib/site";
 import { getProjects } from "@/lib/content";
 import { posts } from "@/lib/writing";
+import { servicePages } from "@/lib/services";
 
 // Refresh at most hourly (ISR) — picks up admin-added projects without a rebuild,
 // while staying cache-fast for Googlebot. Falls back to the static project list
@@ -44,6 +45,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
       images: [PORTRAIT, AVATAR],
     },
+    // The service and hire pages are the commercial half of the site (Goal B) —
+    // they rank for "web developer navsari" and friends, so they sit high.
+    { url: abs("/services"), lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: abs("/work"), lastModified: now, changeFrequency: "monthly", priority: 0.85, images: [OG] },
     { url: abs("/writing"), lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: abs("/contact"), lastModified: now, changeFrequency: "yearly", priority: 0.7 },
@@ -51,6 +55,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: abs("/lab"), lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: abs("/stats"), lastModified: now, changeFrequency: "daily", priority: 0.4 },
   ];
+
+  const services: MetadataRoute.Sitemap = servicePages.map((p) => ({
+    url: abs(p.slug),
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.85,
+    images: [AVATAR],
+  }));
+
+  const legal: MetadataRoute.Sitemap = ["/privacy-policy", "/terms"].map((path) => ({
+    url: abs(path),
+    lastModified: now,
+    changeFrequency: "yearly" as const,
+    priority: 0.2,
+  }));
 
   const writing: MetadataRoute.Sitemap = posts.map((p) => ({
     url: abs(`/writing/${p.slug}`),
@@ -71,5 +90,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
-  return [...pages, ...writing, ...work];
+  return [...pages, ...services, ...writing, ...work, ...legal];
 }

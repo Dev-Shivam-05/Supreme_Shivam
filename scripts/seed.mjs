@@ -117,7 +117,7 @@ const settings = {
     status: "Available for full-time & freelance",
   },
   location: "India",
-  email: "shivambhadoriya1605@gmail.com",
+  email: "contact@shivambhadoriya.com",
 };
 
 /* ----------------------------- run ----------------------------- */

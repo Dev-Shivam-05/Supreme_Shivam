@@ -166,7 +166,7 @@ async function buildOgCard(out) {
   <text x="72" y="392" font-family="${POSTER}" font-size="92" font-weight="900" letter-spacing="-2" fill="${ACCENT}">BHADORIYA</text>
 
   <rect x="72" y="432" width="560" height="1" fill="${FG}" fill-opacity="0.16"/>
-  <text x="72" y="478" font-family="${SANS}" font-size="29" fill="${FG}">AI Engineer &#183; Ahmedabad, India</text>
+  <text x="72" y="478" font-family="${SANS}" font-size="29" fill="${FG}">AI Engineer &#183; Navsari, Gujarat</text>
   <text x="72" y="524" font-family="${SANS}" font-size="22" fill="${MUTED}">I write the spec, direct the agents, review and test what they build.</text>
 </svg>`);
 

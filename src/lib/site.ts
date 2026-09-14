@@ -27,20 +27,38 @@ export const site = {
   role: "AI Engineer",
   roleLong: "AI Engineer — I write the spec, direct the agents, and review and test what they build.",
   company: "Aaziko Global LLP",
-  location: "Ahmedabad, India",
-  address: { locality: "Ahmedabad", region: "Gujarat", country: "IN" },
+  /**
+   * ONE city, everywhere. DEV-HANDOVER settles it as Navsari — the local search
+   * strategy (the /hire pages, the Google Business Profile service area) is built
+   * on it. GitHub currently says Ahmedabad and must be changed to match; three
+   * cities across public profiles is what weakens the entity.
+   */
+  location: "Navsari, Gujarat",
+  address: { locality: "Navsari", region: "Gujarat", country: "IN" },
+  latitude: "20.9°N",
+  /** Cities and regions the service pages and the Business Profile claim. */
+  areaServed: ["Navsari", "Surat"],
   availability: "Open to full-time & freelance",
   status: "Available now",
-  email: "shivambhadoriya1605@gmail.com",
-  university: "VidhyaDeep University",
+  email: "contact@shivambhadoriya.com",
+  /**
+   * Public phone. Empty until confirmed — every consumer (the service pages, the
+   * ProfessionalService schema, /contact) checks for a value first and omits the
+   * whole block when it is blank, so an empty string is never rendered and never
+   * emitted as an empty `telephone` property.
+   */
+  phone: "",
+  university: "Vidhyadeep University",
   url: CANONICAL_URL,
   /** The page <title> and the OG/Twitter title. 30 chars — never truncated. */
   title: "Shivam Bhadoriya — AI Engineer",
-  /** The meta description. 156 chars — inside Google's ~160 char render budget. */
+  /** The meta description. 149 chars — inside Google's ~160 char render budget. */
   tagline:
-    "AI Engineer at Aaziko Global LLP, based in Ahmedabad. I write the spec, direct the coding agents, and review and test what they build. Portfolio and projects.",
+    "AI Engineer in Navsari, Gujarat. I write the spec, direct the coding agents, and review and test what they build. Web, mobile and automation projects.",
   /** The short form used on social cards, where space is tighter. */
   taglineShort: "I write the spec, direct the coding agents, and review and test what they build.",
+  /** Starting price quoted on every service page. Clients filter on this. */
+  rateFrom: "₹30,000",
   /**
    * Stable, human-readable image paths. The filename is a ranking input for
    * Google image search and these exact strings appear in the JSON-LD and the
@@ -54,24 +72,35 @@ export const site = {
     /** 1200x630 link-preview card, built from the profile photograph. */
     og: "/og/shivam-bhadoriya.jpg",
     /** Used verbatim as alt text on every instance of his face. */
-    alt: "Shivam Bhadoriya, AI Engineer at Aaziko Global LLP, Ahmedabad",
+    alt: "Shivam Bhadoriya, AI Engineer at Aaziko Global LLP, Navsari",
   },
   social: {
     github: "https://github.com/Dev-Shivam-05",
     linkedin: "https://www.linkedin.com/in/shivam-bhadoriya-dev/",
     x: "https://x.com/Dev_Shivam_05",
     xHandle: "@Dev_Shivam_05",
-    email: "mailto:shivambhadoriya1605@gmail.com",
+    // The username really is `__https_shivu` — it reads like a signup accident,
+    // but it resolves, and DEV-HANDOVER lists it in sameAs.
+    wakatime: "https://wakatime.com/@__https_shivu",
+    email: "mailto:contact@shivambhadoriya.com",
   },
 } as const;
 
 export const nav = [
-  { label: "Work", href: "/work", index: "01" },
-  { label: "About", href: "/about", index: "02" },
-  { label: "Writing", href: "/writing", index: "03" },
-  { label: "Stack", href: "/stack", index: "04" },
-  { label: "Lab", href: "/lab", index: "05" },
+  { label: "Services", href: "/services", index: "01" },
+  { label: "Work", href: "/work", index: "02" },
+  { label: "About", href: "/about", index: "03" },
+  { label: "Writing", href: "/writing", index: "04" },
+  { label: "Stack", href: "/stack", index: "05" },
   { label: "Contact", href: "/contact", index: "06" },
+] as const;
+
+/** Reachable and in the sitemap, just not in the top bar. */
+export const secondaryNav = [
+  { label: "Lab", href: "/lab" },
+  { label: "Live stats", href: "/stats" },
+  { label: "Privacy", href: "/privacy-policy" },
+  { label: "Terms", href: "/terms" },
 ] as const;
 
 export type Stat = { value: string; label: string; sub?: string };
@@ -515,7 +544,7 @@ export const faqs = [
   },
   {
     q: "Do you work remotely?",
-    a: "Always. I'm based in Ahmedabad, Gujarat and collaborate with teams across time zones, async-first.",
+    a: "Always. I'm based in Navsari, Gujarat — an hour from Surat — and collaborate with teams across time zones, async-first.",
   },
   {
     q: "Can you handle both design and engineering?",
@@ -525,7 +554,7 @@ export const faqs = [
 
 export const facts = [
   { k: "Role", v: `${site.role} · ${site.company}` },
-  { k: "Based in", v: "Ahmedabad, Gujarat · Open to remote" },
+  { k: "Based in", v: "Navsari, Gujarat · Open to remote" },
   { k: "Education", v: `B.Sc. Information Technology · ${site.university}` },
   { k: "Focus", v: "Spec-driven delivery · AI coding agents · Review & tests" },
 ] as const;

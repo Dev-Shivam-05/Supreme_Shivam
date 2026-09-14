@@ -25,41 +25,34 @@ image sitemap and favicon all point at, so it has to be the one on your profiles
 
 ### 1.2 Make the job title identical everywhere
 
-The site now says **AI Engineer at Aaziko Global LLP, Ahmedabad** in the title, the H1 area, the
+The site now says **AI Engineer at Aaziko Global LLP, Navsari** in the title, the H1 area, the
 structured data and the social card. Make LinkedIn, GitHub and X say the same. Three different
 titles for one name is the main reason the profiles never consolidated.
 
-### 1.3 Buy the domain
+### 1.3 Wire up the domain, the mailbox, Search Console and the Business Profile
 
-1. Buy **`shivambhadoriya.com`** (fall back to `.dev`, then `.in`).
-2. Point it at this Vercel deployment.
-3. In Vercel → Settings → Environment Variables, set:
-   ```
-   NEXT_PUBLIC_SITE_URL=https://shivambhadoriya.com
-   ```
-4. Redeploy.
+`shivambhadoriya.com` is bought. **Every remaining click is in
+[DOMAIN-SETUP.md](DOMAIN-SETUP.md)** — DNS records, SSL, the `contact@` mailbox, the Vercel
+environment variables, Google Search Console, Bing, and the Google Business Profile, in order,
+with a verification step after each one.
 
-That one variable moves everything: canonical URLs, `metadataBase`, the JSON-LD `@id`s, the OG
-image URLs, `sitemap.xml`, `robots.txt`, and the 301 from `shivam-bhadoriya-dev.vercel.app` and
-from the `www` variant.
+Two things from it worth repeating here because they are the expensive mistakes:
 
-**Do not set that variable before the domain resolves.** The redirect in `next.config.ts` is
-deliberately guarded so it stays off until then — a 301 into a domain that does not exist is
-cached hard by browsers and is very painful to undo.
+- **The Cloudflare proxy cloud must be grey, not orange,** on the Vercel DNS records. Orange breaks
+  SSL and produces a redirect loop.
+- **Do not set `NEXT_PUBLIC_SITE_URL` until `https://shivambhadoriya.com` returns 200.** The
+  redirect in `next.config.ts` is deliberately guarded so it stays off until you do; setting it
+  early 301s the live site into a host that does not resolve, and browsers cache that hard.
 
-### 1.4 Search Console and Bing
+### 1.4 Google Business Profile — free, and the biggest lever for local leads
 
-- [ ] Add the new domain as a property in [Google Search Console](https://search.google.com/search-console)
-- [ ] Submit `https://shivambhadoriya.com/sitemap.xml`
-- [ ] Request indexing manually for `/`, `/about` and `/writing`
-- [ ] Same in [Bing Webmaster Tools](https://www.bing.com/webmasters) (it can import from GSC)
-
-Without this, expect 2–6 weeks before anything moves. With it, days.
+Step 7 of DOMAIN-SETUP. It is what puts you in the boxed map results for "web developer near me" in
+Navsari, which for local service queries outranks anything a website alone can do.
 
 ### 1.5 Validate the structured data
 
-Paste the live URL into <https://search.google.com/test/rich-results>. It must report
-**ProfilePage** with zero errors, with `sameAs` listing GitHub, LinkedIn and X.
+<https://search.google.com/test/rich-results> — the home URL must report **ProfilePage** with zero
+errors, and any `/hire/*` URL must report **FAQPage** with zero errors.
 
 ---
 
@@ -67,14 +60,35 @@ Paste the live URL into <https://search.google.com/test/rich-results>. It must r
 
 | Where | What | Why it matters |
 |---|---|---|
-| `src/lib/site.ts` → `university` | Currently **"VidhyaDeep University"** | Your profiles spell it three ways (`Vidyadeep`, `VidhyaDeep`, `Vidhyadeep`). Pick whatever the LinkedIn education dropdown says, put that exact string here, and make all four places match. |
-| `src/components/seo/json-ld.tsx` → `sameAs` | WakaTime and Instagram are **not** listed | A `sameAs` pointing at a wrong or dead profile is worse than omitting it. Send me the URLs if they are public and yours, and they go in. |
+| `src/lib/site.ts` → `phone` | **Empty.** | You said the number should be public on the site and the Business Profile. Send it and it goes into the service pages, /contact and the `ProfessionalService` schema. Until then every consumer omits the block rather than rendering a blank. |
+| `src/components/seo/json-ld.tsx` → `sameAs` | Instagram is **not** listed | The handle linked from your GitHub (`__https.https`) could not be verified. A `sameAs` pointing at a wrong profile is worse than omitting it. Confirm the URL and it goes in. |
+| `src/lib/services.ts` → `timeline` | Conventional ranges, not measured | "2–6 weeks", "6–10 weeks", "1–3 weeks per workflow" are normal for a solo developer but are not drawn from your own past jobs. They live in one place — correct them if they are wrong. |
 
 Also unconfirmed: the **AI-PULSE** entry in `src/lib/site.ts` was written from the brief alone.
 The stack list is deliberately minimal (`GitHub Actions`, `Scheduled workflows`,
 `YouTube Data API`, `CI tests`) — fill in the real one and add the `repo` / `live` URLs.
 
+And the **mobile app** service page: your shipped work is all web. The page is written honestly —
+it leads on the backend, which is where your production experience actually is — but if you have
+not shipped a React Native app, either ship one or tell me and I will soften it further.
+
 ---
+
+## 2b. The cookie banner you do not need
+
+DEV-HANDOVER asks for a consent banner *if* non-essential cookies or storage are used. The
+analytics used to keep a session id in `sessionStorage`, which would have required one.
+
+It no longer does. The visitor id is now derived server-side from a daily-rotating salted hash of
+IP and user-agent — the IP itself is never stored, and the hash changes at midnight UTC so days
+cannot be joined together. The contact form hashes the sender's IP too, and enquiries auto-delete
+after 24 months.
+
+Net effect: no cookies, no device storage for analytics, nothing to consent to, no banner hurting
+your conversion rate, and the `/stats` page keeps working. `/privacy-policy` says exactly this and
+is linked in the footer of every page.
+
+**If you ever add Google Analytics, the banner becomes mandatory again.** Tell me before you do.
 
 ## 3. What the code already does
 
@@ -92,8 +106,16 @@ The stack list is deliberately minimal (`GitHub Actions`, `Scheduled workflows`,
 - **Image sitemap.** Both photographs are listed against the pages they actually appear on.
 - **`/writing`.** Four posts, `BlogPosting` + `BreadcrumbList` per post, author pointing at the
   Person node. This is the page that gives the site something to rank *with*.
-- **Email.** Assembled after hydration (`src/lib/email.ts`) so the address is not in the server
-  HTML or the RSC payload, but kept in the JSON-LD where it helps.
+- **Email.** `contact@shivambhadoriya.com`, assembled after hydration (`src/lib/email.ts`) so it is
+  not in the server HTML or the RSC payload, but kept in the JSON-LD where it helps. The old Gmail
+  address is gone from the site entirely.
+- **Five commercial pages.** `/services/web-development`, `/services/mobile-app-development`,
+  `/services/ai-automation`, `/hire/web-developer-navsari`, `/hire/web-developer-surat` — each
+  1,000+ words, with an H1 naming the service and the place, a starting price, a timeline, proof
+  linking to real case studies, a six-question FAQ, and `ProfessionalService` + `FAQPage` +
+  `BreadcrumbList` schema. Indexed from `/services` and the footer.
+- **Legal.** `/privacy-policy` and `/terms`, written from what the code actually does, linked in
+  the footer of every page.
 
 ## 4. Regenerating the images
 

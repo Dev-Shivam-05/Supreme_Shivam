@@ -4,7 +4,8 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { EmailLink } from "@/components/ux/email-link";
 import { Signature } from "@/components/ux/signature";
-import { nav, site, type PublicContent } from "@/lib/site";
+import { serviceOnly, hireOnly } from "@/lib/services";
+import { nav, secondaryNav, site, type PublicContent } from "@/lib/site";
 
 export function Footer({ content }: { content: PublicContent }) {
   const year = new Date().getFullYear();
@@ -92,7 +93,7 @@ export function Footer({ content }: { content: PublicContent }) {
           </div>
 
           {/* index */}
-          <div className="grid gap-10 border-t border-border pt-10 md:grid-cols-[1.5fr_1fr_1fr]">
+          <div className="grid gap-10 border-t border-border pt-10 md:grid-cols-[1fr_1.2fr_1fr_1fr]">
             <div>
               <div className="hud mb-4">Index</div>
               <div className="flex flex-col gap-1.5">
@@ -102,7 +103,19 @@ export function Footer({ content }: { content: PublicContent }) {
                     {n.label}
                   </Link>
                 ))}
+                <Link href="/lab" className="w-fit text-sm text-fg-muted hover:text-fg">Lab</Link>
                 <Link href="/stats" className="w-fit text-sm text-accent hover:underline">Live stats ●</Link>
+              </div>
+            </div>
+
+            <div>
+              <div className="hud mb-4">Services</div>
+              <div className="flex flex-col gap-1.5">
+                {[...serviceOnly, ...hireOnly].map((s) => (
+                  <Link key={s.slug} href={s.slug} className="w-fit text-sm text-fg-muted hover:text-fg">
+                    {s.title}
+                  </Link>
+                ))}
               </div>
             </div>
             <div>
@@ -123,9 +136,18 @@ export function Footer({ content }: { content: PublicContent }) {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-8">
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-border pt-8">
             <p className="font-mono text-xs text-fg-faint">© {year} {site.name}. All rights reserved.</p>
-            <p className="font-mono text-xs text-fg-faint">{content.location} · {content.availability}</p>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              {secondaryNav
+                .filter((l) => l.href.startsWith("/privacy") || l.href.startsWith("/terms"))
+                .map((l) => (
+                  <Link key={l.href} href={l.href} className="font-mono text-xs text-fg-faint hover:text-fg">
+                    {l.label}
+                  </Link>
+                ))}
+              <p className="font-mono text-xs text-fg-faint">{content.location} · {content.availability}</p>
+            </div>
           </div>
         </div>
       </div>
