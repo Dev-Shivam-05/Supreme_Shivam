@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { process } from "@/lib/site";
+import { processSteps } from "@/lib/site";
 
 export function Process() {
   const reduced = useReducedMotion();
@@ -16,7 +16,7 @@ export function Process() {
         </div>
 
         <div className="grid gap-px overflow-hidden border border-border bg-border md:grid-cols-4">
-          {process.map((step, i) => (
+          {processSteps.map((step, i) => (
             <motion.div
               key={step.n}
               initial={reduced ? { opacity: 0 } : { opacity: 0, y: 24 }}

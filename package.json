@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "node scripts/seed.mjs"
+    "seed": "node scripts/seed.mjs",
+    "images": "node scripts/build-images.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

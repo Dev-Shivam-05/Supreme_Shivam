@@ -6,7 +6,7 @@ import { pageMeta } from "@/lib/seo";
 export const metadata = pageMeta({
   title: "Contact",
   description:
-    "Get in touch with Shivam Bhadoriya — available for full-time and freelance full-stack work. Replies within 24 hours.",
+    "Get in touch with Shivam Bhadoriya, AI Engineer in Ahmedabad — available for full-time roles and freelance projects. Replies within 24 hours.",
   path: "/contact",
 });
 
@@ -14,7 +14,7 @@ export default function ContactPage() {
   return (
     <>
       <PageHeader
-        index="05"
+        index="06"
         label="Pit wall"
         title="Ready to"
         accent="build?"

@@ -15,11 +15,12 @@ export const metadata = pageMeta({
 
 export default async function WorkPage() {
   const projects = await getProjects();
+  const featured = projects.filter((p) => !p.archived);
   const itemListLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: "Portfolio Projects",
-    itemListElement: projects.map((p, i) => ({
+    itemListElement: featured.map((p, i) => ({
       "@type": "ListItem",
       position: i + 1,
       name: p.title,
@@ -38,7 +39,7 @@ export default async function WorkPage() {
         accent="work."
         description="Selected builds. Hover a card to preview it, then open the full case study — the problem, the architecture, the trade-offs, and the numbers that came out the other side."
       />
-      <WorkGallery projects={projects} />
+      <WorkGallery projects={featured} />
       <div className="container-x">
         <div className="hud tick mb-2">Full index</div>
       </div>

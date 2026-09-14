@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { useIsTouch, usePrefersReducedMotion } from "@/lib/hooks";
+import { site } from "@/lib/site";
 
 /**
  * Lando-style reveal: a portrait bleeds through only in a circle around the
@@ -66,13 +66,17 @@ export function HeroReveal() {
           filter: "url(#heroLiquid)",
         }}
       >
-        <Image
-          src="/personal/portrait-02.webp"
-          alt=""
-          fill
+        {/* eslint-disable-next-line @next/next/no-img-element -- stable,
+            name-carrying /images/… path is the point; next/image rewrites it to
+            /_next/image?url=… which carries no filename signal for image search. */}
+        <img
+          src={site.images.portrait}
+          alt={site.images.alt}
+          width={576}
+          height={1024}
           loading="lazy"
-          sizes="(max-width: 768px) 0px, 100vw"
-          className="img-duotone object-cover object-[70%_center] opacity-90"
+          decoding="async"
+          className="img-duotone absolute inset-0 h-full w-full object-cover object-[70%_center] opacity-90"
         />
         <div className="tint-accent absolute inset-0 opacity-50" />
       </div>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Moon, Search, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
+import { EmailLink } from "@/components/ux/email-link";
 import { Magnetic } from "@/components/ux/magnetic";
 import { useMounted } from "@/lib/hooks";
 import { nav, site } from "@/lib/site";
@@ -58,7 +59,11 @@ export function Nav() {
   return (
     <>
       <motion.header
-        initial={{ y: -100 }}
+        // `initial={false}` renders the bar in place instead of SSR-ing it at
+        // translateY(-100px) and waiting for hydration to slide it down. It was
+        // the LCP element and it was gated on framer booting; the drop-in was
+        // invisible anyway, behind the cold-open panel. Hide-on-scroll is unchanged.
+        initial={false}
         animate={{ y: hidden ? -110 : 0 }}
         transition={{ duration: 0.4, ease: [0.7, 0, 0.1, 1] }}
         className="fixed inset-x-0 top-0 z-[90]"
@@ -179,7 +184,7 @@ export function Nav() {
                   {[
                     { label: "GitHub", href: site.social.github },
                     { label: "LinkedIn", href: site.social.linkedin },
-                    { label: "Email", href: site.social.email },
+                    { label: "X", href: site.social.x },
                   ].map((s) => (
                     <a
                       key={s.label}
@@ -191,6 +196,7 @@ export function Nav() {
                       {s.label}
                     </a>
                   ))}
+                  <EmailLink label="Email" className="sweep border border-border px-4 py-2.5 text-sm text-fg-muted" />
                   <Link href="/contact" className="sweep border border-accent bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
                     Hire me
                   </Link>

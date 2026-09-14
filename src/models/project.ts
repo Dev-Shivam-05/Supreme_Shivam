@@ -22,6 +22,8 @@ const ProjectSchema = new Schema(
     outcomes: { type: [String], default: [] },
     pattern: { type: String, enum: ["grid", "wave", "nodes", "scan", "orbit"], default: "grid" },
     flagship: { type: Boolean, default: false },
+    // Still has a case study and an archive row, but never shown as featured work.
+    archived: { type: Boolean, default: false },
     imageUrl: { type: String, default: "" }, // /api/media/:id or an external URL
     repo: { type: String, default: "" },
     live: { type: String, default: "" },
