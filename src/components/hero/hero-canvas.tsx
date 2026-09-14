@@ -63,6 +63,17 @@ export function HeroCanvas() {
         fallback
       )}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-bg/20 via-transparent to-bg" />
+      {/* Copy scrim. The blob drifts under the hero text and washes it out — the
+          hero now carries a role line and a lede, not just the name, so the
+          reading side of the frame needs ground under it. Ramps out by ~two
+          thirds across, leaving the shader legible around the portrait. */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(100deg, color-mix(in oklch, var(--bg) 88%, transparent) 0%, color-mix(in oklch, var(--bg) 62%, transparent) 32%, transparent 66%)",
+        }}
+      />
     </div>
   );
 }

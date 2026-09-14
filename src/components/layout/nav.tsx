@@ -75,7 +75,10 @@ export function Nav() {
               scrolled ? "glass-panel" : "border border-transparent",
             )}
           >
-            <Link href="/" className="group flex items-center gap-3" aria-label="Home">
+            {/* The accessible name has to contain the visible text ("Shivam Bhadoriya"),
+                or it reports as a label/content mismatch — and this is the site's
+                primary identity link, so the name belongs in it either way. */}
+            <Link href="/" className="group flex items-center gap-3" aria-label={`${site.name} — home`}>
               <span className="grid h-8 w-8 place-items-center bg-accent font-poster text-sm text-accent-ink">
                 SB
               </span>

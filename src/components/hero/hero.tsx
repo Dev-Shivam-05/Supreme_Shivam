@@ -34,7 +34,7 @@ export function Hero({ content }: { content: PublicContent }) {
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
-    <section ref={ref} className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden pb-28 pt-32">
+    <section ref={ref} className="relative flex min-h-[100svh] flex-col overflow-hidden pb-8 pt-28">
       <HeroCanvas />
       <div className="grid-bg pointer-events-none absolute inset-0 -z-10 opacity-50" />
       <HeroReveal />
@@ -48,33 +48,36 @@ export function Hero({ content }: { content: PublicContent }) {
         <span className="hud tick hud-accent">{content.availability}</span>
       </div>
 
-      <motion.div style={{ y, opacity }} className="container-x relative z-10">
-        <div className="hero-fade mb-8 flex items-center gap-3" style={{ animationDelay: "0.1s" }}>
-          <span className="hud tick">{site.role}</span>
-          <span className="hud">{"//"} {site.company}</span>
-        </div>
-
-        {/* The one <h1> on the page, and the only one anywhere in the app that
-            carries the name. Rendered as plain text in the server HTML — the
-            animation is a CSS transform on top, never a per-character split. */}
-        <h1 className="font-poster display-1">
-          <PosterLine delay={0.15}>Shivam</PosterLine>
-          <PosterLine delay={0.28}>
-            <span className="text-accent">Bhadoriya</span>
-          </PosterLine>
-        </h1>
-
-        <h2
-          className="hero-fade mt-7 max-w-3xl font-display text-lg font-medium leading-snug text-fg md:text-2xl"
-          style={{ animationDelay: "0.3s" }}
-        >
-          {content.roleLong}
-        </h2>
-
-        <div className="mt-10 grid gap-10 md:grid-cols-[1fr_auto] md:items-end md:gap-14">
+      <motion.div style={{ y, opacity }} className="container-x relative z-10 flex flex-1 items-center">
+        {/* Two columns from lg up: the name keeps the poster scale, and the
+            portrait fills the dead space beside it rather than pushing the call
+            to action below the fold. */}
+        <div className="grid w-full gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-14">
           <div>
+            <div className="hero-fade mb-6 flex items-center gap-3" style={{ animationDelay: "0.1s" }}>
+              <span className="hud tick">{site.role}</span>
+              <span className="hud">{"//"} {site.company}</span>
+            </div>
+
+            {/* The one <h1> on the page, and the only one anywhere in the app that
+                carries the name. Rendered as plain text in the server HTML — the
+                animation is a CSS transform on top, never a per-character split. */}
+            <h1 className="font-poster display-hero">
+              <PosterLine delay={0.15}>Shivam</PosterLine>
+              <PosterLine delay={0.28}>
+                <span className="text-accent">Bhadoriya</span>
+              </PosterLine>
+            </h1>
+
+            <h2
+              className="hero-fade mt-6 max-w-2xl font-display text-lg font-medium leading-snug text-fg md:text-2xl"
+              style={{ animationDelay: "0.3s" }}
+            >
+              {content.roleLong}
+            </h2>
+
             <p
-              className="hero-fade max-w-xl text-base leading-relaxed text-fg-muted md:text-lg"
+              className="hero-fade mt-6 max-w-xl text-base leading-relaxed text-fg-muted md:text-lg"
               style={{ animationDelay: "0.36s" }}
             >
               {content.heroLead}
@@ -106,7 +109,7 @@ export function Hero({ content }: { content: PublicContent }) {
               exists at /_next/image?url=… or after a GSAP timeline carries no
               filename signal and may never be indexed at all. */}
           <figure
-            className="hero-fade brackets w-[clamp(9.5rem,16vw,13.5rem)] shrink-0 p-1.5"
+            className="hero-fade brackets w-44 shrink-0 p-1.5 sm:w-52 lg:w-[clamp(13rem,19vw,18rem)]"
             style={{ animationDelay: "0.56s" }}
           >
             <div className="relative overflow-hidden border border-border">
@@ -136,8 +139,8 @@ export function Hero({ content }: { content: PublicContent }) {
         </div>
       </motion.div>
 
-      {/* telemetry strip */}
-      <div className="hero-fade container-x absolute inset-x-0 bottom-8 z-10" style={{ animationDelay: "0.9s" }}>
+      {/* telemetry strip — in the flow, so it can never sit on top of the portrait */}
+      <div className="hero-fade container-x relative z-10 mt-10" style={{ animationDelay: "0.9s" }}>
         <div className="flex flex-wrap items-center justify-between gap-6 border-t border-border pt-5">
           <div className="flex items-center gap-2 text-fg-faint">
             <ArrowDown className="h-4 w-4 animate-bounce" />
