@@ -1,186 +1,193 @@
 # Going live on shivambhadoriya.com — every click, in order
 
-**For:** Shivam. You do all of this yourself; nobody needs your passwords.
-**Time:** about 90 minutes of clicking, plus waiting for DNS.
-**Rule:** do the steps in order. After each ✅ **CHECK**, paste me the output before moving on.
+**Registrar:** Hostinger · **Host:** Vercel · **For:** Shivam
+**Time:** ~60 minutes of clicking, plus DNS waiting
+**After every ✅ CHECK, run `npm run verify:domain` and send me the output before continuing.**
 
-If anything does not match what this file says it should say, **stop and tell me**. Do not improvise —
-the one step that is genuinely hard to undo is step 4, and the check in step 3 exists to stop you
-reaching it too early.
-
----
-
-## Step 0 — What you need open
-
-- The account where you bought `shivambhadoriya.com`
-- <https://vercel.com/dashboard> — logged in, with the `Supreme_Shivam` project visible
-- A terminal (Git Bash on your machine is fine)
-- Your Gmail
-
-Tell me **which registrar you bought the domain from**. The rest of this file covers Cloudflare;
-if you used someone else, step 1 changes and I will give you the exact variant.
+If a screen does not look like this file says it should, **stop and tell me what you see**. Do not
+improvise. Hostinger moves menu labels around, and the one step that is genuinely painful to undo is
+step 5.
 
 ---
 
-## Step 1 — Point the domain at Vercel
+## The one decision, first
 
-### 1a. Add the domain in Vercel first
+Your domain is registered at Hostinger. Its **DNS** — which is a separate thing from registration —
+can live in one of two places.
 
-1. Vercel dashboard → click the **Supreme_Shivam** project
-2. Top tabs → **Settings**
-3. Left sidebar → **Domains**
-4. In the input box type `shivambhadoriya.com` → click **Add**
-5. When it asks which redirect you want, choose **"Redirect www.shivambhadoriya.com to shivambhadoriya.com"**
-   — the apex is the canonical host and the code already assumes that
-6. Vercel now shows **"Invalid Configuration"** in red with a list of DNS records. **That is expected.**
-   Leave this tab open — those values are the authoritative ones. Use what Vercel shows you, not what
-   any guide says, including this one.
-
-They will look like this:
-
-| Type | Name | Value |
+|  | Path A: Cloudflare DNS **(recommended)** | Path B: stay on Hostinger DNS |
 |---|---|---|
-| A | `@` | `76.76.21.21` |
-| CNAME | `www` | `cname.vercel-dns.com` |
+| Domain stays registered at | Hostinger | Hostinger |
+| `contact@shivambhadoriya.com` | **Free forever** (Cloudflare Email Routing) | Hostinger email is a paid add-on on most plans |
+| DNS speed | Fastest network available | Fine |
+| Extra step | One nameserver change, up to 24h | None |
+| Cost | ₹0 | ₹0 for DNS, ~₹700+/yr if you need the mailbox |
 
-### 1b. Add those records at Cloudflare
+**Take Path A.** The mailbox is the deciding factor — you need `contact@shivambhadoriya.com` because
+it is now printed on five service pages and in your structured data, and Cloudflare gives it away
+free. Everything below is Path A. Path B is in the appendix if you would rather not move.
 
-1. <https://dash.cloudflare.com> → click **shivambhadoriya.com**
-2. Left sidebar → **DNS** → **Records**
-3. **Add record** → Type `A`, Name `@`, IPv4 address `76.76.21.21`
-4. ⚠️ **Set Proxy status to "DNS only" (the cloud icon must be GREY, not orange).**
-   This is the single most common way to break a Vercel site. Orange cloud means Cloudflare proxies
-   the request, which fights Vercel's own SSL certificate and produces either a redirect loop or a
-   certificate error. Grey cloud. Every time.
-5. **Save**
-6. **Add record** again → Type `CNAME`, Name `www`, Target `cname.vercel-dns.com`, Proxy status
-   **DNS only (grey)** → **Save**
+---
 
-✅ **CHECK 1** — run this and paste me all of it:
+## Step 1 — Create the Cloudflare account and add the domain
+
+1. <https://dash.cloudflare.com/sign-up> → sign up with your Gmail → verify the email
+2. On the dashboard click **Add a domain**
+3. Type `shivambhadoriya.com` → **Continue**
+4. Plan → choose **Free** → **Continue**
+5. Cloudflare scans for existing records and shows a list. It will find Hostinger's parking records.
+   **Delete every A, AAAA and CNAME record it found** (leave any TXT alone for now) — they point at
+   Hostinger's parking page and would fight Vercel.
+6. **Continue** → Cloudflare shows you **two nameservers**, something like:
+   ```
+   xxxx.ns.cloudflare.com
+   yyyy.ns.cloudflare.com
+   ```
+   **Copy both.** They are unique to your account — do not use anyone else's.
+
+---
+
+## Step 2 — Point Hostinger at Cloudflare
+
+1. <https://hpanel.hostinger.com> → sign in
+2. Top menu → **Domains** → click **shivambhadoriya.com**
+3. Left sidebar → **DNS / Nameservers**
+4. Find the **Nameservers** section (not the DNS records section) → **Change nameservers**
+5. Select **Use custom nameservers** (Hostinger's default is `ns1.dns-parking.com` /
+   `ns2.dns-parking.com` — you are replacing those)
+6. Paste the two Cloudflare nameservers from step 1.6 → **Save**
+7. Back in Cloudflare → **Check nameservers now**
+
+This is the slow part. Usually 15 minutes to 2 hours, occasionally up to 24. Cloudflare emails you
+when it is active.
+
+✅ **CHECK 1** — run this; when it prints the Cloudflare names instead of `dns-parking.com`, you can
+continue:
 
 ```bash
-dig +short shivambhadoriya.com A
-dig +short www.shivambhadoriya.com CNAME
+nslookup -type=ns shivambhadoriya.com 8.8.8.8
 ```
-
-Expected: the first prints `76.76.21.21`, the second prints `cname.vercel-dns.com.`
-If either is empty, wait 10 minutes and run it again. DNS is not instant.
 
 ---
 
-## Step 2 — Wait for Vercel to issue the certificate
+## Step 3 — Add the domain in Vercel and get the records
 
-1. Back in the Vercel **Domains** tab → click **Refresh**
-2. Wait until `shivambhadoriya.com` shows a green **Valid Configuration**
-3. Vercel issues the SSL certificate automatically. This usually takes under five minutes and
-   occasionally up to an hour.
+1. <https://vercel.com/dashboard> → click the **Supreme_Shivam** project
+2. Top tabs → **Settings** → left sidebar → **Domains**
+3. Type `shivambhadoriya.com` → **Add**
+4. Choose **"Redirect www.shivambhadoriya.com to shivambhadoriya.com"** — the apex is the canonical
+   host and the code already assumes that
+5. Vercel shows **Invalid Configuration** in red with the DNS records it wants. **Expected.**
+   **Leave this tab open — those values are the authoritative ones. Use what Vercel shows you, not
+   what this file says.** They normally are:
 
-✅ **CHECK 2** — paste me the output:
+   | Type | Name | Value |
+   |---|---|---|
+   | A | `@` | `76.76.21.21` |
+   | CNAME | `www` | `cname.vercel-dns.com` |
+
+---
+
+## Step 4 — Add those records in Cloudflare
+
+1. Cloudflare → **shivambhadoriya.com** → left sidebar → **DNS** → **Records**
+2. **Add record** → Type `A` · Name `@` · IPv4 `76.76.21.21`
+3. ⚠️ **Proxy status must be "DNS only" — the cloud icon GREY, not orange.**
+   This is the single most common way to break a Vercel site. Orange means Cloudflare proxies the
+   request, which fights Vercel's own SSL certificate and gives you either a redirect loop or a
+   certificate error. Grey. Every time.
+4. **Save**
+5. **Add record** → Type `CNAME` · Name `www` · Target `cname.vercel-dns.com` · Proxy **DNS only
+   (grey)** → **Save**
+6. Back in Vercel → **Domains** → **Refresh**. Wait for green **Valid Configuration**. Vercel issues
+   the SSL certificate automatically — usually under five minutes.
+
+✅ **CHECK 2** — this must return `200` before you touch step 5:
 
 ```bash
 curl -sI https://shivambhadoriya.com | head -1
 ```
 
-Expected: `HTTP/2 200`. If you get a certificate error, the proxy cloud in step 1b is orange. Go
-back and make it grey.
-
-**Do not go to step 4 until this returns 200.**
+A certificate error here means the cloud in step 4.3 is orange. Go back and make it grey.
 
 ---
 
-## Step 3 — Set up contact@shivambhadoriya.com
+## Step 5 — Create contact@shivambhadoriya.com
 
-Free, five minutes, and it needs to exist before the site starts advertising it.
+Free, five minutes. Do it before step 6, because step 6 makes the site start advertising the address.
 
-### 3a. Receiving
+### 5a. Receiving
 
 1. Cloudflare → **shivambhadoriya.com** → left sidebar → **Email** → **Email Routing**
-2. Click **Get started**
-3. Custom address: `contact` · Action: **Send to an email** · Destination: your Gmail address
-4. **Create**
-5. Cloudflare asks to add MX and TXT records automatically → click **Add records and enable**
-6. Check your Gmail for a verification email from Cloudflare → click the link in it
+2. **Get started**
+3. Custom address `contact` · Action **Send to an email** · Destination = your Gmail
+4. **Create** → Cloudflare offers to add the MX and TXT records → **Add records and enable**
+5. Check Gmail for Cloudflare's verification email → click the link
 
-### 3b. Sending (so replies come *from* contact@, not your Gmail)
+### 5b. Sending, so replies come *from* contact@
 
-1. Gmail → gear icon → **See all settings** → **Accounts and Import**
-2. **Send mail as** → **Add another email address**
-3. Name: `Shivam Bhadoriya` · Email: `contact@shivambhadoriya.com` · **untick** "Treat as an alias"
-4. Next → SMTP Server `smtp.gmail.com`, Port `587`, Username = your full Gmail address,
-   Password = an **App Password** (not your Gmail password — make one at
-   <https://myaccount.google.com/apppasswords>), TLS selected
-5. **Add Account** → Gmail sends a confirmation code to contact@, which Cloudflare forwards back to
-   your inbox → paste the code
+1. Create a Gmail **App Password**: <https://myaccount.google.com/apppasswords> → name it
+   `shivambhadoriya.com` → copy the 16-character password. **Keep this — step 6 needs it.**
+2. Gmail → gear → **See all settings** → **Accounts and Import**
+3. **Send mail as** → **Add another email address**
+4. Name `Shivam Bhadoriya` · Email `contact@shivambhadoriya.com` · **untick** "Treat as an alias"
+5. Next → SMTP `smtp.gmail.com` · Port `587` · Username = your full Gmail · Password = the App
+   Password · **TLS**
+6. **Add Account** → Gmail emails a code to contact@, Cloudflare forwards it to your inbox → paste it
 
-✅ **CHECK 3** — send an email from any other account to `contact@shivambhadoriya.com`. It should
-land in your Gmail. Tell me when it does.
+✅ **CHECK 3** — email `contact@shivambhadoriya.com` from another account. It must arrive in Gmail.
 
 ---
 
-## Step 4 — Flip the site to the new domain
+## Step 6 — Flip the site onto the new domain
 
-**Only do this once CHECK 2 returned 200.** This is the step that 301-redirects the old address, and
-browsers cache a 301 hard.
+**Only once CHECK 2 returned 200.** This is the step that permanently redirects the old address.
 
 1. Vercel → **Supreme_Shivam** → **Settings** → **Environment Variables**
-2. Add each of these. For every one, tick **Production**, **Preview** and **Development**:
+2. Add each row below. Tick **Production**, **Preview** and **Development** on every one.
 
 | Key | Value |
 |---|---|
 | `NEXT_PUBLIC_SITE_URL` | `https://shivambhadoriya.com` |
-| `ANALYTICS_SALT` | a long random string — run `openssl rand -hex 32` and paste the output |
+| `ANALYTICS_SALT` | run `openssl rand -hex 32` and paste the output |
 | `CONTACT_TO` | `contact@shivambhadoriya.com` |
 | `SMTP_HOST` | `smtp.gmail.com` |
 | `SMTP_PORT` | `587` |
 | `SMTP_USER` | your full Gmail address |
-| `SMTP_PASS` | the App Password from step 3b |
+| `SMTP_PASS` | the App Password from step 5b.1 |
 | `SMTP_FROM` | `contact@shivambhadoriya.com` |
 
 3. **Save**
-4. Top tabs → **Deployments** → the newest one → **⋯** menu → **Redeploy** →
-   **untick "Use existing Build Cache"** → **Redeploy**
-5. Wait for it to go green
+4. **Deployments** tab → newest deployment → **⋯** → **Redeploy** → **untick "Use existing Build
+   Cache"** → **Redeploy**
+5. Wait for green
 
-✅ **CHECK 4** — paste me all four outputs:
+✅ **CHECK 4** — the big one:
 
 ```bash
-curl -sI https://shivam-bhadoriya-dev.vercel.app | head -3
-curl -sI https://www.shivambhadoriya.com | head -3
-curl -s https://shivambhadoriya.com | grep -o '<link rel="canonical" href="[^"]*"'
-curl -s https://shivambhadoriya.com/robots.txt
+npm run verify:domain
 ```
 
-Expected: the first two show `HTTP/2 308` (Next.js uses 308, which is a permanent redirect — this is
-correct) with `location: https://shivambhadoriya.com/`; the canonical prints
-`https://shivambhadoriya.com`; robots.txt lists the sitemap on the new domain.
+It checks the redirect, the canonical, the schema, the images, the sitemap, all five service pages
+and that no page still says Ahmedabad. **Send me the whole output.**
 
 ---
 
-## Step 5 — Google Search Console
+## Step 7 — Google Search Console
 
 1. <https://search.google.com/search-console> → sign in
-2. **Add property** → choose the **Domain** box on the left (not "URL prefix" — Domain covers every
-   subdomain and both http/https at once)
-3. Type `shivambhadoriya.com` → **Continue**
-4. Google gives you a **TXT record**. Copy the value — it starts `google-site-verification=`
-5. Cloudflare → **DNS** → **Records** → **Add record** → Type `TXT`, Name `@`, Content = the value
-   you copied → **Save**
-6. Back in Search Console → **Verify**. If it fails, wait five minutes and press it again
-
-### Submit the sitemap
-
-7. Left sidebar → **Sitemaps**
-8. In "Add a new sitemap" type `sitemap.xml` → **Submit**
-9. Status should become **Success** within a few minutes
-
-### Request indexing — this is what turns weeks into days
-
-10. Use the search box at the very top ("Inspect any URL")
-11. Paste `https://shivambhadoriya.com/` → Enter → wait for the report → click **Request Indexing**
-12. Repeat for each of these, one at a time. Google throttles this, so if it stops you, finish the
-    rest tomorrow:
+2. **Add property** → the **Domain** box on the left (not "URL prefix")
+3. `shivambhadoriya.com` → **Continue**
+4. Google gives a **TXT record** starting `google-site-verification=`. Copy the value
+5. Cloudflare → **DNS** → **Records** → **Add record** → Type `TXT` · Name `@` · Content = that value
+   → **Save**
+6. Search Console → **Verify** (retry after five minutes if it fails the first time)
+7. Left sidebar → **Sitemaps** → type `sitemap.xml` → **Submit**. It should find **26 URLs**
+8. Top search box ("Inspect any URL") → paste each of these, wait for the report, click
+   **Request Indexing**. Google throttles this — finish the rest tomorrow if it stops you:
 
 ```
+https://shivambhadoriya.com/
 https://shivambhadoriya.com/about
 https://shivambhadoriya.com/services
 https://shivambhadoriya.com/services/web-development
@@ -192,106 +199,106 @@ https://shivambhadoriya.com/writing
 https://shivambhadoriya.com/work
 ```
 
-✅ **CHECK 5** — screenshot or tell me the sitemap status and how many URLs it found. It should say
-**26**.
-
 ---
 
-## Step 6 — Bing Webmaster Tools
-
-Ten minutes, and it also feeds ChatGPT's search.
+## Step 8 — Bing (10 minutes, also feeds ChatGPT search)
 
 1. <https://www.bing.com/webmasters> → sign in
-2. **Import from Google Search Console** → authorise → pick `shivambhadoriya.com`
-3. That copies the verification and the sitemap across. Done.
+2. **Import from Google Search Console** → authorise → select `shivambhadoriya.com`
+
+Done — it copies the verification and the sitemap across.
 
 ---
 
-## Step 7 — Google Business Profile
+## Step 9 — Google Business Profile
 
-**This is the biggest single lever for local leads.** It is what puts you in the boxed map results
-for "web developer near me" in Navsari. It is free.
+**The biggest single lever for local leads.** It is what puts you in the boxed map results for
+"web developer near me" in Navsari. Free.
 
 1. <https://business.google.com> → **Manage now**
-2. Business name: `Shivam Bhadoriya — Web & App Development`
-3. Business category: **Website designer**
-4. "Do you want to add a location customers can visit?" → **No** (you are a service-area business;
-   saying yes publishes your home address)
-5. Service areas: add **Navsari**, then **Surat**
-6. Contact details: website `https://shivambhadoriya.com`, plus your phone number
-7. Verification — Google will ask for a video or a postcard. Video is faster. It wants to see your
-   workspace, your equipment and you. Follow its prompts exactly; a failed video means a two-week
-   retry.
+2. Name: `Shivam Bhadoriya — Web & App Development`
+3. Primary category: **Website designer**
+4. "Add a location customers can visit?" → **No**. You are a service-area business; saying yes
+   publishes your home address
+5. Service areas: **Navsari**, then **Surat**
+6. Website `https://shivambhadoriya.com` · Phone `+91 91069 88376`
+7. Verification — choose **video** over postcard, it is far faster. It wants to see your workspace,
+   your equipment and you. Follow the prompts exactly; a failed video costs you a two-week retry
 8. Once verified:
-   - **Add a secondary category**: `Software company`
-   - **Services**: add `Web development`, `Mobile app development`, `AI automation`
-   - **Photos**: upload `public/images/shivam-bhadoriya-ai-engineer.jpg` as the profile photo —
-     the same file as everywhere else — plus screenshots of your work
-   - **Description**: paste the meta description from the site
-9. Ask every client you finish work for to leave a Google review. Reviews are the single largest
-   ranking factor in the map pack.
+   - Secondary category → `Software company`
+   - Services → `Web development`, `Mobile app development`, `AI automation`
+   - Profile photo → `public/images/shivam-bhadoriya-ai-engineer.jpg`, the same file as everywhere else
+   - Description → paste the site's meta description
+9. Ask every client for a Google review. Reviews are the largest ranking factor in the map pack.
 
 ---
 
-## Step 8 — Make your profiles match the site
+## Step 10 — Make your profiles match the site
 
-The whole plan depends on Google seeing one person, not four. Ten minutes.
+The whole plan depends on Google seeing one person. Ten minutes.
 
-| Where | Change |
+| Where | Change to |
 |---|---|
-| **LinkedIn** | Headline → `AI Engineer at Aaziko Global LLP`. Location → **Navsari, Gujarat**. Profile photo → `shivam-bhadoriya-ai-engineer.jpg`. Website → `https://shivambhadoriya.com` |
-| **GitHub** | Bio → `AI Engineer at Aaziko Global LLP`. Location → **Navsari, Gujarat** (it currently says Ahmedabad — this must change). Website → `https://shivambhadoriya.com`. Avatar → the same file |
-| **X** | Bio and location the same. Website link. Same avatar |
-| **WakaTime** | Same avatar if it lets you |
+| **LinkedIn** | Headline `AI Engineer at Aaziko Global LLP` · Location **Navsari, Gujarat** · Website `https://shivambhadoriya.com` · Photo = `shivam-bhadoriya-ai-engineer.jpg` |
+| **GitHub** | Bio `AI Engineer at Aaziko Global LLP` · Location **Navsari, Gujarat** · Website + same avatar |
+| **X** | Same bio, location, website, avatar |
+| **WakaTime** | Same avatar |
 
-⚠️ **The GitHub location is not optional.** The site, the structured data and the Business Profile
-all say Navsari now. If GitHub says Ahmedabad, you have rebuilt the exact split-identity problem
-this whole job is fixing.
+⚠️ **GitHub currently says Ahmedabad. That is not optional to change.** The site, the schema and the
+Business Profile all say Navsari now. Leaving GitHub on Ahmedabad rebuilds the exact split-identity
+problem this whole job exists to fix.
 
 ---
 
-## Step 9 — Final verification
-
-Paste me the output of all of these:
+## Step 11 — Final verification
 
 ```bash
-curl -s https://shivambhadoriya.com | grep -c "Shivam Bhadoriya"
-curl -s https://shivambhadoriya.com | grep -o "<title>[^<]*</title>"
-curl -sI https://shivambhadoriya.com/images/shivam-bhadoriya-ai-engineer.jpg | head -1
-curl -s https://shivambhadoriya.com/sitemap.xml | grep -c "<loc>"
+npm run verify:domain
 ```
 
-Then, by hand:
+Then by hand:
 
-1. <https://search.google.com/test/rich-results> → paste `https://shivambhadoriya.com` →
-   must report **ProfilePage** with **zero errors**
-2. Same tool → paste `https://shivambhadoriya.com/hire/web-developer-navsari` →
-   must report **FAQPage** with zero errors
-3. <https://pagespeed.web.dev> → paste the home URL → tell me the mobile numbers
-4. Paste your homepage link into a WhatsApp message to yourself — the preview card should show your
-   photo, your name and "AI Engineer · Navsari, Gujarat"
-
----
-
-## Step 10 — Optional, but do it eventually
-
-- **Buy `shivambhadoriya.in`** (~₹700/yr) at the same registrar and redirect it to the `.com`.
-  Defensive only.
-- **Email hardening (SPF/DMARC).** Cloudflare Email Routing adds what receiving needs. For *sending*
-  from contact@ via Gmail without landing in spam, add these TXT records at Cloudflare:
-  - Name `@`, Content `v=spf1 include:_spf.google.com include:_spf.mx.cloudflare.net ~all`
-  - Name `_dmarc`, Content `v=DMARC1; p=none; rua=mailto:contact@shivambhadoriya.com`
-  Tell me before you add these — if you already have an SPF record you must merge, not duplicate.
-  Two SPF records is worse than none.
+1. <https://search.google.com/test/rich-results> → `https://shivambhadoriya.com` →
+   must say **ProfilePage**, zero errors
+2. Same tool → `https://shivambhadoriya.com/hire/web-developer-navsari` →
+   must say **FAQPage** and **ProfessionalService**, zero errors
+3. <https://pagespeed.web.dev> → the home URL → send me the mobile numbers
+4. WhatsApp the homepage link to yourself — the preview must show your photo, your name and
+   "AI Engineer · Navsari, Gujarat"
+5. Submit the contact form once and confirm the email lands in Gmail
 
 ---
 
-## What to send me when you are done
+## Optional, later
 
-1. The four outputs from CHECK 4
-2. The sitemap URL count from CHECK 5
-3. The Rich Results Test verdict for both URLs
-4. **Your phone number**, so I can wire it into the service pages and the schema — that is the last
-   `ASK SHIVAM` item left in the code
+- **`shivambhadoriya.in`** (~₹700/yr at Hostinger) → redirect to the `.com`. Defensive only.
+- **Email deliverability.** Cloudflare Email Routing handles receiving. For *sending* from contact@
+  via Gmail without landing in spam, add at Cloudflare → DNS:
+  - TXT · Name `@` · `v=spf1 include:_spf.google.com include:_spf.mx.cloudflare.net ~all`
+  - TXT · Name `_dmarc` · `v=DMARC1; p=none; rua=mailto:contact@shivambhadoriya.com`
 
-I will verify each one and tell you if anything is wrong before it costs you ranking.
+  ⚠️ **Tell me before you add the SPF one.** Cloudflare Email Routing already creates an SPF record.
+  Two SPF records is worse than none — they have to be merged into one line, not duplicated.
+
+---
+
+## Appendix — Path B, staying entirely on Hostinger DNS
+
+Only if you do not want to move nameservers. You lose free email routing.
+
+1. hPanel → **Domains** → `shivambhadoriya.com` → **DNS / Nameservers** → **DNS records**
+2. **Delete** the existing `A` record for `@` (it points at Hostinger parking) and the `CNAME` for
+   `www`
+3. **Add record** → Type `A` · Name `@` · Points to `76.76.21.21` · TTL leave default → **Add**
+4. **Add record** → Type `CNAME` · Name `www` · Target `cname.vercel-dns.com` → **Add**
+5. Continue from **step 3** above (Vercel), skipping Cloudflare entirely
+6. For `contact@shivambhadoriya.com` you then need Hostinger's email add-on, or a free tier
+   elsewhere. Tell me which and I will give you the records.
+
+---
+
+## What to send me
+
+1. `npm run verify:domain` output after step 6
+2. The Rich Results Test verdicts from step 11
+3. Anything that did not look like this file said it would

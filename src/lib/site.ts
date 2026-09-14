@@ -42,12 +42,12 @@ export const site = {
   status: "Available now",
   email: "contact@shivambhadoriya.com",
   /**
-   * Public phone. Empty until confirmed — every consumer (the service pages, the
-   * ProfessionalService schema, /contact) checks for a value first and omits the
-   * whole block when it is blank, so an empty string is never rendered and never
-   * emitted as an empty `telephone` property.
+   * Public phone. E.164 for schema and tel: links, spaced for display.
+   * Consumers still guard on a value, so clearing it removes the number
+   * everywhere rather than rendering a blank.
    */
-  phone: "",
+  phone: "+919106988376",
+  phoneDisplay: "+91 91069 88376",
   university: "Vidhyadeep University",
   url: CANONICAL_URL,
   /** The page <title> and the OG/Twitter title. 30 chars — never truncated. */

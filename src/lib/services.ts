@@ -14,9 +14,9 @@ import { site } from "./site";
  * studies, an FAQ, and a contact CTA. Pages without a price and a timeline
  * convert badly — clients filter on both.
  *
- * TIMELINES below are conventional ranges for a solo developer, not measured
- * from his own past jobs. They live here, in one place, so they are one edit to
- * correct.
+ * TIMELINES are Shivam's own figures, confirmed 2026-09-14: web 1–4 weeks,
+ * mobile 2–8 weeks, automation 1–2 weeks per workflow. They live here, in one
+ * place, and the FAQ answers below repeat them in words — change both together.
  */
 
 export type ServiceFaq = { q: string; a: string };
@@ -63,7 +63,7 @@ export const servicePages: ServicePage[] = [
     lede: `I build websites and web applications that hold up under inspection — fast, measured, and documented — for businesses in ${CITY}, Surat and across ${REGION}.`,
     priceFrom: site.rateFrom,
     priceNote: "Fixed quote after a free 30-minute scoping call. No hourly billing on fixed-scope work.",
-    timeline: "2–6 weeks for most sites · 6–10 weeks for a full web application",
+    timeline: "1–4 weeks",
     sections: [
       {
         h: "What I actually build",
@@ -111,7 +111,7 @@ export const servicePages: ServicePage[] = [
       },
       {
         q: "How long does it take?",
-        a: "Two to six weeks for most websites, depending on how many pages there are and how much of the content you already have written. A full web application is usually six to ten weeks. The single biggest cause of delay is waiting on copy and photographs from the client, so the faster you get me those, the faster it ships.",
+        a: "One to four weeks, depending on how many pages there are and how much of the content you already have written. The single biggest cause of delay is waiting on copy and photographs from the client, so the faster you get me those, the faster it ships.",
       },
       {
         q: "Do you work with clients outside Navsari and Surat?",
@@ -144,13 +144,20 @@ export const servicePages: ServicePage[] = [
     lede: "Cross-platform apps for Android and iOS from one codebase, on the same tested backend patterns I use for production web systems.",
     priceFrom: site.rateFrom,
     priceNote: "Fixed quote after a free 30-minute scoping call. Store submission included.",
-    timeline: "6–10 weeks for a first release, including store review",
+    timeline: "2–8 weeks, including store review",
     sections: [
       {
         h: "One codebase, both stores",
         p: [
           "I build in React Native, which means Android and iOS come out of a single codebase rather than two separate builds. For almost every business app — a booking tool, a delivery tracker, a customer account app, an internal tool for your field staff — that is the correct trade-off. You pay for one app and ship to both stores.",
           "Where it is not the correct trade-off, I will tell you. If your app depends on heavy device-specific hardware, real-time video processing, or platform features that only exist natively, cross-platform will fight you and you should hire a native developer. That is a short conversation, not a three-week discovery.",
+        ],
+      },
+      {
+        h: "What I can and cannot show you",
+        p: [
+          "My shipped app work is covered by client confidentiality, so it is not listed on this site and I will not name it on a first call. That is the normal arrangement for contract work, and you would want the same protection on yours.",
+          "What I can show you is the layer underneath, which is the part that actually decides whether an app succeeds — and all of it is public, inspectable and linked below.",
         ],
       },
       {
@@ -171,7 +178,7 @@ export const servicePages: ServicePage[] = [
       {
         h: "Cost, timeline and honesty about scope",
         p: [
-          `Apps start at ${site.rateFrom} and realistically sit above that, because an app is a backend, two store listings and a review process as well as a set of screens. Six to ten weeks to a first release is typical, and roughly one of those weeks is store review, which is outside anyone's control.`,
+          `Apps start at ${site.rateFrom} and realistically sit above that, because an app is a backend, two store listings and a review process as well as a set of screens. Two to eight weeks to a first release, depending on scope, and roughly one of those weeks is store review, which is outside anyone's control.`,
           "If your idea is really a website that people would open on a phone, say a menu, a catalogue or a booking form, then a fast mobile web app is cheaper, ships sooner, needs no store approval and updates instantly. I will point that out rather than sell you an app you do not need.",
         ],
       },
@@ -183,6 +190,7 @@ export const servicePages: ServicePage[] = [
       { title: "Store submission handled", body: "Listings, assets, privacy declarations and the review process." },
       { title: "Offline and failure states designed", body: "What the app does with no signal is part of the spec, not an afterthought." },
       { title: "30 days of fixes included", body: "Anything that does not match the approved spec gets fixed free after launch." },
+      { title: "Your confidentiality", body: "Your app is not put on my portfolio unless you say it can be. Same protection I give every client." },
     ],
     proof: ["cgpe-connect", "jsclimatenow", "ai-pulse"],
     faqs: [
@@ -192,7 +200,7 @@ export const servicePages: ServicePage[] = [
       },
       {
         q: "How long until it is in the store?",
-        a: "Six to ten weeks for a first release. Roughly one of those weeks is Google and Apple's review, which nobody can speed up. Updates after launch are much faster — usually days.",
+        a: "Two to eight weeks for a first release, depending on how many screens have their own logic. Roughly one of those weeks is Google and Apple's review, which nobody can speed up. Updates after launch are much faster — usually days.",
       },
       {
         q: "Do I need an app, or would a website do?",
@@ -201,6 +209,10 @@ export const servicePages: ServicePage[] = [
       {
         q: "Android and iOS both, or one first?",
         a: "Both, from one codebase — that is the whole reason for React Native. Shipping one platform first only makes sense if you are validating an idea and want to spend less, and in that case Android first is usually right in India.",
+      },
+      {
+        q: "Can I see an app you have built?",
+        a: "Not on this page — my shipped app work is under client confidentiality and I do not publish clients' products without permission. I can talk through the architecture, the decisions and the problems on a call, and the backend and performance work linked below is public and inspectable. You get the same confidentiality on your project.",
       },
       {
         q: "Who owns the developer accounts?",
@@ -225,7 +237,7 @@ export const servicePages: ServicePage[] = [
     lede: "The repetitive work in your business, running unattended, tested, and with a visible trail of what it did. This is the thing I actually do for a living.",
     priceFrom: site.rateFrom,
     priceNote: "Fixed quote per workflow after a free 30-minute call. Most automations cost less than the salary of the hours they return.",
-    timeline: "1–3 weeks per workflow",
+    timeline: "1–2 weeks per workflow",
     sections: [
       {
         h: "What this means in practice",
@@ -251,7 +263,7 @@ export const servicePages: ServicePage[] = [
       {
         h: "Cost, and how to tell whether it is worth it",
         p: [
-          `Automations start at ${site.rateFrom} per workflow and most take one to three weeks. The arithmetic is usually simple: count the hours a week the task currently takes, multiply by what that person's hour costs you, and multiply by fifty. If the automation costs less than that, it pays for itself inside a year and keeps paying every year after.`,
+          `Automations start at ${site.rateFrom} per workflow and most take one to two weeks. The arithmetic is usually simple: count the hours a week the task currently takes, multiply by what that person's hour costs you, and multiply by fifty. If the automation costs less than that, it pays for itself inside a year and keeps paying every year after.`,
           "Where it is not worth it: tasks that happen rarely, tasks whose rules change every month, and tasks where a human judgement call is the actual work. I will tell you which of your processes are in that category rather than automating them badly.",
         ],
       },
@@ -305,7 +317,7 @@ export const servicePages: ServicePage[] = [
     lede: `I live and work in ${CITY}. If you are a business here that needs a website, a web application or a process automated, you can sit across a table from the person who will actually build it.`,
     priceFrom: site.rateFrom,
     priceNote: "Free 30-minute scoping call or an in-person meeting in Navsari. Fixed quote after it.",
-    timeline: "2–6 weeks for most sites",
+    timeline: "1–4 weeks",
     sections: [
       {
         h: "Why local matters more than people admit",
@@ -331,7 +343,7 @@ export const servicePages: ServicePage[] = [
       {
         h: "What it costs, plainly",
         p: [
-          `Projects start at ${site.rateFrom}, quoted fixed after a free 30-minute conversation. A straightforward site for a local business sits near that; anything with logins, roles or payments sits above it. Most sites take two to six weeks, and the usual reason one takes longer is waiting on photographs and copy.`,
+          `Projects start at ${site.rateFrom}, quoted fixed after a free 30-minute conversation. A straightforward site for a local business sits near that; anything with logins, roles or payments sits above it. Most sites take one to four weeks, and the usual reason one takes longer is waiting on photographs and copy.`,
           "If a ready-made template or a page on a marketplace would genuinely solve your problem for a fraction of the price, I will say so on the call. I would rather give you that answer for free than take a project that did not need a developer.",
         ],
       },
@@ -385,7 +397,7 @@ export const servicePages: ServicePage[] = [
     lede: `I am based in ${CITY}, an hour from Surat, and a large share of my work comes from Surat businesses — textiles, trading, manufacturing and services.`,
     priceFrom: site.rateFrom,
     priceNote: "Free 30-minute scoping call, or I come to you in Surat. Fixed quote after it.",
-    timeline: "2–6 weeks for most sites · 6–10 weeks for a web application",
+    timeline: "1–4 weeks",
     sections: [
       {
         h: "Close enough to turn up",
@@ -412,7 +424,7 @@ export const servicePages: ServicePage[] = [
       {
         h: "Price, timeline, and a straight answer",
         p: [
-          `Projects start at ${site.rateFrom} with a fixed quote after a free 30-minute call. Most sites take two to six weeks; a web application with accounts, roles and dashboards is six to ten. Everything — domain, hosting, database, code — is registered in your name from day one.`,
+          `Projects start at ${site.rateFrom} with a fixed quote after a free 30-minute call. Most sites take one to four weeks. Everything — domain, hosting, database, code — is registered in your name from day one.`,
           "If your problem does not need a custom build, I will tell you that on the call rather than three weeks into an invoice.",
         ],
       },
@@ -441,7 +453,7 @@ export const servicePages: ServicePage[] = [
       },
       {
         q: "How long does it take?",
-        a: "Two to six weeks for most sites; six to ten for a full web application. Photographs and product data from your side are almost always the thing that decides which end of that range you land on.",
+        a: "One to four weeks for most sites. Photographs and product data from your side are almost always the thing that decides which end of that range you land on.",
       },
       {
         q: "We already have a site. Should we fix it or start again?",

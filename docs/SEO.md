@@ -60,17 +60,18 @@ errors, and any `/hire/*` URL must report **FAQPage** with zero errors.
 
 | Where | What | Why it matters |
 |---|---|---|
-| `src/lib/site.ts` → `phone` | **Empty.** | You said the number should be public on the site and the Business Profile. Send it and it goes into the service pages, /contact and the `ProfessionalService` schema. Until then every consumer omits the block rather than rendering a blank. |
 | `src/components/seo/json-ld.tsx` → `sameAs` | Instagram is **not** listed | The handle linked from your GitHub (`__https.https`) could not be verified. A `sameAs` pointing at a wrong profile is worse than omitting it. Confirm the URL and it goes in. |
-| `src/lib/services.ts` → `timeline` | Conventional ranges, not measured | "2–6 weeks", "6–10 weeks", "1–3 weeks per workflow" are normal for a solo developer but are not drawn from your own past jobs. They live in one place — correct them if they are wrong. |
 
 Also unconfirmed: the **AI-PULSE** entry in `src/lib/site.ts` was written from the brief alone.
 The stack list is deliberately minimal (`GitHub Actions`, `Scheduled workflows`,
 `YouTube Data API`, `CI tests`) — fill in the real one and add the `repo` / `live` URLs.
 
-And the **mobile app** service page: your shipped work is all web. The page is written honestly —
-it leads on the backend, which is where your production experience actually is — but if you have
-not shipped a React Native app, either ship one or tell me and I will soften it further.
+**Settled 2026-09-14:** phone `+91 91069 88376` is live on the service pages, `/contact` and the
+`ProfessionalService` schema. Timelines are your own figures — web 1–4 weeks, mobile 2–8 weeks,
+automation 1–2 weeks per workflow. The mobile page now states plainly that shipped app work is under
+client confidentiality and names nothing; it leads on the backend layer, which is public and
+inspectable. If the app clears review and the client lets you show it, tell me and it becomes a
+case study.
 
 ---
 
@@ -116,6 +117,20 @@ is linked in the footer of every page.
   `BreadcrumbList` schema. Indexed from `/services` and the footer.
 - **Legal.** `/privacy-policy` and `/terms`, written from what the code actually does, linked in
   the footer of every page.
+
+## 3b. Verifying a deploy
+
+```
+npm run verify:domain              # checks https://shivambhadoriya.com
+npm run verify:domain -- http://localhost:3000   # dry run against a local build
+```
+
+Read-only, changes nothing, and checks all of it: the 301 off the old host, the canonical, the
+title, the name in raw HTML, one `<h1>`, `max-image-preview`, that the JSON-LD parses and says
+`AI Engineer` with at least three `sameAs` profiles, that all three photographs return 200, that
+robots and the sitemap name the right host, that every service page returns 200 with
+`ProfessionalService` + `FAQPage` and 600+ words, and that no page still says Ahmedabad or carries
+the old address. Run it after every deploy and send me the output.
 
 ## 4. Regenerating the images
 

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "node scripts/seed.mjs",
-    "images": "node scripts/build-images.mjs"
+    "images": "node scripts/build-images.mjs",
+    "verify:domain": "node scripts/verify-domain.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

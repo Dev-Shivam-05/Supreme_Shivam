@@ -9,6 +9,7 @@ import { site } from "@/lib/site";
 
 /** Everything except the address — that one is assembled after hydration. */
 const channels = [
+  ...(site.phone ? [{ label: "Phone", value: site.phoneDisplay, href: `tel:${site.phone}` }] : []),
   { label: "GitHub", value: site.handle, href: site.social.github },
   { label: "LinkedIn", value: "shivam-bhadoriya-dev", href: site.social.linkedin },
   { label: "X", value: site.social.xHandle, href: site.social.x },
@@ -93,8 +94,10 @@ export function Contact() {
               <a
                 key={c.label}
                 href={c.href}
-                target="_blank"
-                rel="noopener noreferrer"
+                // tel: must not open a new tab — on desktop that is a blank window.
+                {...(c.href.startsWith("http")
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
                 className="group flex items-center justify-between border-b border-border bg-bg-elev px-6 py-5 transition-colors hover:bg-surface"
               >
                 <div>
