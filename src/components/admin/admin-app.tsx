@@ -83,7 +83,7 @@ export function AdminApp() {
             <button type="submit" disabled={busy} className="mt-4 inline-flex w-full items-center justify-center gap-2 bg-accent px-5 py-3 text-sm font-semibold text-accent-ink disabled:opacity-70">
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enter"}
             </button>
-            <p className="mt-4 font-mono text-[0.65rem] text-fg-faint">Set ADMIN_PASSWORD &amp; ADMIN_SECRET in .env to enable.</p>
+            <p className="mt-4 font-mono text-[0.65rem] text-fg-faint">Set ADMIN_PASSWORDS &amp; ADMIN_SECRET in the environment to enable.</p>
           </div>
         </form>
       </div>

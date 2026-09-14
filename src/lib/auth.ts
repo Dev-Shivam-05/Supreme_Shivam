@@ -29,12 +29,25 @@ export function verifyToken(token?: string | null): boolean {
   }
 }
 
-/** Constant-time password check. */
+/**
+ * Constant-time check against every accepted password.
+ *
+ * Compares SHA-256 digests rather than the raw strings for two reasons: digests
+ * are always the same length, so a mismatched length cannot be distinguished
+ * from a mismatched value, and it removes the early `a.length === b.length`
+ * return that leaked the password's length. Every candidate is checked with no
+ * early exit, so the time taken does not reveal which one matched.
+ */
 export function checkPassword(input: string): boolean {
-  if (!env.ADMIN_PASSWORD) return false;
-  const a = Buffer.from(input);
-  const b = Buffer.from(env.ADMIN_PASSWORD);
-  return a.length === b.length && crypto.timingSafeEqual(a, b);
+  const accepted = env.ADMIN_PASSWORDS;
+  if (accepted.length === 0) return false;
+  const given = crypto.createHash("sha256").update(input, "utf8").digest();
+  let matched = false;
+  for (const candidate of accepted) {
+    const expected = crypto.createHash("sha256").update(candidate, "utf8").digest();
+    if (crypto.timingSafeEqual(given, expected)) matched = true;
+  }
+  return matched;
 }
 
 export const cookieMaxAge = MAX_AGE;
