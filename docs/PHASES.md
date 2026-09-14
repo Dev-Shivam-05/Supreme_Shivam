@@ -4,7 +4,10 @@
 |---|---|---|---|
 | 1 | SEO + identity rebuild | **Done** — 2026-09-14 | Implements `portfolio-implementation-brief.md`. |
 | 2 | DEV-HANDOVER: local SEO, services, legal | **Done** — 2026-09-14 | City settled as Navsari; `contact@shivambhadoriya.com`; five service/hire pages; `/privacy-policy` + `/terms`; cookieless analytics. |
-| 3 | Domain, console and profile setup | **In progress** | Hostinger → Cloudflare nameservers done and propagated; domain added to Vercel. Remaining: A/CNAME to Vercel (`npm run dns`), env vars (Vercel CLI), mailbox, GSC/Bing/GBP. `docs/DOMAIN-SETUP.md`. |
+| 3 | Domain live on shivambhadoriya.com | **Done** — 2026-09-14 | DNS, SSL, www, 308 off the old host, production env vars, deploy. `npm run verify:domain` → 29 passed, 0 failed. |
+| 3b | Admin panel | **Done** — 2026-09-14 | Two passwords accepted, wrong ones rejected, verified against the live domain. Needs `MONGODB_URI` before it has data to show. |
+| 3c | Indexing | **Partly automated** | IndexNow done and submitted (Bing/Yandex/Seznam/Naver). Google has no sanctioned push API — sitemap is in robots.txt; Request Indexing in Search Console is manual. |
+| 3d | Mailbox + SMTP | **Blocked** | `contact@shivambhadoriya.com` is advertised on five service pages. MX points at Hostinger — the mailbox must exist, and SMTP_* must be set, or enquiries are lost. |
 | 4 | Above-the-fold performance | **Not started** | Deliberately not absorbed. Detail below. |
 | 5 | Confirm unverified facts | **Done** — 2026-09-14 | Phone, timelines, app confidentiality, Instagram and the real AI-PULSE stack (read from the GitHub API, not guessed) are all in the code. |
 
