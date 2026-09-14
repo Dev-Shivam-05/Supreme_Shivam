@@ -11,7 +11,8 @@
     "images": "node scripts/build-images.mjs",
     "verify:domain": "node scripts/verify-domain.mjs",
     "browser": "node scripts/browser.mjs",
-    "dns": "node scripts/cloudflare-dns.mjs"
+    "dns": "node scripts/cloudflare-dns.mjs",
+    "indexnow": "node scripts/indexnow.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

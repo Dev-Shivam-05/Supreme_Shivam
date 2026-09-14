@@ -35,6 +35,20 @@ const DESIRED = [
 const MANAGED_NAMES = new Set([ZONE_NAME, `www.${ZONE_NAME}`]);
 const MANAGED_TYPES = new Set(["A", "AAAA", "CNAME"]);
 
+/**
+ * Mail records must never be proxied.
+ *
+ * Cloudflare imported these from Hostinger with the proxy ON. A proxied DKIM
+ * CNAME resolves to a Cloudflare address instead of following the delegation to
+ * Hostinger's signing key, so receiving servers cannot retrieve the public key
+ * and DKIM verification fails — mail starts landing in spam. autoconfig and
+ * autodiscover break mail-client setup the same way. These are only ever
+ * un-proxied, never deleted.
+ */
+const MAIL_PREFIXES = ["autoconfig.", "autodiscover.", "_domainkey.", "mail.", "dkim."];
+const isMailRecord = (name) =>
+  MAIL_PREFIXES.some((p) => name.startsWith(p) || name.includes(p));
+
 async function token() {
   const fromEnv = process.env.CLOUDFLARE_API_TOKEN;
   if (fromEnv) return fromEnv.trim();
@@ -110,7 +124,8 @@ async function main() {
   const toUnproxy = existing.filter(
     (r) =>
       r.proxied &&
-      DESIRED.some((d) => d.type === r.type && d.name === r.name && d.content === r.content),
+      (DESIRED.some((d) => d.type === r.type && d.name === r.name && d.content === r.content) ||
+        isMailRecord(r.name)),
   );
 
   console.log("\nPlan:");
