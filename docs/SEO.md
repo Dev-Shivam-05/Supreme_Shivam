@@ -60,11 +60,13 @@ errors, and any `/hire/*` URL must report **FAQPage** with zero errors.
 
 | Where | What | Why it matters |
 |---|---|---|
-| `src/components/seo/json-ld.tsx` → `sameAs` | Instagram is **not** listed | The handle linked from your GitHub (`__https.https`) could not be verified. A `sameAs` pointing at a wrong profile is worse than omitting it. Confirm the URL and it goes in. |
+| — | **Nothing outstanding.** | Phone, timelines, the app question, Instagram and the AI-PULSE stack were all answered on 2026-09-14 and are in the code. |
 
-Also unconfirmed: the **AI-PULSE** entry in `src/lib/site.ts` was written from the brief alone.
-The stack list is deliberately minimal (`GitHub Actions`, `Scheduled workflows`,
-`YouTube Data API`, `CI tests`) — fill in the real one and add the `repo` / `live` URLs.
+**AI-PULSE** is now described from the repository itself, not from the brief: Python, GitHub
+Actions, FFmpeg, Playwright, text-to-speech, the YouTube Data API and pytest, with the cheat-sheet
+PDFs on GitHub Pages and the Telegram/X announcements. Repo and live links are wired in.
+
+`sameAs` now lists five profiles: GitHub, LinkedIn, X, Instagram and WakaTime.
 
 **Settled 2026-09-14:** phone `+91 91069 88376` is live on the service pages, `/contact` and the
 `ProfessionalService` schema. Timelines are your own figures — web 1–4 weeks, mobile 2–8 weeks,

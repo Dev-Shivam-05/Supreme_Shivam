@@ -46,3 +46,7 @@ Extra/
 
 .vercel
 .env*
+
+# local browser session for the go-live steps — never commit cookies
+.browser-profile/
+.browser-shots/

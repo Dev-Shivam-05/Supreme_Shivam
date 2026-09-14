@@ -1,122 +1,97 @@
 # Going live on shivambhadoriya.com — every click, in order
 
-**Registrar:** Hostinger · **Host:** Vercel · **For:** Shivam
-**Time:** ~60 minutes of clicking, plus DNS waiting
-**After every ✅ CHECK, run `npm run verify:domain` and send me the output before continuing.**
-
-If a screen does not look like this file says it should, **stop and tell me what you see**. Do not
-improvise. Hostinger moves menu labels around, and the one step that is genuinely painful to undo is
-step 5.
+**Registrar:** Hostinger · **DNS:** Cloudflare · **Host:** Vercel · **For:** Shivam
 
 ---
 
-## The one decision, first
+## Progress
 
-Your domain is registered at Hostinger. Its **DNS** — which is a separate thing from registration —
-can live in one of two places.
+| Step | State |
+|---|---|
+| Domain bought at Hostinger | ✅ done |
+| Nameservers moved to Cloudflare (`patrick` / `vera`) | ✅ done, propagated |
+| `shivambhadoriya.com` added to the Vercel account | ✅ done |
+| **DNS A/CNAME still point at Hostinger `2.57.91.91`** | ⬅ **you are here** |
+| Vercel env vars + redeploy | pending (Claude does this by CLI) |
+| `contact@` mailbox | pending |
+| Search Console / Bing / Business Profile | pending |
 
-|  | Path A: Cloudflare DNS **(recommended)** | Path B: stay on Hostinger DNS |
-|---|---|---|
-| Domain stays registered at | Hostinger | Hostinger |
-| `contact@shivambhadoriya.com` | **Free forever** (Cloudflare Email Routing) | Hostinger email is a paid add-on on most plans |
-| DNS speed | Fastest network available | Fine |
-| Extra step | One nameserver change, up to 24h | None |
-| Cost | ₹0 | ₹0 for DNS, ~₹700+/yr if you need the mailbox |
+### Was moving to Cloudflare compulsory?
 
-**Take Path A.** The mailbox is the deciding factor — you need `contact@shivambhadoriya.com` because
-it is now printed on five service pages and in your structured data, and Cloudflare gives it away
-free. Everything below is Path A. Path B is in the appendix if you would rather not move.
+**No.** Registration and DNS are separate things. You could have stayed entirely on Hostinger DNS
+and just edited one A record there — Vercel's own panel offers exactly that as the recommended
+option.
 
----
-
-## Step 1 — Create the Cloudflare account and add the domain
-
-1. <https://dash.cloudflare.com/sign-up> → sign up with your Gmail → verify the email
-2. On the dashboard click **Add a domain**
-3. Type `shivambhadoriya.com` → **Continue**
-4. Plan → choose **Free** → **Continue**
-5. Cloudflare scans for existing records and shows a list. It will find Hostinger's parking records.
-   **Delete every A, AAAA and CNAME record it found** (leave any TXT alone for now) — they point at
-   Hostinger's parking page and would fight Vercel.
-6. **Continue** → Cloudflare shows you **two nameservers**, something like:
-   ```
-   xxxx.ns.cloudflare.com
-   yyyy.ns.cloudflare.com
-   ```
-   **Copy both.** They are unique to your account — do not use anyone else's.
+It was still the better call, and now that it is done you get two things Hostinger would have
+charged for or not offered: **free email routing** for `contact@shivambhadoriya.com`, and an API
+that lets DNS changes be made precisely and verifiably instead of by clicking. Nothing was lost —
+the domain is still registered at Hostinger and still renews there.
 
 ---
 
-## Step 2 — Point Hostinger at Cloudflare
+## Step 1 — Create a scoped Cloudflare API token *(6 clicks, then Claude does the rest)*
 
-1. <https://hpanel.hostinger.com> → sign in
-2. Top menu → **Domains** → click **shivambhadoriya.com**
-3. Left sidebar → **DNS / Nameservers**
-4. Find the **Nameservers** section (not the DNS records section) → **Change nameservers**
-5. Select **Use custom nameservers** (Hostinger's default is `ns1.dns-parking.com` /
-   `ns2.dns-parking.com` — you are replacing those)
-6. Paste the two Cloudflare nameservers from step 1.6 → **Save**
-7. Back in Cloudflare → **Check nameservers now**
+This is instead of handing over a password. The token can edit DNS on this one domain and nothing
+else — it cannot touch billing, your other domains, your account settings or your password — and it
+is one click to revoke when the migration is done.
 
-This is the slow part. Usually 15 minutes to 2 hours, occasionally up to 24. Cloudflare emails you
-when it is active.
+1. <https://dash.cloudflare.com/profile/api-tokens>
+2. **Create Token**
+3. Find **Edit zone DNS** in the template list → **Use template**
+4. Under **Zone Resources**, set: `Include` · `Specific zone` · `shivambhadoriya.com`
+5. **Continue to summary** → **Create Token**
+6. Copy the token — it is shown **once**
 
-✅ **CHECK 1** — run this; when it prints the Cloudflare names instead of `dns-parking.com`, you can
-continue:
+Then, in the project folder, open `.env.local` and add this as a new line:
 
-```bash
-nslookup -type=ns shivambhadoriya.com 8.8.8.8
+```
+CLOUDFLARE_API_TOKEN=paste_the_token_here
 ```
 
----
+⚠️ **Paste it into that file, not into the chat.** `.env.local` is gitignored, so it never reaches
+GitHub, and the script never prints it.
 
-## Step 3 — Add the domain in Vercel and get the records
-
-1. <https://vercel.com/dashboard> → click the **Supreme_Shivam** project
-2. Top tabs → **Settings** → left sidebar → **Domains**
-3. Type `shivambhadoriya.com` → **Add**
-4. Choose **"Redirect www.shivambhadoriya.com to shivambhadoriya.com"** — the apex is the canonical
-   host and the code already assumes that
-5. Vercel shows **Invalid Configuration** in red with the DNS records it wants. **Expected.**
-   **Leave this tab open — those values are the authoritative ones. Use what Vercel shows you, not
-   what this file says.** They normally are:
-
-   | Type | Name | Value |
-   |---|---|---|
-   | A | `@` | `76.76.21.21` |
-   | CNAME | `www` | `cname.vercel-dns.com` |
+Tell Claude when it is saved.
 
 ---
 
-## Step 4 — Add those records in Cloudflare
+## Step 2 — Claude points DNS at Vercel
 
-1. Cloudflare → **shivambhadoriya.com** → left sidebar → **DNS** → **Records**
-2. **Add record** → Type `A` · Name `@` · IPv4 `76.76.21.21`
-3. ⚠️ **Proxy status must be "DNS only" — the cloud icon GREY, not orange.**
-   This is the single most common way to break a Vercel site. Orange means Cloudflare proxies the
-   request, which fights Vercel's own SSL certificate and gives you either a redirect loop or a
-   certificate error. Grey. Every time.
-4. **Save**
-5. **Add record** → Type `CNAME` · Name `www` · Target `cname.vercel-dns.com` · Proxy **DNS only
-   (grey)** → **Save**
-6. Back in Vercel → **Domains** → **Refresh**. Wait for green **Valid Configuration**. Vercel issues
-   the SSL certificate automatically — usually under five minutes.
+```bash
+npm run dns            # dry run: shows exactly what it would change
+npm run dns -- --apply # makes the change
+```
 
-✅ **CHECK 2** — this must return `200` before you touch step 5:
+It sets:
+
+| Type | Name | Value | Proxy |
+|---|---|---|---|
+| A | `@` | `76.76.21.21` | **off** |
+| CNAME | `www` | `cname.vercel-dns.com` | **off** |
+
+and removes the leftover Hostinger records at those two names. **MX and TXT records are never
+touched**, which is what keeps email working.
+
+Proxy must be off (grey cloud). Cloudflare's proxy terminates TLS itself, which collides with the
+certificate Vercel issues for the same hostname — that is the redirect loop / certificate error
+everyone hits.
+
+✅ **CHECK** — Vercel issues the certificate within a few minutes:
 
 ```bash
 curl -sI https://shivambhadoriya.com | head -1
 ```
 
-A certificate error here means the cloud in step 4.3 is orange. Go back and make it grey.
+Must be `HTTP/2 200` **and** served by Vercel, not Hostinger. Right now it returns 200 from
+Hostinger's parking page, so the check is `server:` in the headers — it must stop saying `hcdn`.
 
 ---
 
-## Step 5 — Create contact@shivambhadoriya.com
+## Step 3 — Create contact@shivambhadoriya.com
 
-Free, five minutes. Do it before step 6, because step 6 makes the site start advertising the address.
+Free, five minutes. Do it before step 4, because step 4 makes the site start advertising the address.
 
-### 5a. Receiving
+### 3a. Receiving
 
 1. Cloudflare → **shivambhadoriya.com** → left sidebar → **Email** → **Email Routing**
 2. **Get started**
@@ -124,10 +99,10 @@ Free, five minutes. Do it before step 6, because step 6 makes the site start adv
 4. **Create** → Cloudflare offers to add the MX and TXT records → **Add records and enable**
 5. Check Gmail for Cloudflare's verification email → click the link
 
-### 5b. Sending, so replies come *from* contact@
+### 3b. Sending, so replies come *from* contact@
 
 1. Create a Gmail **App Password**: <https://myaccount.google.com/apppasswords> → name it
-   `shivambhadoriya.com` → copy the 16-character password. **Keep this — step 6 needs it.**
+   `shivambhadoriya.com` → copy the 16-character password. **Keep this — step 4 needs it.**
 2. Gmail → gear → **See all settings** → **Accounts and Import**
 3. **Send mail as** → **Add another email address**
 4. Name `Shivam Bhadoriya` · Email `contact@shivambhadoriya.com` · **untick** "Treat as an alias"
@@ -135,16 +110,15 @@ Free, five minutes. Do it before step 6, because step 6 makes the site start adv
    Password · **TLS**
 6. **Add Account** → Gmail emails a code to contact@, Cloudflare forwards it to your inbox → paste it
 
-✅ **CHECK 3** — email `contact@shivambhadoriya.com` from another account. It must arrive in Gmail.
+✅ **CHECK** — email `contact@shivambhadoriya.com` from another account. It must arrive in Gmail.
 
 ---
 
-## Step 6 — Flip the site onto the new domain
+## Step 4 — Flip the site onto the new domain — *Claude does this over the Vercel CLI*
 
-**Only once CHECK 2 returned 200.** This is the step that permanently redirects the old address.
-
-1. Vercel → **Supreme_Shivam** → **Settings** → **Environment Variables**
-2. Add each row below. Tick **Production**, **Preview** and **Development** on every one.
+You are already signed in to the CLI, so Claude runs `vercel env add` for each variable and then
+`vercel --prod`. You do not need to open the dashboard. For reference, these are the values going
+in:
 
 | Key | Value |
 |---|---|
@@ -154,15 +128,13 @@ Free, five minutes. Do it before step 6, because step 6 makes the site start adv
 | `SMTP_HOST` | `smtp.gmail.com` |
 | `SMTP_PORT` | `587` |
 | `SMTP_USER` | your full Gmail address |
-| `SMTP_PASS` | the App Password from step 5b.1 |
+| `SMTP_PASS` | the App Password from step 3b.1 |
 | `SMTP_FROM` | `contact@shivambhadoriya.com` |
 
-3. **Save**
-4. **Deployments** tab → newest deployment → **⋯** → **Redeploy** → **untick "Use existing Build
-   Cache"** → **Redeploy**
-5. Wait for green
+Only after `https://shivambhadoriya.com` serves from Vercel — setting `NEXT_PUBLIC_SITE_URL` while
+Hostinger's parking page is still answering would 301 the live site into a dead end.
 
-✅ **CHECK 4** — the big one:
+✅ **CHECK** — the big one:
 
 ```bash
 npm run verify:domain
@@ -173,7 +145,7 @@ and that no page still says Ahmedabad. **Send me the whole output.**
 
 ---
 
-## Step 7 — Google Search Console
+## Step 5 — Google Search Console
 
 1. <https://search.google.com/search-console> → sign in
 2. **Add property** → the **Domain** box on the left (not "URL prefix")
@@ -201,7 +173,7 @@ https://shivambhadoriya.com/work
 
 ---
 
-## Step 8 — Bing (10 minutes, also feeds ChatGPT search)
+## Step 6 — Bing (10 minutes, also feeds ChatGPT search)
 
 1. <https://www.bing.com/webmasters> → sign in
 2. **Import from Google Search Console** → authorise → select `shivambhadoriya.com`
@@ -210,7 +182,7 @@ Done — it copies the verification and the sitemap across.
 
 ---
 
-## Step 9 — Google Business Profile
+## Step 7 — Google Business Profile
 
 **The biggest single lever for local leads.** It is what puts you in the boxed map results for
 "web developer near me" in Navsari. Free.
@@ -233,7 +205,7 @@ Done — it copies the verification and the sitemap across.
 
 ---
 
-## Step 10 — Make your profiles match the site
+## Step 8 — Make your profiles match the site
 
 The whole plan depends on Google seeing one person. Ten minutes.
 
@@ -250,7 +222,7 @@ problem this whole job exists to fix.
 
 ---
 
-## Step 11 — Final verification
+## Step 9 — Final verification
 
 ```bash
 npm run verify:domain
@@ -279,21 +251,6 @@ Then by hand:
 
   ⚠️ **Tell me before you add the SPF one.** Cloudflare Email Routing already creates an SPF record.
   Two SPF records is worse than none — they have to be merged into one line, not duplicated.
-
----
-
-## Appendix — Path B, staying entirely on Hostinger DNS
-
-Only if you do not want to move nameservers. You lose free email routing.
-
-1. hPanel → **Domains** → `shivambhadoriya.com` → **DNS / Nameservers** → **DNS records**
-2. **Delete** the existing `A` record for `@` (it points at Hostinger parking) and the `CNAME` for
-   `www`
-3. **Add record** → Type `A` · Name `@` · Points to `76.76.21.21` · TTL leave default → **Add**
-4. **Add record** → Type `CNAME` · Name `www` · Target `cname.vercel-dns.com` → **Add**
-5. Continue from **step 3** above (Vercel), skipping Cloudflare entirely
-6. For `contact@shivambhadoriya.com` you then need Hostinger's email add-on, or a free tier
-   elsewhere. Tell me which and I will give you the records.
 
 ---
 

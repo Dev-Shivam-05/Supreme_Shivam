@@ -82,10 +82,16 @@ const personNode = {
     "System architecture",
     "Web performance",
   ],
-  // Only public accounts that resolve and are actually his. Instagram stays out:
-  // the handle linked from GitHub (`__https.https`) could not be verified, and a
-  // sameAs pointing at a wrong profile is worse than omitting it.
-  sameAs: [site.social.github, site.social.linkedin, site.social.x, site.social.wakatime],
+  // Every public account, each one confirmed by Shivam. This array is the
+  // explicit claim that all of these are the same human — a URL that does not
+  // resolve is worse here than an absent one.
+  sameAs: [
+    site.social.github,
+    site.social.linkedin,
+    site.social.x,
+    site.social.instagram,
+    site.social.wakatime,
+  ],
 };
 
 /**

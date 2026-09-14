@@ -124,6 +124,7 @@ export function Footer({ content }: { content: PublicContent }) {
                 <a href={site.social.github} target="_blank" rel="noopener noreferrer" className="sweep border border-border px-4 py-2 text-sm text-fg-muted">GitHub</a>
                 <a href={site.social.linkedin} target="_blank" rel="noopener noreferrer" className="sweep border border-border px-4 py-2 text-sm text-fg-muted">LinkedIn</a>
                 <a href={site.social.x} target="_blank" rel="noopener noreferrer" className="sweep border border-border px-4 py-2 text-sm text-fg-muted">X</a>
+                <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" className="sweep border border-border px-4 py-2 text-sm text-fg-muted">Instagram</a>
                 <EmailLink label="Email" className="sweep border border-border px-4 py-2 text-sm text-fg-muted" />
               </div>
             </div>

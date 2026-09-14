@@ -4,9 +4,9 @@
 |---|---|---|---|
 | 1 | SEO + identity rebuild | **Done** — 2026-09-14 | Implements `portfolio-implementation-brief.md`. |
 | 2 | DEV-HANDOVER: local SEO, services, legal | **Done** — 2026-09-14 | City settled as Navsari; `contact@shivambhadoriya.com`; five service/hire pages; `/privacy-policy` + `/terms`; cookieless analytics. |
-| 3 | Domain, console and profile setup | **Blocked on Shivam** | Registrar is Hostinger. All clicks in `docs/DOMAIN-SETUP.md` (Path A moves DNS to Cloudflare for the free mailbox). Verify each stage with `npm run verify:domain`. |
+| 3 | Domain, console and profile setup | **In progress** | Hostinger → Cloudflare nameservers done and propagated; domain added to Vercel. Remaining: A/CNAME to Vercel (`npm run dns`), env vars (Vercel CLI), mailbox, GSC/Bing/GBP. `docs/DOMAIN-SETUP.md`. |
 | 4 | Above-the-fold performance | **Not started** | Deliberately not absorbed. Detail below. |
-| 5 | Confirm remaining unverified facts | **Mostly closed** | Phone, timelines and the app question answered 2026-09-14. Outstanding: the Instagram URL and the real AI-PULSE stack. `docs/SEO.md` §2. |
+| 5 | Confirm unverified facts | **Done** — 2026-09-14 | Phone, timelines, app confidentiality, Instagram and the real AI-PULSE stack (read from the GitHub API, not guessed) are all in the code. |
 
 ## Phase 2 — what shipped
 

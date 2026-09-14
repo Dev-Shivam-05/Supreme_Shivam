@@ -82,6 +82,7 @@ export const site = {
     // The username really is `__https_shivu` — it reads like a signup accident,
     // but it resolves, and DEV-HANDOVER lists it in sameAs.
     wakatime: "https://wakatime.com/@__https_shivu",
+    instagram: "https://www.instagram.com/__https.shivu",
     email: "mailto:contact@shivambhadoriya.com",
   },
 } as const;
@@ -182,8 +183,8 @@ export const projects: Project[] = [
     summary:
       "A YouTube channel that publishes itself: one video and one Short about a trending AI tool, every day, unattended — on GitHub Actions at zero infrastructure cost.",
     description:
-      "An unattended content pipeline. A scheduled GitHub Actions workflow picks the AI tool trending that day, assembles a long-form video and a Short from it, and publishes both to YouTube through the Data API. There is no server and no cron box: the whole thing runs inside CI minutes, and the pipeline has its own tests that gate every run.",
-    stack: ["GitHub Actions", "Scheduled workflows", "YouTube Data API", "CI tests"],
+      "An unattended content pipeline in Python. A scheduled GitHub Actions workflow picks the AI tool trending that day, researches it with Playwright, narrates it with text-to-speech, cuts a long-form video and a Short with FFmpeg, and publishes both through the YouTube Data API. It also builds a cheat-sheet PDF onto GitHub Pages and announces each video on Telegram and X. There is no server and no cron box — the whole thing runs inside CI minutes, and pytest gates every run.",
+    stack: ["Python", "GitHub Actions", "FFmpeg", "Playwright", "Text-to-speech", "YouTube Data API", "pytest"],
     metrics: [
       { value: "Daily", label: "Unattended publishes" },
       { value: "$0", label: "Infrastructure cost" },
@@ -197,9 +198,10 @@ export const projects: Project[] = [
       "Put tests in CI so a broken run fails loudly instead of publishing something wrong.",
     ],
     architecture: [
-      "GitHub Actions cron · one workflow per publish",
-      "Trending-tool selection → asset assembly → upload",
-      "YouTube Data API publish step · tests gate the run",
+      "Three GitHub Actions workflows · publish, notify, test",
+      "Playwright research → TTS narration → FFmpeg cut",
+      "YouTube Data API upload · cheat-sheet PDF to GitHub Pages",
+      "pytest in CI gates the publish step · Telegram + X announce",
     ],
     outcomes: [
       "Publishes a video and a Short every day without a human in the loop",
@@ -208,6 +210,8 @@ export const projects: Project[] = [
     ],
     pattern: "orbit",
     flagship: true,
+    repo: "https://github.com/Dev-Shivam-05/AI-PULSE",
+    live: "https://dev-shivam-05.github.io/AI-PULSE/",
   },
   {
     slug: "cgpe-connect",
