@@ -61,11 +61,16 @@
 
 ## Known broken / deliberately skipped
 
-- **`contact@shivambhadoriya.com` does not receive mail.** Hostinger mailboxes are a paid
-  add-on, so the panel shows the address as created while nothing is delivered. The address is
-  printed on five service pages, so this is the highest-priority open item.
-  `scripts/cloudflare-email.mjs` is written and ready but needs a token with Email Routing
-  permissions — the current one is DNS-only and returns 403.
+- **CORRECTED 2026-09-15: `contact@shivambhadoriya.com` DOES receive mail.** The earlier entry
+  here was wrong. Verified live against 1.1.1.1: `MX 5 mx1.hostinger.com` / `MX 10
+  mx2.hostinger.com` and `v=spf1 include:_spf.mail.hostinger.com ~all` are both intact, and the
+  Hostinger webmail inbox has a delivered message. Cloudflare is the **nameserver only** — it
+  serves the Hostinger MX records, it does not intercept mail.
+  **The real deadline is billing, not DNS:** the mailbox is on a Hostinger email trial that ends
+  **2026-10-14**. Delivery stops then unless it is renewed or replaced.
+  **DO NOT run `scripts/cloudflare-email.mjs --apply` while the Hostinger mailbox is wanted** —
+  enabling Cloudflare Email Routing rewrites the MX records and would kill a mailbox that
+  currently works.
 - **SMTP is unset**, so the contact form stores the lead but sends no notification. Leads are
   safe in the `leads` collection and visible in /admin.
 - **Mobile LCP is ~5.3s** against the brief's 2.5s target. It was ~5.1s before this work, so it
@@ -78,15 +83,16 @@
 
 ## Next session starts here
 
-- **Phase 3e:** finish inbound mail so `contact@shivambhadoriya.com` actually receives, then
-  wire SMTP so the contact form notifies.
-- **First command:**
-  ```
-  node scripts/cloudflare-email.mjs aaziko.com@gmail.com
-  ```
-  (dry run; needs a replacement `CLOUDFLARE_API_TOKEN` in `.env.local` carrying
-  `Zone:DNS:Edit`, `Zone:Email Routing Rules:Edit` and `Account:Email Routing Addresses:Edit`)
-- **Watch out for:** enabling Cloudflare Email Routing **rewrites the MX records** and cuts
-  Hostinger mail off. That is the intent here, but confirm Shivam is not relying on a Hostinger
-  mailbox for anything else first. And the destination inbox must be verified by clicking a link
-  Cloudflare emails — forwarding silently does nothing until then.
+- **Phase 3e is now a decision, not a build.** Inbound already works. Before 2026-10-14 Shivam
+  chooses: renew the Hostinger email plan (keeps send + receive, costs money), or migrate to
+  Cloudflare Email Routing (free, receive-only, rewrites MX). Only after that choice does the
+  SMTP half of the phase have a sender to configure.
+- **Phase 3f — off-site entity signals.** The technical SEO is clean (verified 2026-09-15:
+  `robots.txt` allows, `<meta name="robots" content="index, follow">`, canonical correct,
+  sitemap serving 26 URLs). What is missing is **reciprocal links**. `sameAs` lists five
+  profiles; none of the five link back to shivambhadoriya.com, so the claim is one-way and
+  Google will not merge the entity on it. Fix the profile website fields by hand.
+- **Watch out for:** `scripts/cloudflare-email.mjs --apply` rewrites the MX records. That is
+  destructive to the working Hostinger mailbox. Do not run it until the billing decision above
+  is made. The destination inbox also has to be verified by clicking a link Cloudflare emails —
+  forwarding silently does nothing until then.
