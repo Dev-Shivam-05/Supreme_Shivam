@@ -70,7 +70,9 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     if (!canonicalHost || !canonicalUrl) return [];
-    const to = { destination: `${canonicalUrl}/:path*`, permanent: true };
+    // An explicit 301, not `permanent: true` (which sends 308). Google treats both as
+    // permanent, but Search Console's Change of Address check is documented as "301".
+    const to = { destination: `${canonicalUrl}/:path*`, statusCode: 301 as const };
     const hosts = [LEGACY_HOST];
     // Fold the www/apex variant into one origin too — two hosts serving 200s is
     // two competing copies of the same page as far as Google is concerned.

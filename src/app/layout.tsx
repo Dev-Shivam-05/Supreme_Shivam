@@ -103,6 +103,12 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+  // Ownership token for the OLD `shivam-bhadoriya-dev.vercel.app` Search Console property.
+  // That host now redirects here, and Search Console follows redirects for meta-tag
+  // verification, so this tag is what keeps the old property verified. Without it the
+  // Change of Address tool cannot be used and Google has to discover the move on its own.
+  // It was dropped once in a redesign — do not remove it again.
+  verification: { google: "FpMq1620MPw97ShOx5JxKpvxsk0ON2uvsx7jUCBk_Ks" },
 };
 
 export const viewport: Viewport = {
