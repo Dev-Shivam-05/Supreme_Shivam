@@ -7,22 +7,24 @@ import { FeaturedWork } from "@/components/sections/featured-work";
 import { Process } from "@/components/sections/process";
 import { GithubProof } from "@/components/sections/github-proof";
 import { Gateway } from "@/components/sections/gateway";
-import { JsonLd, personLd, websiteLd, profilePageLd } from "@/components/seo/json-ld";
-import { getProjects, getSettings } from "@/lib/content";
+import { JsonLd, profilePageLd } from "@/components/seo/json-ld";
+import { getProjects, getSettings, toPublicContent } from "@/lib/content";
 
 export default async function Home() {
   const [projects, content] = await Promise.all([getProjects(), getSettings()]);
+  // Archived work keeps its case study and its archive row, but never fronts the site.
+  const featured = projects.filter((p) => !p.archived);
   return (
     <>
-      <JsonLd data={personLd} />
-      <JsonLd data={websiteLd} />
+      {/* The Person + WebSite graph lives in the root layout — this page adds the
+          ProfilePage wrapper that says the page itself is about him. */}
       <JsonLd data={profilePageLd} />
-      <Hero content={content} />
+      <Hero content={toPublicContent(content)} />
       <Marquee />
       <Stats />
       <Services />
       <Statement />
-      <FeaturedWork projects={projects} />
+      <FeaturedWork projects={featured} />
       <Process />
       <GithubProof />
       <Gateway />

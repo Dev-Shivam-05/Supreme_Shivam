@@ -41,7 +41,7 @@ export default function LabPage() {
   return (
     <>
       <PageHeader
-        index="04"
+        index="07"
         label="The garage"
         title="Experiments &"
         accent="infrastructure."

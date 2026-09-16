@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 const FIELDS = [
   "slug", "index", "title", "category", "year", "role", "timeline", "summary",
   "description", "stack", "metrics", "problem", "approach", "architecture",
-  "outcomes", "pattern", "flagship", "imageUrl", "repo", "live", "order", "published",
+  "outcomes", "pattern", "flagship", "archived", "imageUrl", "repo", "live", "order", "published",
 ] as const;
 
 /** Whitelist the fields a client may write to a Project. */

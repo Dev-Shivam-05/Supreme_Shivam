@@ -166,6 +166,9 @@
   .sweep:hover::before, .sweep:focus-visible::before { transform: translateY(0); }
   .sweep:hover, .sweep:focus-visible { color: var(--accent-ink); border-color: var(--accent); }
   .display-1 { font-size: clamp(2.9rem, 14vw, 17rem); }
+  /* The hero name now sits above a role line, a lede, two buttons and the
+     portrait; at display-1 that stack ran past the fold on a 900px-tall window. */
+  .display-hero { font-size: clamp(2.6rem, 11.5vw, 14rem); }
   .display-2 { font-size: clamp(2.4rem, 8.5vw, 8.5rem); }
   .display-3 { font-size: clamp(1.85rem, 5.5vw, 4.5rem); }
 
@@ -209,6 +212,18 @@
     border: 1px solid var(--border);
     backdrop-filter: blur(14px) saturate(1.2);
     -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  }
+
+  /* The scrolled nav bar specifically.
+     .glass-panel is 3.5% white, which is fine over body copy and nowhere near
+     enough over poster-scale type — the hero and page headings read straight
+     through it and the nav links become unreadable against lime. This keeps the
+     blur but puts real ground behind it. */
+  .nav-panel {
+    background: color-mix(in oklch, var(--bg) 82%, transparent);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
   }
 
   /* faint engineering grid */

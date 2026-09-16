@@ -21,3 +21,18 @@ export function Loader() {
     </div>
   );
 }
+
+/*
+ * NOTE: no longer wired to a route-level `loading.tsx`.
+ *
+ * A root `app/loading.tsx` puts a Suspense boundary around every page, and in
+ * the prerendered HTML that meant <main> contained this loader while the hero —
+ * the <h1>, the lede and the portrait — was streamed in *after* the footer.
+ * Raw-HTML readers saw "LOAD SHIVAM" where the name should be, and the browser
+ * painted a full-screen panel before the real LCP element.
+ *
+ * Every route here is static or ISR, and the cold-open Preloader already covers
+ * the first visit, so the boundary bought nothing. Kept for a future route that
+ * genuinely does slow work on demand — add `loading.tsx` in *that* segment, not
+ * at the root.
+ */

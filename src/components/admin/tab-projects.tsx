@@ -23,6 +23,7 @@ type Project = {
   outcomes: string[];
   pattern: string;
   flagship: boolean;
+  archived: boolean;
   imageUrl: string;
   repo: string;
   live: string;
@@ -33,7 +34,7 @@ type Project = {
 const blank: Project = {
   slug: "", index: "01", title: "", category: "", year: "2026", role: "", timeline: "",
   summary: "", description: "", stack: [], metrics: [], problem: "", approach: [],
-  architecture: [], outcomes: [], pattern: "grid", flagship: false, imageUrl: "",
+  architecture: [], outcomes: [], pattern: "grid", flagship: false, archived: false, imageUrl: "",
   repo: "", live: "", order: 0, published: true,
 };
 
@@ -207,6 +208,7 @@ function ProjectForm({ initial, onDone, onCancel }: { initial: Project; onDone: 
         <div><label className={labelCls}>Live URL</label><input className={field} value={p.live} onChange={(e) => set("live", e.target.value)} /></div>
         <div className="flex items-center gap-6">
           <label className="flex items-center gap-2 text-sm text-fg-muted"><input type="checkbox" checked={p.flagship} onChange={(e) => set("flagship", e.target.checked)} /> Flagship</label>
+          <label className="flex items-center gap-2 text-sm text-fg-muted"><input type="checkbox" checked={p.archived} onChange={(e) => set("archived", e.target.checked)} /> Archived</label>
           <label className="flex items-center gap-2 text-sm text-fg-muted"><input type="checkbox" checked={p.published} onChange={(e) => set("published", e.target.checked)} /> Published</label>
         </div>
         <div><label className={labelCls}>Order</label><input type="number" className={field} value={p.order} onChange={(e) => set("order", Number(e.target.value))} /></div>

@@ -3,20 +3,17 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-function getSessionId() {
-  try {
-    let id = sessionStorage.getItem("sb_sid");
-    if (!id) {
-      id = `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
-      sessionStorage.setItem("sb_sid", id);
-    }
-    return id;
-  } catch {
-    return "";
-  }
-}
-
-/** Fires a pageview beacon on every route change. Server no-ops if DB is unset. */
+/**
+ * Fires a pageview beacon on every route change. Server no-ops if DB is unset.
+ *
+ * Deliberately stores NOTHING on the device. It used to keep a session id in
+ * sessionStorage, which is "access to information stored on a user's terminal
+ * equipment" under ePrivacy and personal-data processing under the DPDP Act —
+ * both of which would require a consent banner in front of it. The session id
+ * is now derived server-side from a daily-rotating salted hash instead (see
+ * app/api/collect/route.ts), so the same metric survives with no cookie, no
+ * storage, no banner, and nothing that can be read back to a person.
+ */
 export function Beacon() {
   const pathname = usePathname();
   useEffect(() => {
@@ -24,7 +21,6 @@ export function Beacon() {
     const payload = JSON.stringify({
       path: pathname + window.location.search,
       referrer: document.referrer,
-      sessionId: getSessionId(),
     });
     try {
       if (navigator.sendBeacon) {

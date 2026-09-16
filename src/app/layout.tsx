@@ -9,7 +9,8 @@ import { ScrollProgress } from "@/components/ux/scroll-progress";
 import { CommandPalette } from "@/components/ux/command-palette";
 import { Preloader } from "@/components/ux/preloader";
 import { Beacon } from "@/components/analytics/beacon";
-import { getSettings } from "@/lib/content";
+import { JsonLd, siteGraphLd } from "@/components/seo/json-ld";
+import { getSettings, toPublicContent } from "@/lib/content";
 import { site } from "@/lib/site";
 
 const anton = Anton({
@@ -33,34 +34,81 @@ const sacramento = Sacramento({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://shivam-bhadoriya-dev.vercel.app"),
+  metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — ${site.role}`,
+    // One title, one role, everywhere — see the IDENTITY RULE in lib/site.ts.
+    default: site.title,
     template: `%s · ${site.name}`,
   },
   description: site.tagline,
+  applicationName: site.name,
   keywords: [
     "Shivam Bhadoriya",
-    "full-stack developer",
-    "MERN developer",
-    "React engineer",
-    "Node.js",
-    "MongoDB",
-    "portfolio",
+    "Shivam Bhadoriya AI Engineer",
+    "Shivam Bhadoriya portfolio",
+    "Shivam Bhadoriya Navsari",
+    "AI Engineer Navsari",
+    "web developer Navsari",
+    "website developer Surat",
+    "AI automation developer India",
+    "Aaziko Global LLP",
+    "Dev-Shivam-05",
+    "spec-driven development",
+    "AI coding agents",
   ],
-  authors: [{ name: site.name }],
+  authors: [{ name: site.name, url: site.url }],
+  creator: site.name,
+  publisher: site.name,
+  alternates: { canonical: "/" },
   openGraph: {
-    type: "website",
-    title: `${site.name} — ${site.role}`,
-    description: site.tagline,
+    type: "profile",
+    firstName: site.firstName,
+    lastName: site.lastName,
+    username: site.handle,
+    title: site.title,
+    description: site.taglineShort,
+    url: site.url,
     siteName: site.name,
+    locale: "en_IN",
+    images: [
+      {
+        url: site.images.og,
+        width: 1200,
+        height: 630,
+        alt: site.images.alt,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} — ${site.role}`,
-    description: site.tagline,
+    site: site.social.xHandle,
+    creator: site.social.xHandle,
+    title: site.title,
+    description: site.taglineShort,
+    images: [site.images.og],
   },
-  robots: { index: true, follow: true },
+  // `max-image-preview: large` is what permits a full-size thumbnail in results.
+  // Without it his photograph cannot appear at usable size next to the listing.
+  robots: {
+    index: true,
+    follow: true,
+    "max-image-preview": "large",
+    "max-snippet": -1,
+    "max-video-preview": -1,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  // Ownership token for the OLD `shivam-bhadoriya-dev.vercel.app` Search Console property.
+  // That host now redirects here, and Search Console follows redirects for meta-tag
+  // verification, so this tag is what keeps the old property verified. Without it the
+  // Change of Address tool cannot be used and Google has to discover the move on its own.
+  // It was dropped once in a redesign — do not remove it again.
+  verification: { google: "FpMq1620MPw97ShOx5JxKpvxsk0ON2uvsx7jUCBk_Ks" },
 };
 
 export const viewport: Viewport = {
@@ -76,11 +124,14 @@ export default async function RootLayout({
   const content = await getSettings();
   return (
     <html
-      lang="en"
+      lang="en-IN"
       suppressHydrationWarning
       className={`${anton.variable} ${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable} ${sacramento.variable} antialiased`}
     >
       <body>
+        {/* The person entity rides on every route, not just the home page — it is
+            what ties this site, LinkedIn, GitHub, X and the photograph together. */}
+        <JsonLd data={siteGraphLd} />
         {/* skip the cold-open on repeat visits in the same tab — runs before paint */}
         <script
           dangerouslySetInnerHTML={{
@@ -102,7 +153,7 @@ export default async function RootLayout({
             <Nav />
             <CommandPalette />
             <main>{children}</main>
-            <Footer content={content} />
+            <Footer content={toPublicContent(content)} />
           </SmoothScroll>
         </ThemeProvider>
       </body>

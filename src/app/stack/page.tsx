@@ -15,7 +15,7 @@ export default function StackPage() {
   return (
     <>
       <PageHeader
-        index="03"
+        index="05"
         label="Under the hood"
         title="The tools I build"
         accent="with."

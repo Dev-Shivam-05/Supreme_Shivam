@@ -1,37 +1,50 @@
 import type { Metadata } from "next";
 import { site } from "./site";
 
-/** Build consistent per-route metadata (title uses the layout template). */
+/**
+ * Build consistent per-route metadata (title uses the layout template).
+ *
+ * The social card is a static file at a stable, name-carrying path rather than a
+ * runtime-rendered route: the filename is a ranking input for image search, and
+ * a `/_next/…` or `/opengraph-image` URL carries none of that signal and changes
+ * between deploys.
+ */
 export function pageMeta({
   title,
   description,
   path,
+  image = site.images.og,
+  imageAlt = site.images.alt,
 }: {
   title: string;
   description: string;
   path: string;
+  image?: string;
+  imageAlt?: string;
 }): Metadata {
   const url = site.url + path;
-  // Explicitly carry the OG image: setting an openGraph object otherwise suppresses
-  // the file-based opengraph-image on non-home routes, leaving blank social cards.
-  const image = { url: "/opengraph-image", width: 1200, height: 630, alt: `${title} · ${site.name}` };
+  const fullTitle = `${title} · ${site.name}`;
+  const og = { url: image, width: 1200, height: 630, alt: imageAlt };
   return {
     title,
     description,
     alternates: { canonical: path },
     openGraph: {
-      title: `${title} · ${site.name}`,
+      title: fullTitle,
       description,
       url,
       type: "website",
       siteName: site.name,
-      images: [image],
+      locale: "en_IN",
+      images: [og],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} · ${site.name}`,
+      site: site.social.xHandle,
+      creator: site.social.xHandle,
+      title: fullTitle,
       description,
-      images: ["/opengraph-image"],
+      images: [image],
     },
   };
 }

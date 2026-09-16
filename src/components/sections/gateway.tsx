@@ -16,18 +16,25 @@ const panels = [
     title: "About",
     body: "The engineer behind the work — how I think, what I optimise for, and where I'm headed.",
   },
+  {
+    href: "/writing",
+    index: "03",
+    kicker: "In writing",
+    title: "Writing",
+    body: "Notes on what changed when agents started writing the implementation — spec, review, tests.",
+  },
 ];
 
 export function Gateway() {
   return (
     <section className="border-t border-border">
-      <div className="grid md:grid-cols-2">
+      <div className="grid md:grid-cols-3">
         {panels.map((p, i) => (
           <Link
             key={p.href}
             href={p.href}
             className={`group relative overflow-hidden px-6 py-20 md:px-12 md:py-32 ${
-              i === 0 ? "md:border-r border-border" : ""
+              i < panels.length - 1 ? "md:border-r border-border" : ""
             }`}
           >
             <div className="pointer-events-none absolute inset-0 origin-bottom scale-y-0 bg-accent transition-transform duration-500 ease-[cubic-bezier(0.7,0,0.1,1)] group-hover:scale-y-100" />
@@ -38,7 +45,7 @@ export function Gateway() {
                 </span>
                 <ArrowUpRight className="h-6 w-6 text-fg-faint transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-accent-ink" />
               </div>
-              <h3 className="font-poster text-6xl transition-colors group-hover:text-accent-ink md:text-8xl">
+              <h3 className="font-poster text-6xl transition-colors group-hover:text-accent-ink md:text-7xl">
                 {p.title}
               </h3>
               <p className="mt-6 max-w-sm text-fg-muted transition-colors group-hover:text-accent-ink/80">

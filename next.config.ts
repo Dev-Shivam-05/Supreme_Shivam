@@ -2,6 +2,30 @@ import type { NextConfig } from "next";
 
 const isProd = process.env.NODE_ENV === "production";
 
+/**
+ * Canonical host. An exact-match domain on the full name is the single strongest
+ * signal that this site is *about* this person; a shared *.vercel.app subdomain
+ * carries none of it. The day shivambhadoriya.com is pointed at this deployment,
+ * set NEXT_PUBLIC_SITE_URL in Vercel and the redirect below starts 301-ing the
+ * old host to it.
+ *
+ * The guard matters: without it, a deploy would permanently redirect the live
+ * site into a domain that does not resolve yet. A 301 is cached hard by browsers
+ * and is very expensive to take back.
+ */
+const LEGACY_HOST = "shivam-bhadoriya-dev.vercel.app";
+const canonicalUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "");
+const canonicalHost = (() => {
+  if (!canonicalUrl) return null;
+  try {
+    const host = new URL(canonicalUrl).host;
+    // A *.vercel.app value is not a custom domain — nothing to redirect to.
+    return host.endsWith(".vercel.app") ? null : host;
+  } catch {
+    return null;
+  }
+})();
+
 // Content-Security-Policy. Strict in production; dev needs eval + ws for Turbopack HMR.
 const csp = [
   "default-src 'self'",
@@ -43,6 +67,21 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
+  },
+  async redirects() {
+    if (!canonicalHost || !canonicalUrl) return [];
+    // An explicit 301, not `permanent: true` (which sends 308). Google treats both as
+    // permanent, but Search Console's Change of Address check is documented as "301".
+    const to = { destination: `${canonicalUrl}/:path*`, statusCode: 301 as const };
+    const hosts = [LEGACY_HOST];
+    // Fold the www/apex variant into one origin too — two hosts serving 200s is
+    // two competing copies of the same page as far as Google is concerned.
+    hosts.push(canonicalHost.startsWith("www.") ? canonicalHost.slice(4) : `www.${canonicalHost}`);
+    return hosts.map((value) => ({
+      source: "/:path*",
+      has: [{ type: "host" as const, value }],
+      ...to,
+    }));
   },
 };
 

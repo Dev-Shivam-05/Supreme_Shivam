@@ -1,12 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { EmailLink } from "@/components/ux/email-link";
 import { Signature } from "@/components/ux/signature";
-import { nav, site, type SiteContent } from "@/lib/site";
+import { serviceOnly, hireOnly } from "@/lib/services";
+import { nav, secondaryNav, site, type PublicContent } from "@/lib/site";
 
-export function Footer({ content }: { content: SiteContent }) {
+export function Footer({ content }: { content: PublicContent }) {
   const year = new Date().getFullYear();
   return (
     <footer className="relative overflow-hidden border-t border-border bg-bg-elev">
@@ -68,17 +69,22 @@ export function Footer({ content }: { content: SiteContent }) {
                 <div className="hud mb-3">Signed</div>
                 <Signature className="max-w-md" />
                 <div className="mt-3 font-mono text-xs text-fg-faint">
-                  {site.name} · Full-Stack Engineer
+                  {site.name} · {site.role}
                 </div>
               </div>
               <div className="brackets hidden shrink-0 p-1.5 sm:block">
-                <div className="relative h-28 w-24 overflow-hidden">
-                  <Image
-                    src="/personal/portrait-01.webp"
-                    alt={site.name}
-                    fill
-                    sizes="96px"
-                    className="img-duotone object-cover"
+                <div className="relative h-24 w-24 overflow-hidden rounded-full">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- stable,
+                      name-carrying /images/… path is the point; next/image rewrites it to
+                      /_next/image?url=… which carries no filename signal for image search. */}
+                  <img
+                    src={site.images.avatar}
+                    alt={site.images.alt}
+                    width={1000}
+                    height={1000}
+                    loading="lazy"
+                    decoding="async"
+                    className="img-duotone absolute inset-0 h-full w-full object-cover"
                   />
                   <div className="tint-accent absolute inset-0 opacity-40" />
                 </div>
@@ -87,7 +93,7 @@ export function Footer({ content }: { content: SiteContent }) {
           </div>
 
           {/* index */}
-          <div className="grid gap-10 border-t border-border pt-10 md:grid-cols-[1.5fr_1fr_1fr]">
+          <div className="grid gap-10 border-t border-border pt-10 md:grid-cols-[1fr_1.2fr_1fr_1fr]">
             <div>
               <div className="hud mb-4">Index</div>
               <div className="flex flex-col gap-1.5">
@@ -97,7 +103,19 @@ export function Footer({ content }: { content: SiteContent }) {
                     {n.label}
                   </Link>
                 ))}
+                <Link href="/lab" className="w-fit text-sm text-fg-muted hover:text-fg">Lab</Link>
                 <Link href="/stats" className="w-fit text-sm text-accent hover:underline">Live stats ●</Link>
+              </div>
+            </div>
+
+            <div>
+              <div className="hud mb-4">Services</div>
+              <div className="flex flex-col gap-1.5">
+                {[...serviceOnly, ...hireOnly].map((s) => (
+                  <Link key={s.slug} href={s.slug} className="w-fit text-sm text-fg-muted hover:text-fg">
+                    {s.title}
+                  </Link>
+                ))}
               </div>
             </div>
             <div>
@@ -105,21 +123,32 @@ export function Footer({ content }: { content: SiteContent }) {
               <div className="flex flex-wrap gap-2">
                 <a href={site.social.github} target="_blank" rel="noopener noreferrer" className="sweep border border-border px-4 py-2 text-sm text-fg-muted">GitHub</a>
                 <a href={site.social.linkedin} target="_blank" rel="noopener noreferrer" className="sweep border border-border px-4 py-2 text-sm text-fg-muted">LinkedIn</a>
-                <a href={site.social.email} className="sweep border border-border px-4 py-2 text-sm text-fg-muted">Email</a>
+                <a href={site.social.x} target="_blank" rel="noopener noreferrer" className="sweep border border-border px-4 py-2 text-sm text-fg-muted">X</a>
+                <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" className="sweep border border-border px-4 py-2 text-sm text-fg-muted">Instagram</a>
+                <EmailLink label="Email" className="sweep border border-border px-4 py-2 text-sm text-fg-muted" />
               </div>
             </div>
             <div>
               <div className="hud mb-4">Colophon</div>
               <p className="text-sm leading-relaxed text-fg-muted">
-                Built with Next.js, React Three Fiber &amp; GSAP. Designed and engineered
-                end-to-end by {site.name.split(" ")[0]}.
+                Built with Next.js, React Three Fiber &amp; GSAP. Specified, directed,
+                reviewed and tested end-to-end by {site.name}.
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-8">
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-border pt-8">
             <p className="font-mono text-xs text-fg-faint">© {year} {site.name}. All rights reserved.</p>
-            <p className="font-mono text-xs text-fg-faint">{content.location} · {content.availability}</p>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              {secondaryNav
+                .filter((l) => l.href.startsWith("/privacy") || l.href.startsWith("/terms"))
+                .map((l) => (
+                  <Link key={l.href} href={l.href} className="font-mono text-xs text-fg-faint hover:text-fg">
+                    {l.label}
+                  </Link>
+                ))}
+              <p className="font-mono text-xs text-fg-faint">{content.location} · {content.availability}</p>
+            </div>
           </div>
         </div>
       </div>

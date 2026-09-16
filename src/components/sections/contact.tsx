@@ -2,33 +2,40 @@
 
 import { motion } from "motion/react";
 import { ArrowUpRight, Check, Copy, Loader2 } from "lucide-react";
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Magnetic } from "@/components/ux/magnetic";
+import { EMAIL_MASKED, emailAddress, emailHref } from "@/lib/email";
 import { site } from "@/lib/site";
 
+/** Everything except the address — that one is assembled after hydration. */
 const channels = [
-  { label: "Email", value: site.email, href: site.social.email },
+  ...(site.phone ? [{ label: "Phone", value: site.phoneDisplay, href: `tel:${site.phone}` }] : []),
   { label: "GitHub", value: site.handle, href: site.social.github },
-  { label: "LinkedIn", value: "shivam-bhadoriya", href: site.social.linkedin },
+  { label: "LinkedIn", value: "shivam-bhadoriya-dev", href: site.social.linkedin },
+  { label: "X", value: site.social.xHandle, href: site.social.x },
 ];
 
 type Status = "idle" | "sending" | "ok" | "error";
 
 export function Contact() {
   const [copied, setCopied] = useState(false);
+  // null until hydration, so the address never ships in the server HTML.
+  const [mail, setMail] = useState<string | null>(null);
+  useEffect(() => setMail(emailHref()), []);
   const [status, setStatus] = useState<Status>("idle");
   const [msg, setMsg] = useState("");
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "", website: "" });
 
   const copy = () => {
-    navigator.clipboard?.writeText(site.email);
+    navigator.clipboard?.writeText(emailAddress());
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   };
 
   const mailtoFallback = () => {
     const body = `Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`;
-    window.location.href = `mailto:${site.email}?subject=${encodeURIComponent(
+    window.location.href = `${emailHref()}?subject=${encodeURIComponent(
       form.subject || "Portfolio enquiry",
     )}&body=${encodeURIComponent(body)}`;
   };
@@ -69,16 +76,30 @@ export function Contact() {
       <div className="grid gap-16 md:grid-cols-[1fr_1fr] md:gap-20">
         <div>
           <p className="max-w-sm text-lg text-fg-muted">
-            Tell me about the problem. I reply within 24 hours — no gatekeeping, no fluff.
+            Prefer to talk? The phone number is real and it reaches me directly. Otherwise the
+            form is the fastest route — it lands in my inbox and my leads board at once.
           </p>
 
           <div className="mt-12 overflow-hidden border border-border">
+            {/* The address is not in the server HTML — see lib/email.ts. */}
+            <a
+              href={mail ?? "/contact"}
+              className="group flex items-center justify-between border-b border-border bg-bg-elev px-6 py-5 transition-colors hover:bg-surface"
+            >
+              <div>
+                <div className="hud">Email</div>
+                <div className="mt-1 text-sm text-fg">{mail ? emailAddress() : EMAIL_MASKED}</div>
+              </div>
+              <ArrowUpRight className="h-4 w-4 text-fg-faint transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
+            </a>
             {channels.map((c) => (
               <a
                 key={c.label}
                 href={c.href}
-                target="_blank"
-                rel="noopener noreferrer"
+                // tel: must not open a new tab — on desktop that is a blank window.
+                {...(c.href.startsWith("http")
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
                 className="group flex items-center justify-between border-b border-border bg-bg-elev px-6 py-5 transition-colors hover:bg-surface"
               >
                 <div>
@@ -148,10 +169,21 @@ export function Contact() {
           {msg && (
             <p className={`font-mono text-xs ${status === "ok" ? "text-accent" : "text-signal"}`}>{msg}</p>
           )}
+          {/* A setup note for whoever is running this locally — never for a visitor,
+              who has no idea what SMTP is and should not be told the site is half-wired. */}
+          {process.env.NODE_ENV !== "production" && (
+            <p className="font-mono text-[0.65rem] leading-relaxed text-fg-faint">
+              Dev only: posts to a rate-limited API with spam protection. Set SMTP + MongoDB in{" "}
+              <code>.env.local</code> to enable delivery and the leads pipeline; falls back to the
+              visitor&apos;s mail client otherwise.
+            </p>
+          )}
           <p className="font-mono text-[0.65rem] leading-relaxed text-fg-faint">
-            Posts to a rate-limited API with spam protection. Set SMTP + MongoDB in{" "}
-            <code>.env</code> to enable delivery &amp; the leads pipeline; falls back to your
-            mail client otherwise.
+            Your details are used to reply to you and nothing else — see the{" "}
+            <Link href="/privacy-policy" className="underline underline-offset-2 hover:text-fg">
+              privacy policy
+            </Link>
+            .
           </p>
         </motion.form>
       </div>

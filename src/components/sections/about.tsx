@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Reveal } from "@/components/ux/reveal";
 import { facts, site } from "@/lib/site";
 
@@ -28,19 +27,24 @@ export function About({ paragraphs }: { paragraphs: string[] }) {
         <div>
           <div className="brackets md:sticky md:top-28">
             <div className="group relative aspect-[4/5] overflow-hidden border border-border">
-              <Image
-                src="/personal/portrait-02.webp"
-                alt={`${site.name} — portrait`}
-                fill
-                sizes="(max-width: 768px) 100vw, 40vw"
-                className="img-duotone object-cover transition-all duration-700 group-hover:scale-[1.03]"
+              {/* eslint-disable-next-line @next/next/no-img-element -- stable,
+                  name-carrying /images/… path is the point; next/image rewrites it to
+                  /_next/image?url=… which carries no filename signal for image search. */}
+              <img
+                src={site.images.portrait}
+                alt={site.images.alt}
+                width={576}
+                height={1024}
+                loading="lazy"
+                decoding="async"
+                className="img-duotone absolute inset-0 h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.03]"
               />
               <div className="tint-accent absolute inset-0 opacity-30 transition-opacity duration-700 group-hover:opacity-0" />
               <div className="scanlines pointer-events-none absolute inset-0 opacity-60" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/80 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 flex items-center justify-between p-4">
                 <span className="hud hud-accent">{site.name}</span>
-                <span className="hud">IND · 26°N</span>
+                <span className="hud">{site.address.locality} · IND</span>
               </div>
             </div>
           </div>

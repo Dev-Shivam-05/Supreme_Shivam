@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { UAParser } from "ua-parser-js";
 import { dbConnect } from "@/lib/db";
@@ -5,6 +6,22 @@ import { Event } from "@/models/event";
 import { rateLimit } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
+
+/**
+ * A session identifier that never touches the visitor's device.
+ *
+ * sha256(salt | UTC date | ip | user-agent), truncated. The raw IP is never
+ * stored — only this digest is — and the date component rotates it at UTC
+ * midnight, so yesterday's id cannot be joined to today's. That makes it a
+ * per-day visitor counter rather than a tracker, which is what lets the site
+ * run without a consent banner. Set ANALYTICS_SALT to a long random string in
+ * production so the digest cannot be brute-forced back to an IP.
+ */
+function dailySessionId(ip: string, ua: string) {
+  const salt = process.env.ANALYTICS_SALT || "sb-portfolio";
+  const day = new Date().toISOString().slice(0, 10);
+  return createHash("sha256").update(`${salt}|${day}|${ip}|${ua}`).digest("hex").slice(0, 32);
+}
 
 /** Analytics beacon. Never throws to the client — always returns 204. */
 export async function POST(req: NextRequest) {
@@ -22,6 +39,7 @@ export async function POST(req: NextRequest) {
 
     const ua = req.headers.get("user-agent") || "";
     const parsed = new UAParser(ua).getResult();
+    const sessionId = dailySessionId(ip, ua);
     const referrer = String(body.referrer || "");
     let referrerHost = "direct";
     try {
@@ -42,7 +60,7 @@ export async function POST(req: NextRequest) {
       device: parsed.device?.type || "desktop",
       browser: parsed.browser?.name || "",
       os: parsed.os?.name || "",
-      sessionId: String(body.sessionId || "").slice(0, 64),
+      sessionId,
     });
   } catch (err) {
     console.error("[collect] ignored:", (err as Error).message);

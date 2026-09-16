@@ -32,6 +32,7 @@ function Linkedin({ className }: { className?: string }) {
 }
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { EMAIL_MASKED, emailAddress, emailHref } from "@/lib/email";
 import { nav, site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -87,10 +88,10 @@ export function CommandPalette() {
       {
         id: "copy-email",
         label: "Copy email address",
-        hint: site.email,
+        hint: EMAIL_MASKED,
         icon: <Copy className="h-4 w-4" />,
         run: () => {
-          navigator.clipboard?.writeText(site.email);
+          navigator.clipboard?.writeText(emailAddress());
           close();
         },
       },
@@ -111,7 +112,7 @@ export function CommandPalette() {
         id: "email",
         label: "Send an email",
         icon: <Mail className="h-4 w-4" />,
-        run: open_(site.social.email),
+        run: open_(emailHref()),
       },
       {
         id: "theme",

@@ -1,43 +1,115 @@
 /**
  * Single source of truth for portfolio content.
  * Dynamic parts (projects, leads, analytics) live in MongoDB; this is the
- * typed editorial seed. Swap the placeholder `picsum.photos` images for your
- * own files in /public when you have them.
+ * typed editorial seed.
+ *
+ * IDENTITY RULE: one job title, one company, one city — everywhere. Google
+ * reconciles a person across sites; three different titles for one name weakens
+ * all three. Anything user-visible that names the role must read from `site`.
  */
+
+/**
+ * The canonical origin. Set NEXT_PUBLIC_SITE_URL in Vercel the day the
+ * exact-match domain is live (shivambhadoriya.com); until then the vercel.app
+ * host stays canonical so nothing 301s into a domain that doesn't resolve.
+ * Everything downstream — metadata, canonicals, JSON-LD, sitemap, robots and
+ * the host redirect in next.config.ts — derives from this one value.
+ */
+const CANONICAL_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://shivam-bhadoriya-dev.vercel.app")
+  .trim()
+  .replace(/\/+$/, "");
 
 export const site = {
   name: "Shivam Bhadoriya",
+  firstName: "Shivam",
+  lastName: "Bhadoriya",
   handle: "Dev-Shivam-05",
-  role: "Full-Stack Developer",
-  roleLong: "Full-Stack Engineer — MERN, realtime systems & performance",
-  location: "India",
+  role: "AI Engineer",
+  roleLong: "AI Engineer — I write the spec, direct the agents, and review and test what they build.",
+  company: "Aaziko Global LLP",
+  /**
+   * ONE city, everywhere. DEV-HANDOVER settles it as Navsari — the local search
+   * strategy (the /hire pages, the Google Business Profile service area) is built
+   * on it. GitHub currently says Ahmedabad and must be changed to match; three
+   * cities across public profiles is what weakens the entity.
+   */
+  location: "Navsari, Gujarat",
+  address: { locality: "Navsari", region: "Gujarat", country: "IN" },
+  latitude: "20.9°N",
+  /** Cities and regions the service pages and the Business Profile claim. */
+  areaServed: ["Navsari", "Surat"],
   availability: "Open to full-time & freelance",
   status: "Available now",
-  email: "shivambhadoriya1605@gmail.com",
-  url: "https://shivam-bhadoriya-dev.vercel.app",
+  email: "contact@shivambhadoriya.com",
+  /**
+   * Public phone. E.164 for schema and tel: links, spaced for display.
+   * Consumers still guard on a value, so clearing it removes the number
+   * everywhere rather than rendering a blank.
+   */
+  phone: "+919106988376",
+  phoneDisplay: "+91 91069 88376",
+  university: "Vidhyadeep University",
+  url: CANONICAL_URL,
+  /** The page <title> and the OG/Twitter title. 30 chars — never truncated. */
+  title: "Shivam Bhadoriya — AI Engineer",
+  /** The meta description. 149 chars — inside Google's ~160 char render budget. */
   tagline:
-    "I build fast, observable, production-grade web systems — and the interfaces that make them feel effortless.",
+    "AI Engineer in Navsari, Gujarat. I write the spec, direct the coding agents, and review and test what they build. Web, mobile and automation projects.",
+  /** The short form used on social cards, where space is tighter. */
+  taglineShort: "I write the spec, direct the coding agents, and review and test what they build.",
+  /** Starting price quoted on every service page. Clients filter on this. */
+  rateFrom: "₹30,000",
+  /**
+   * Stable, human-readable image paths. The filename is a ranking input for
+   * Google image search and these exact strings appear in the JSON-LD and the
+   * image sitemap — regenerate with `npm run images`, never rename.
+   */
+  images: {
+    /** Square, ring intact. The ONE avatar — also upload this to LinkedIn, GitHub and X. */
+    avatar: "/images/shivam-bhadoriya-ai-engineer.jpg",
+    /** The full photograph, used in the hero and on /about. */
+    portrait: "/images/shivam-bhadoriya-portrait.jpg",
+    /** 1200x630 link-preview card, built from the profile photograph. */
+    og: "/og/shivam-bhadoriya.jpg",
+    /** Used verbatim as alt text on every instance of his face. */
+    alt: "Shivam Bhadoriya, AI Engineer at Aaziko Global LLP, Navsari",
+  },
   social: {
     github: "https://github.com/Dev-Shivam-05",
-    linkedin: "https://linkedin.com/in/shivam-bhadoriya-dev",
-    email: "mailto:shivambhadoriya1605@gmail.com",
+    linkedin: "https://www.linkedin.com/in/shivam-bhadoriya-dev/",
+    x: "https://x.com/Dev_Shivam_05",
+    xHandle: "@Dev_Shivam_05",
+    // The username really is `__https_shivu` — it reads like a signup accident,
+    // but it resolves, and DEV-HANDOVER lists it in sameAs.
+    wakatime: "https://wakatime.com/@__https_shivu",
+    instagram: "https://www.instagram.com/__https.shivu",
+    email: "mailto:contact@shivambhadoriya.com",
   },
 } as const;
 
 export const nav = [
-  { label: "Work", href: "/work", index: "01" },
-  { label: "About", href: "/about", index: "02" },
-  { label: "Stack", href: "/stack", index: "03" },
-  { label: "Lab", href: "/lab", index: "04" },
-  { label: "Contact", href: "/contact", index: "05" },
+  { label: "Services", href: "/services", index: "01" },
+  { label: "Work", href: "/work", index: "02" },
+  { label: "About", href: "/about", index: "03" },
+  { label: "Writing", href: "/writing", index: "04" },
+  { label: "Stack", href: "/stack", index: "05" },
+  { label: "Contact", href: "/contact", index: "06" },
+] as const;
+
+/** Reachable and in the sitemap, just not in the top bar. */
+export const secondaryNav = [
+  { label: "Lab", href: "/lab" },
+  { label: "Live stats", href: "/stats" },
+  { label: "Privacy", href: "/privacy-policy" },
+  { label: "Terms", href: "/terms" },
 ] as const;
 
 export type Stat = { value: string; label: string; sub?: string };
 
 export const stats: Stat[] = [
-  { value: "3", label: "Shipped products", sub: "live & maintained" },
-  { value: "40+", label: "REST endpoints", sub: "authored & documented" },
-  { value: "70%", label: "Faster queries", sub: "indexing + aggregation" },
+  { value: "99.77%", label: "Of my line changes", sub: "written by AI, Aug 2026" },
+  { value: "0%", label: "The same figure", sub: "in October 2025" },
+  { value: "Daily", label: "Unattended publishes", sub: "AI-PULSE, on CI" },
   { value: "98", label: "Lighthouse", sub: "performance budget" },
 ];
 
@@ -45,8 +117,8 @@ export const stats: Stat[] = [
 export const signatureText = "S.D.Bhadoriya";
 
 export const now = {
-  building: "An observable, self-instrumenting portfolio engine",
-  learning: "Advanced Next.js, Docker & distributed systems",
+  building: "AI-PULSE — a YouTube channel that publishes itself, daily",
+  learning: "Agent orchestration, evals and spec-driven delivery",
   status: "Available for full-time & freelance",
 } as const;
 
@@ -61,6 +133,41 @@ export type SiteContent = {
   now: { building: string; learning: string; status: string };
   location: string;
   email: string;
+};
+
+/**
+ * The editable content with the address removed.
+ *
+ * Anything handed to a client component is serialised into the RSC flight
+ * payload inside the HTML, where an address harvester reads it just as easily as
+ * a `mailto:` href. Public surfaces take this type; only the admin sees the address.
+ */
+export type PublicContent = Omit<SiteContent, "email">;
+
+/**
+ * The editable content, before any admin overrides.
+ *
+ * Lives here rather than in content.ts so that scripts/seed.mjs can import it
+ * without dragging in mongoose and the "@/" path alias. One source of truth for
+ * the app, the admin and the seed.
+ */
+export const contentDefaults: SiteContent = {
+  availability: site.availability,
+  status: site.status,
+  roleLong: site.roleLong,
+  tagline: site.tagline,
+  heroLead:
+    `I'm ${site.name} — an ${site.role} at ${site.company}, in ${site.address.locality}. In August 2026, AI made 99.77% of my line changes. In October 2025 it made 0%. What I do with the hours I no longer spend typing: specs, architecture, tests and reviews.`,
+  aboutParagraphs: [
+    `I'm ${site.name}, an ${site.role} at ${site.company}, based in ${site.address.locality}, ${site.address.region}. My job title changed in 2026, and so did the work behind it. I write the specification, direct the coding agents that implement it, and review and test what comes back. The judgement calls — what to build, how it should be shaped, whether the result is actually correct — stayed with me. The typing did not.`,
+    "The clearest way to describe the shift is with one number. In October 2025, AI wrote 0% of the lines I changed. In August 2026, it wrote 99.77% of them. Nothing about that makes the engineering easier; it moves where the engineering happens. A vague ticket used to produce slow code. Now it produces confident, well-formatted, wrong code — much faster. So the specification stopped being paperwork and became the actual deliverable.",
+    "What that looks like day to day: I write down the exact behaviour, the field names, the status values and the acceptance criteria before anything is generated. I keep the work in phases small enough to review properly. I read every diff. I write the tests myself, or I make sure the agent's tests fail for the right reasons before I trust them. When a path is going wrong, I stop and rewind rather than argue the build forward. Most of my value now sits in the review, and in knowing which 0.23% of the lines had to be mine.",
+    "I did not start here. Before this I shipped full-stack MERN products end-to-end — production Express and MongoDB backends with JWT auth, rate limiting, realtime sockets and structured logging, behind React front ends built to a performance budget. The habits came from there: 70% faster queries through indexing and aggregation, roughly 60% less bandwidth through caching, 98 Lighthouse. Numbers settle arguments that opinions cannot, and that has not changed just because something else is writing the lines.",
+    `I studied B.Sc. Information Technology at ${site.university}, and won a pair of inter-college technical competitions along the way. Outside the day job I run AI-PULSE — a YouTube channel that publishes itself, one video and one Short about a trending AI tool every day, entirely on GitHub Actions with no server and no bill. This site is the other proof: a Next.js front end, a MongoDB-backed API, a self-built analytics pipeline and an admin dashboard, all designed and engineered end-to-end and all inspectable from the outside.`,
+  ],
+  now: { ...now },
+  location: site.location,
+  email: site.email,
 };
 
 export type CoverPattern = "grid" | "wave" | "nodes" | "scan" | "orbit";
@@ -83,6 +190,8 @@ export type Project = {
   outcomes: string[];
   pattern: CoverPattern; // coded cover motif (no stock photos)
   flagship?: boolean;
+  /** Kept in the archive and still has a case study, but never shown as featured. */
+  archived?: boolean;
   imageUrl?: string; // optional uploaded image (overrides the coded motif)
   repo?: string;
   live?: string;
@@ -90,15 +199,56 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    slug: "cgpe-connect",
+    slug: "ai-pulse",
     index: "01",
+    title: "AI-PULSE",
+    category: "Flagship · Autonomous Pipeline",
+    year: "2026",
+    role: "Solo — pipeline design + delivery",
+    timeline: "2026 · running daily",
+    summary:
+      "A YouTube channel that publishes itself: one video and one Short about a trending AI tool, every day, unattended — on GitHub Actions at zero infrastructure cost.",
+    description:
+      "An unattended content pipeline in Python. A scheduled GitHub Actions workflow picks the AI tool trending that day, researches it with Playwright, narrates it with text-to-speech, cuts a long-form video and a Short with FFmpeg, and publishes both through the YouTube Data API. It also builds a cheat-sheet PDF onto GitHub Pages and announces each video on Telegram and X. There is no server and no cron box — the whole thing runs inside CI minutes, and pytest gates every run.",
+    stack: ["Python", "GitHub Actions", "FFmpeg", "Playwright", "Text-to-speech", "YouTube Data API", "pytest"],
+    metrics: [
+      { value: "Daily", label: "Unattended publishes" },
+      { value: "$0", label: "Infrastructure cost" },
+      { value: "CI", label: "Tested every run" },
+    ],
+    problem:
+      "Publishing daily is a discipline problem, not a creative one. Doing it by hand costs an hour a day; doing it on a server costs money and babysitting.",
+    approach: [
+      "Moved the whole pipeline into scheduled GitHub Actions — no server, no cron box, no bill.",
+      "Made one run produce both formats: a long-form video and a Short, from the same source material.",
+      "Put tests in CI so a broken run fails loudly instead of publishing something wrong.",
+    ],
+    architecture: [
+      "Three GitHub Actions workflows · publish, notify, test",
+      "Playwright research → TTS narration → FFmpeg cut",
+      "YouTube Data API upload · cheat-sheet PDF to GitHub Pages",
+      "pytest in CI gates the publish step · Telegram + X announce",
+    ],
+    outcomes: [
+      "Publishes a video and a Short every day without a human in the loop",
+      "Zero infrastructure cost — it runs entirely inside CI minutes",
+      "Failures surface as red CI runs, not as bad uploads",
+    ],
+    pattern: "orbit",
+    flagship: true,
+    repo: "https://github.com/Dev-Shivam-05/AI-PULSE",
+    live: "https://dev-shivam-05.github.io/AI-PULSE/",
+  },
+  {
+    slug: "cgpe-connect",
+    index: "02",
     title: "CGPE Connect",
     category: "Flagship · Ops Platform",
     year: "2025",
     role: "Full-stack lead",
     timeline: "2024 — 2025",
     summary:
-      "A production operations platform — realtime dashboards, document vaults and role-based workflows for agents and admins.",
+      "Replaced spreadsheet-and-email operations with realtime, role-separated workflows — live dashboards, an S3 document vault and an audit trail behind every action.",
     description:
       "A MERN platform handling policies, claims and agent workflows. Socket.io powers live dashboards; documents live in AWS S3 behind signed URLs; Twilio and email drive notifications; JWT + RBAC gate every route, with rate-limiting, request sanitisation and Winston structured logging throughout.",
     stack: ["React", "TypeScript", "Node/Express", "MongoDB", "Socket.io", "AWS S3", "Twilio", "JWT"],
@@ -131,14 +281,14 @@ export const projects: Project[] = [
   },
   {
     slug: "observable-machine",
-    index: "02",
+    index: "03",
     title: "The Observable Machine",
     category: "Meta · This Site",
     year: "2026",
     role: "Design + full-stack",
     timeline: "2026",
     summary:
-      "The site you're on — a portfolio built as a live, self-instrumenting system you can inspect.",
+      "The site you are reading — a portfolio that instruments itself: its own analytics pipeline, a public /stats page and an admin, all inspectable.",
     description:
       "A Next.js 16 + React 19 front end with a WebGL hero, GSAP/Lenis motion and a ⌘K palette, over a MongoDB backend: a self-built analytics pipeline (beacon → API → rollups) feeding a public /stats page and an env-gated admin with a leads pipeline.",
     stack: ["Next.js 16", "React 19", "TypeScript", "MongoDB", "Three / R3F", "GSAP"],
@@ -169,43 +319,6 @@ export const projects: Project[] = [
     live: "/stats",
   },
   {
-    slug: "contribution-art",
-    index: "03",
-    title: "Contribution Art Engine",
-    category: "Open Source · Tooling",
-    year: "2025",
-    role: "Solo — full-stack",
-    timeline: "2025 · ongoing",
-    summary:
-      "A generator that paints custom patterns onto a GitHub contribution graph via a scheduled commit engine.",
-    description:
-      "A full-stack tool that turns a design grid into a real contribution graph. A versioned MongoDB schema stores pattern templates; an Express job engine triggers backdated commit workflows in under two minutes.",
-    stack: ["Node.js", "Express", "MongoDB", "REST API", "SVG"],
-    metrics: [
-      { value: "<2min", label: "Trigger time" },
-      { value: "Versioned", label: "Pattern schema" },
-      { value: "OSS", label: "Public repo" },
-    ],
-    problem:
-      "Contribution-graph art tools were manual, brittle and slow — no reusable templates, no fast way to trigger the workflow.",
-    approach: [
-      "Modelled patterns as a versioned MongoDB schema so templates are reusable and diffable.",
-      "Built an Express job engine that maps a grid to backdated commit workflows.",
-      "Reduced end-to-end trigger time to under two minutes.",
-    ],
-    architecture: [
-      "Express REST API · pattern + job services",
-      "MongoDB (Mongoose) with schema versioning",
-      "SVG grid → commit-workflow translator",
-    ],
-    outcomes: [
-      "Sub-2-minute trigger for complex patterns",
-      "Reusable, versioned template library",
-      "Open-sourced with a small active user base",
-    ],
-    pattern: "grid",
-  },
-  {
     slug: "jsclimatenow",
     index: "04",
     title: "JSClimateNow",
@@ -214,7 +327,7 @@ export const projects: Project[] = [
     role: "Solo — front-end + perf",
     timeline: "2025",
     summary:
-      "A performance-obsessed weather client with intelligent caching and an offline-first fallback.",
+      "98/100 Lighthouse and ~60% less bandwidth — a weather client with a request-throttling cache and an offline-first fallback.",
     description:
       "A feature-rich weather app scoring 98/100 Lighthouse. A request-throttling cache cut bandwidth ~60%, with multi-location comparison, custom data visualisations and a localStorage offline mode.",
     stack: ["JavaScript ES6+", "OpenWeather API", "LocalStorage", "Vite"],
@@ -251,7 +364,7 @@ export const projects: Project[] = [
     role: "Solo — front-end",
     timeline: "2025",
     summary:
-      "A full CRUD recipe platform with instant client-side search and filtering across a responsive grid.",
+      "Sub-40ms client-side search across a full CRUD recipe library, responsive from mobile to widescreen across five breakpoints.",
     description:
       "Create, edit and organise unlimited recipes with sub-40ms search and multi-facet filtering. Responsive across five breakpoints with a clean, componentised front end.",
     stack: ["HTML", "CSS", "Bootstrap", "JavaScript", "Vercel"],
@@ -278,6 +391,44 @@ export const projects: Project[] = [
       "Responsive from mobile to widescreen",
     ],
     pattern: "orbit",
+  },
+  {
+    slug: "contribution-art",
+    index: "06",
+    title: "Contribution Art Engine",
+    category: "Archived · Tooling",
+    year: "2025",
+    role: "Solo — full-stack",
+    timeline: "2025 · ongoing",
+    summary:
+      "An archived experiment: a generator that painted patterns onto a GitHub contribution graph via a scheduled commit engine.",
+    description:
+      "A full-stack tool that turns a design grid into a real contribution graph. A versioned MongoDB schema stores pattern templates; an Express job engine triggers backdated commit workflows in under two minutes.",
+    stack: ["Node.js", "Express", "MongoDB", "REST API", "SVG"],
+    metrics: [
+      { value: "<2min", label: "Trigger time" },
+      { value: "Versioned", label: "Pattern schema" },
+      { value: "OSS", label: "Public repo" },
+    ],
+    problem:
+      "Contribution-graph art tools were manual, brittle and slow — no reusable templates, no fast way to trigger the workflow.",
+    approach: [
+      "Modelled patterns as a versioned MongoDB schema so templates are reusable and diffable.",
+      "Built an Express job engine that maps a grid to backdated commit workflows.",
+      "Reduced end-to-end trigger time to under two minutes.",
+    ],
+    architecture: [
+      "Express REST API · pattern + job services",
+      "MongoDB (Mongoose) with schema versioning",
+      "SVG grid → commit-workflow translator",
+    ],
+    outcomes: [
+      "Sub-2-minute trigger for complex patterns",
+      "Reusable, versioned template library",
+      "Open-sourced with a small active user base",
+    ],
+    pattern: "grid",
+    archived: true,
   },
 ];
 
@@ -331,8 +482,8 @@ export const approach: Approach[] = [
     body: "This very site runs a self-built analytics pipeline. If it moves, I want to measure it.",
   },
   {
-    title: "Relentlessly consistent",
-    body: "A long GitHub streak isn't the point — showing up and shipping every day is. Discipline compounds.",
+    title: "The spec is the work",
+    body: "Agents write most of my lines now. What decides whether the result is any good is the specification they were given, and the review and tests that came after.",
   },
 ];
 
@@ -365,7 +516,8 @@ export const services: Service[] = [
 ];
 
 export type Step = { n: string; title: string; body: string };
-export const process: Step[] = [
+/** Named `processSteps`, not `process` — the bare name shadows the Node global. */
+export const processSteps: Step[] = [
   { n: "01", title: "Scope", body: "Understand the problem, the constraints and what 'done' actually means before writing code." },
   { n: "02", title: "Architect", body: "Model the data, design the API surface, decide the trade-offs — on paper first." },
   { n: "03", title: "Build", body: "Ship in vertical slices with types, validation and tests at every boundary." },
@@ -375,10 +527,16 @@ export const process: Step[] = [
 export type TimelineItem = { period: string; title: string; org: string; body: string };
 export const timeline: TimelineItem[] = [
   {
-    period: "2024 — now",
+    period: "2026 — now",
+    title: "AI Engineer",
+    org: "Aaziko Global LLP",
+    body: "I write the spec, direct the coding agents, and review and test what they build. In August 2026 agents made 99.77% of my line changes; in October 2025 they made none. The hours that used to go into typing now go into specification, architecture, tests and review.",
+  },
+  {
+    period: "2024 — 2026",
     title: "Full-Stack Developer",
     org: "Freelance & open source",
-    body: "Shipping MERN products end-to-end, contributing to open source, and going deep on Next.js, realtime and systems design.",
+    body: "Shipped MERN products end-to-end — Express/MongoDB backends with JWT auth, rate limiting and realtime sockets, behind React front-ends built to a performance budget.",
   },
   {
     period: "2024",
@@ -389,7 +547,7 @@ export const timeline: TimelineItem[] = [
   {
     period: "2023 — 2026",
     title: "B.Sc. Information Technology",
-    org: "VidhyaDeep University",
+    org: site.university,
     body: "Computer science fundamentals alongside a relentless self-taught build cadence and a long GitHub streak.",
   },
 ];
@@ -404,15 +562,19 @@ export const values = [
 export const faqs = [
   {
     q: "Are you available right now?",
-    a: "Yes — open to full-time roles, internships and freelance projects. I reply to enquiries within 24 hours.",
+    a: "Yes — open to full-time roles and freelance projects alongside my work at Aaziko Global LLP. I reply to enquiries within 24 hours.",
+  },
+  {
+    q: "What does an AI Engineer actually do here?",
+    a: "I write the spec, direct the coding agents, and review and test what they build. The judgement calls — what to build, how it should be shaped, whether the result is correct — stay with me; the typing does not.",
   },
   {
     q: "What's your core stack?",
-    a: "MERN — MongoDB, Express, React, Node — with TypeScript, Next.js, and realtime via Socket.io. Comfortable across the whole slice.",
+    a: "TypeScript, Next.js and React on the front, Node/Express and MongoDB behind, with AI coding agents driving the implementation under a written spec and a test suite.",
   },
   {
     q: "Do you work remotely?",
-    a: "Always. I'm based in India and collaborate with teams across time zones, async-first.",
+    a: "Always. I'm based in Navsari, Gujarat — an hour from Surat — and collaborate with teams across time zones, async-first.",
   },
   {
     q: "Can you handle both design and engineering?",
@@ -421,8 +583,8 @@ export const faqs = [
 ];
 
 export const facts = [
-  { k: "Education", v: "B.Sc. IT · VidhyaDeep University" },
-  { k: "Based in", v: "India · Open to remote" },
-  { k: "Focus", v: "MERN · Realtime · Performance" },
-  { k: "Currently", v: "Deep on Next.js, Docker & systems design" },
+  { k: "Role", v: `${site.role} · ${site.company}` },
+  { k: "Based in", v: "Navsari, Gujarat · Open to remote" },
+  { k: "Education", v: `B.Sc. Information Technology · ${site.university}` },
+  { k: "Focus", v: "Spec-driven delivery · AI coding agents · Review & tests" },
 ] as const;

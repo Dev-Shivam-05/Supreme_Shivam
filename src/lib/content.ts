@@ -1,32 +1,19 @@
 import { dbConnect } from "./db";
 import { Project as ProjectModel } from "@/models/project";
 import { Setting } from "@/models/setting";
-import { projects as staticProjects, site, type Project, type SiteContent } from "./site";
+import { contentDefaults, projects as staticProjects, type Project, type PublicContent, type SiteContent } from "./site";
 
 /* ---------------- editable site content (text/images) ---------------- */
 
-export type { SiteContent };
+export type { PublicContent, SiteContent };
 
-export const contentDefaults: SiteContent = {
-  availability: site.availability,
-  status: site.status,
-  roleLong: site.roleLong,
-  tagline: site.tagline,
-  heroLead:
-    "I build fast, observable, production-grade web systems — realtime, indexed, engineered to be inspected — and the interfaces that make them feel effortless.",
-  aboutParagraphs: [
-    `I'm ${site.name.split(" ")[0]} — a full-stack developer who cares as much about the query plan as the pixel. My work spans production Express/MongoDB backends with JWT auth, rate limiting and realtime sockets, and React front-ends engineered for speed.`,
-    "I optimise for outcomes that hold up under inspection: 70% faster queries via indexing and aggregation, 60% less bandwidth through smart caching, 98 Lighthouse. Discipline over hype — I show up and ship, every day.",
-    "This site is the proof: a Next.js front end, a Mongo-backed API, a self-built analytics pipeline and an admin dashboard — all designed and engineered end-to-end.",
-  ],
-  now: {
-    building: "An observable, self-instrumenting portfolio engine",
-    learning: "Advanced Next.js, Docker & distributed systems",
-    status: "Available for full-time & freelance",
-  },
-  location: site.location,
-  email: site.email,
-};
+/** Drops the address before the content crosses into a client component. */
+export function toPublicContent(content: SiteContent): PublicContent {
+  const { email: _email, ...rest } = content;
+  return rest;
+}
+
+export { contentDefaults };
 
 export async function getSettings(): Promise<SiteContent> {
   const conn = await dbConnect();
@@ -65,6 +52,7 @@ function normalize(d: LeanProject): Project {
     outcomes: arr("outcomes"),
     pattern: (s("pattern") || "grid") as Project["pattern"],
     flagship: Boolean(d.flagship),
+    archived: Boolean(d.archived),
     imageUrl: s("imageUrl") || undefined,
     repo: s("repo") || undefined,
     live: s("live") || undefined,
