@@ -62,6 +62,11 @@ and Vercel all do; that is how the domain migration was done, with no password i
 conversation and every change auditable. `scripts/browser.mjs` is the fallback for consoles with
 no API (Search Console, Bing, Business Profile), not the first move.
 
+**Never automate LinkedIn or Instagram.** LinkedIn loads a PerimeterX anti-scraping frame and
+hung the CDP session within three page loads (2026-09-16); pushing on risks a restriction on
+Shivam's own account. Profile edits there are done by hand. GitHub profile fields have an API:
+`gh api user` to read, `gh api -X PATCH user -f blog=... -f location=...` to write.
+
 ## Windows / shell
 
 - **Node resolves `/tmp` as `D:\tmp`** while Git Bash treats it as the Git-Bash root. They are
