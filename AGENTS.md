@@ -46,6 +46,14 @@ It verifies the **old** `shivam-bhadoriya-dev.vercel.app` Search Console propert
 redirect. A redesign once deleted it as dead weight, which put the Change of Address tool out of
 reach after the domain move. Keep it for as long as the old host redirects.
 
+## Search Console / Bing automation
+
+`node scripts/cdp.mjs start` opens a Chrome Shivam signs into; `run <step.mjs>` drives it.
+Search Console buttons are uppercased with CSS, so match `/^request indexing$/i`, never the
+visible caps. Its comboboxes ignore locator clicks — click by position, then pick the option.
+Change of Address can say "Couldn't fetch the page" for a while after a deploy; retry before
+debugging the redirect.
+
 ## Infrastructure: reach for the API and a scoped token first
 
 Before either refusing an infra task or reaching for browser automation, check whether the
@@ -64,6 +72,9 @@ no API (Search Console, Bing, Business Profile), not the first move.
   `Get-NetTCPConnection -LocalPort <p> | Stop-Process`. A stale server keeps serving an old
   `.next` and returns **HTTP 500 for the CSS chunk** after a rebuild — the page renders unstyled
   and it looks like a CSS bug. Restart on a fresh port when in doubt.
+- **`curl -w "...
+"` in Git Bash** prints `/n`, which reads like a double-slash redirect.
+  Use single quotes for `-w` formats.
 - **Local DNS caching lies during a migration.** `curl` can hit the old IP long after the
   authoritative record has changed. Check with `nslookup <host> 1.1.1.1` and the authoritative
   nameserver before believing a failure, and `ipconfig /flushdns` between tests.

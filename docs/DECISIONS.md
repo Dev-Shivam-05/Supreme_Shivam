@@ -97,3 +97,10 @@ needs that property verified. Search Console follows redirects for meta-tag veri
 for HTML files), so the tag is served on the new site and reaches Google through the redirect.
 Legacy and www redirects now send an explicit 301 instead of Next's default 308, since the
 Change of Address check is documented against 301.
+
+## 2026-09-16 — Console automation drives a hand-signed-in Chrome over CDP
+
+Google sign-in refuses Playwright-launched Chrome. `scripts/cdp.mjs start` opens plain Chrome
+with a localhost-only debugging port and its own profile; Shivam signs in and approves every
+OAuth consent personally, then the script attaches. Used to confirm the Google Change of Address
+and set up Bing Webmaster Tools. Final confirm buttons are clicked only for steps Shivam asked for.

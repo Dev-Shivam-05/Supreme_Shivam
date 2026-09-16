@@ -2,9 +2,9 @@
 
 ## Now
 
-**Phase 3g — search visibility after the domain move.** Code fix is committed (`98ff772`) but
-**not deployed**. Shivam: `vercel --prod`, `npm run verify:domain`, then DOMAIN-SETUP Step 5b
-(Change of Address from the old vercel.app property). Then wait 2–4 weeks.
+**Phase 3g — search visibility after the domain move.** Deployed; Google Change of Address
+confirmed 2026-09-16; indexing requested; Bing set up. Left: Bing Site Move after Bing finishes
+processing (after 2026-09-18). Then watch Search Console for 2–6 weeks.
 **Deadline alongside it:** Hostinger email trial ends 2026-10-14 (Phase 3e).
 
 ## Next 3
@@ -27,7 +27,7 @@
 | 3d | Database | **Done** — 2026-09-14 | Dedicated `shivambhadoriya` database on Atlas. `projects` + `settings` seeded from lib/site.ts. Live `/api/stats` reports `configured: true`. |
 | 3e | Mailbox + SMTP | **Open — decision, deadline 2026-10-14** | Inbound **is** working (verified 2026-09-15: MX → Hostinger, SPF intact, message delivered). Hostinger email trial expires 2026-10-14. Renew vs Cloudflare Email Routing is Shivam's call; SMTP follows it. |
 | 3f | Off-site entity signals | **Open — highest priority for ranking** | On-site SEO verified clean. `sameAs` claims five profiles, none link back. Add shivambhadoriya.com to the website field on LinkedIn, GitHub, X and Instagram; fix GitHub location Ahmedabad → Navsari. Manual, free, off-repo. |
-| 3g | Search visibility after the move | **Code done, deploy + manual pending** — 2026-09-16 | Old vercel.app GSC verification tag restored (redesign had dropped it); redirects now 301. Needs `vercel --prod` and Change of Address (DOMAIN-SETUP 5b). |
+| 3g | Search visibility after the move | **Nearly done** — 2026-09-16 | Verification tag restored, 301s live, Google Change of Address confirmed, 10 URLs requested, Bing imported + sitemap. Bing Site Move pending Bing's 48h processing. |
 | 4 | Above-the-fold performance | **Not started** | Deliberately not absorbed. Detail below. |
 | 5 | Confirm unverified facts | **Done** — 2026-09-14 | Phone, timelines, app confidentiality, Instagram and the real AI-PULSE stack (read from the GitHub API, not guessed) are all in the code. |
 
