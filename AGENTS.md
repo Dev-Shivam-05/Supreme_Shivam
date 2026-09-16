@@ -40,6 +40,12 @@ that trims the bottom to ~792px, so anything starting below that never fires and
 anything in the first viewport use the CSS-only `.hero-fade` with an `animationDelay`, the way
 the hero does.
 
+## The `google-site-verification` tag in `layout.tsx` is load-bearing
+
+It verifies the **old** `shivam-bhadoriya-dev.vercel.app` Search Console property, through the
+redirect. A redesign once deleted it as dead weight, which put the Change of Address tool out of
+reach after the domain move. Keep it for as long as the old host redirects.
+
 ## Infrastructure: reach for the API and a scoped token first
 
 Before either refusing an infra task or reaching for browser automation, check whether the

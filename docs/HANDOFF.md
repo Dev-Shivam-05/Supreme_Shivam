@@ -1,98 +1,60 @@
-# HANDOFF — Supreme_Shivam — Phase 3 (domain, database, admin) — 2026-09-14
+# HANDOFF — Supreme_Shivam — Phase 3g (search visibility after the domain move) — 2026-09-16
 
 ## Done
 
-- **https://shivambhadoriya.com serves the site over SSL.** `www` and the old
-  `shivam-bhadoriya-dev.vercel.app` host both 308 to the apex. `npm run verify:domain`
-  reports **29 passed, 1 warning, 0 failed**.
-- **DNS is correct and mail-safe.** Hostinger registration, Cloudflare nameservers,
-  `A @ → 76.76.21.21` and `CNAME www → cname.vercel-dns.com`, both proxy-off. MX, SPF and
-  DMARC untouched. Five DKIM/autoconfig CNAMEs that Cloudflare had imported *proxied* were
-  un-proxied — left as they were, DKIM would have failed and outbound mail would have
-  started landing in spam.
-- **Identity is one person everywhere.** AI Engineer at Aaziko Global LLP, Navsari, Gujarat.
-  Title, H1, H2, hero copy, `ProfilePage` → `Person` with five `sameAs` profiles, phone
-  `+91 91069 88376` on the `ProfessionalService` nodes.
-- **Five commercial pages live**, 1,223–1,421 words each, each with `ProfessionalService` +
-  `FAQPage` + `BreadcrumbList`, a ₹30,000 starting price and a real timeline.
-- **Database live.** Dedicated `shivambhadoriya` database on Atlas; `projects`, `settings`,
-  `leads`, `events`, `media`. `/api/stats` returns `configured: true`. A submitted enquiry is
-  stored and visible in the admin.
-- **Admin works at /admin** with two passwords, verified against the live domain
-  (both 200, wrong password 401).
-- **Indexing: IndexNow done** — all 26 URLs accepted, reaching Bing, Yandex, Seznam, Naver.
-  Google Search Console property is verified by Shivam.
+- **Audit: why "Shivam Bhadoriya" does not show shivambhadoriya.com yet.** The site itself is
+  clean on the live domain (checked 2026-09-16): apex 200, `www` and the old
+  `shivam-bhadoriya-dev.vercel.app` redirect to the apex path-for-path, `robots.txt` allows and
+  lists the sitemap, `<meta name="robots" content="index, follow, …">`, canonical
+  `https://shivambhadoriya.com`, title `Shivam Bhadoriya — AI Engineer`. Nothing blocks Google.
+- **The cause is the domain move, not a site defect.** The domain went live 2026-09-14, two days
+  before this audit. Google ranked the *vercel.app* URL for seven months; that URL now redirects,
+  and Google has to re-crawl, notice the move and transfer the ranking to a brand-new domain.
+  The earlier "indexed in 2–4 hours" was a Google-verified vercel.app property with the
+  `google-site-verification` tag on it.
+- **Found a real gap:** the redesign (commit `899c7f2`) removed that verification meta tag
+  (`FpMq1620…`). With the tag gone and the host redirecting, the old Search Console property is
+  at risk of losing verification — and without it the **Change of Address** tool cannot be used.
+- **Fixed in code, verified on a local production build** (`next start` on port 3917): the home
+  page serves `<meta name="google-site-verification" content="FpMq1620…"/>`; legacy host
+  `/about` → `301 https://shivambhadoriya.com/about`; `www` → `301`; apex → `200`.
+  Commit `98ff772`, pushed to `seo-ai-engineer-identity`.
+- **NOT deployed to production.** `vercel --prod` was blocked by the session's permission
+  classifier. The live site still sends 308 and has no verification tag until Shivam deploys.
 
 ## Files changed
 
-- `src/lib/site.ts` — single source of truth: identity, Navsari address, phone, rate,
-  `contentDefaults` (moved here so the seed can read it without mongoose), real AI-PULSE stack.
-- `src/lib/services.ts` — five service/hire pages with Shivam's own timelines.
-- `src/lib/legal.ts`, `src/app/privacy-policy/`, `src/app/terms/` — written from what the code
-  actually does, not a template.
-- `src/lib/writing.ts`, `src/app/writing/` — four posts, the text layer the site had none of.
-- `src/components/seo/json-ld.tsx` — Person/WebSite graph, ProfilePage with the Person node
-  embedded, ProfessionalService and FAQPage builders.
-- `src/lib/auth.ts`, `src/lib/env.ts` — `ADMIN_PASSWORDS` list, SHA-256 digest comparison.
-- `src/app/api/collect/route.ts`, `src/components/analytics/beacon.tsx` — cookieless analytics.
-- `src/models/lead.ts`, `src/app/api/contact/route.ts` — IP hashed not stored, 24-month TTL.
-- `scripts/build-images.mjs` — every derived image from the two source photographs.
-- `scripts/seed.mjs` — **rewritten** to import `src/lib/site.ts` instead of a stale duplicate.
-- `scripts/verify-domain.mjs`, `scripts/cloudflare-dns.mjs`, `scripts/indexnow.mjs`,
-  `scripts/cloudflare-email.mjs`, `scripts/browser.mjs` — the operational tooling.
-- `src/components/layout/nav.tsx` + `globals.css` — `.nav-panel`; the scrolled bar was 3.5%
-  white and page headings read straight through it.
+- `src/app/layout.tsx` — `metadata.verification.google` restores the old property's token, with
+  a comment saying why it must never be removed.
+- `next.config.ts` — legacy/www redirects use `statusCode: 301` instead of `permanent: true` (308).
+- `docs/DOMAIN-SETUP.md` — new Step 5b: the Change of Address procedure.
 
 ## Decisions made
 
-- **Navsari, not Ahmedabad.** DEV-HANDOVER is the command file and the whole local-SEO play is
-  built on Navsari + Surat. GitHub still says Ahmedabad and must be changed by hand.
-- **Scoped API tokens, never account passwords.** Cloudflare DNS was done over the API with a
-  `Zone:DNS:Edit` token; Vercel over its CLI after Shivam authenticated. Nothing was typed into
-  a dashboard by an agent and no password passed through the conversation.
-- **No cookie banner, because there is nothing to consent to.** The analytics session id moved
-  from `sessionStorage` to a server-side daily-rotating salted hash. Removing the requirement
-  beat satisfying it.
-- **Google indexing is not automated, deliberately.** Google is not an IndexNow participant and
-  its Indexing API is documented as JobPosting/BroadcastEvent only — using it for ordinary pages
-  violates the terms. Sitemap in robots.txt is the automatic route; Request Indexing is manual.
-- **Plain `<img>` on stable paths, not `next/image`,** for the three photographs. A
-  `/_next/image?url=…` URL carries no filename signal and changes between deploys.
+- **Restore the meta tag rather than exempt a verification file from the redirect.** Search
+  Console follows redirects for meta-tag verification but not for HTML-file verification, and
+  the tag's value is already known from git history. One line, no redirect exceptions.
+- **Explicit 301 over 308.** Google treats both as permanent; the Change of Address check is
+  documented as "301", so remove the doubt for free.
 
 ## Known broken / deliberately skipped
 
-- **CORRECTED 2026-09-15: `contact@shivambhadoriya.com` DOES receive mail.** The earlier entry
-  here was wrong. Verified live against 1.1.1.1: `MX 5 mx1.hostinger.com` / `MX 10
-  mx2.hostinger.com` and `v=spf1 include:_spf.mail.hostinger.com ~all` are both intact, and the
-  Hostinger webmail inbox has a delivered message. Cloudflare is the **nameserver only** — it
-  serves the Hostinger MX records, it does not intercept mail.
-  **The real deadline is billing, not DNS:** the mailbox is on a Hostinger email trial that ends
-  **2026-10-14**. Delivery stops then unless it is renewed or replaced.
-  **DO NOT run `scripts/cloudflare-email.mjs --apply` while the Hostinger mailbox is wanted** —
-  enabling Cloudflare Email Routing rewrites the MX records and would kill a mailbox that
-  currently works.
-- **SMTP is unset**, so the contact form stores the lead but sends no notification. Leads are
-  safe in the `leads` collection and visible in /admin.
-- **Mobile LCP is ~5.3s** against the brief's 2.5s target. It was ~5.1s before this work, so it
-  is pre-existing, not a regression. Ruled out the cold-open, the nav entrance and the portrait
-  preload. It is paint and compositing cost in the effects system. Phase 4.
-- **`.hud` fails WCAG AA** (`--fg-faint` on dark, ~3.2:1). A design-token decision, so it needs
-  Shivam's call.
-- **Two credentials are in the session transcript** and should be rotated: the Cloudflare API
-  token (printed to the terminal by mistake while debugging `.env.local`) and the Atlas password.
+- **Production deploy** — blocked by the permission classifier; Shivam must run it.
+- **Change of Address in Search Console** — manual, needs Shivam's Google account. DOMAIN-SETUP
+  Step 5b.
+- **Could not see Google's own results.** The web search tool here is not Google; it returned
+  other people named Shivam Bhadoriya and no result for either domain. Real state is only
+  visible in Search Console → URL Inspection / Performance.
+- Carried over, unchanged: **Hostinger email trial ends 2026-10-14** (Phase 3e); SMTP unset;
+  mobile LCP ~5.3s (Phase 4); `.hud` contrast; Cloudflare token + Atlas password to rotate;
+  `sameAs` profiles do not link back (Phase 3f). Do **not** run
+  `scripts/cloudflare-email.mjs --apply` while the Hostinger mailbox is wanted.
 
 ## Next session starts here
 
-- **Phase 3e is now a decision, not a build.** Inbound already works. Before 2026-10-14 Shivam
-  chooses: renew the Hostinger email plan (keeps send + receive, costs money), or migrate to
-  Cloudflare Email Routing (free, receive-only, rewrites MX). Only after that choice does the
-  SMTP half of the phase have a sender to configure.
-- **Phase 3f — off-site entity signals.** The technical SEO is clean (verified 2026-09-15:
-  `robots.txt` allows, `<meta name="robots" content="index, follow">`, canonical correct,
-  sitemap serving 26 URLs). What is missing is **reciprocal links**. `sameAs` lists five
-  profiles; none of the five link back to shivambhadoriya.com, so the claim is one-way and
-  Google will not merge the entity on it. Fix the profile website fields by hand.
-- **Watch out for:** `scripts/cloudflare-email.mjs --apply` rewrites the MX records. That is
-  destructive to the working Hostinger mailbox. Do not run it until the billing decision above
-  is made. The destination inbox also has to be verified by clicking a link Cloudflare emails —
-  forwarding silently does nothing until then.
+- Phase 3g finish: deploy, run Change of Address, request indexing for `/`, then watch Search
+  Console for 2–4 weeks before changing anything else.
+- First command: `vercel --prod` then `npm run verify:domain`
+- Watch out for: the Change of Address tool must be run **from the old vercel.app property**,
+  on the **same Google account** that owns `shivambhadoriya.com`. If the old property is not in
+  that account, add it as a URL-prefix property with the HTML-tag method — after the deploy.

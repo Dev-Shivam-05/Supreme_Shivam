@@ -171,6 +171,20 @@ https://shivambhadoriya.com/writing
 https://shivambhadoriya.com/work
 ```
 
+### Step 5b — Tell Google the site moved (Change of Address)
+
+Without this, Google has to work out on its own that `shivam-bhadoriya-dev.vercel.app` became
+`shivambhadoriya.com`, and the old URL's ranking transfers slowly. Requires the production deploy
+that carries the `google-site-verification` meta tag (commit `98ff772`).
+
+1. Search Console → property dropdown → confirm **`https://shivam-bhadoriya-dev.vercel.app/`**
+   is listed and verified, on the **same Google account** as the `shivambhadoriya.com` property.
+   If it is missing, add it as a **URL prefix** property and pick **HTML tag** — the tag is
+   already on the site, so Verify passes immediately.
+2. Open the **vercel.app** property → **Settings** → **Change of address**
+3. New site: `shivambhadoriya.com` → **Validate & update**. All checks must pass.
+4. Keep the redirect for **at least 180 days**. Never remove the meta tag.
+
 ---
 
 ## Step 6 — Bing (10 minutes, also feeds ChatGPT search)

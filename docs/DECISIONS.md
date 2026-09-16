@@ -87,3 +87,13 @@ running it wrote the pre-brief data over the live site — the app prefers datab
 code defaults. It now imports `src/lib/site.ts` directly (Node strips the types) and logs what
 it wrote. `contentDefaults` moved from `content.ts` to `site.ts` so the seed can reach it
 without pulling in mongoose and the `@/` alias.
+
+## 2026-09-16 — Keep the old vercel.app Search Console property verified via its meta tag
+
+After the move to shivambhadoriya.com the name search stopped showing the site. Technical SEO
+on the new domain was clean; the gap was that the redesign had dropped the
+`google-site-verification` tag that verified `shivam-bhadoriya-dev.vercel.app`. Change of Address
+needs that property verified. Search Console follows redirects for meta-tag verification (not
+for HTML files), so the tag is served on the new site and reaches Google through the redirect.
+Legacy and www redirects now send an explicit 301 instead of Next's default 308, since the
+Change of Address check is documented against 301.

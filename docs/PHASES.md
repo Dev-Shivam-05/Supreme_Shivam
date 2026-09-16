@@ -2,20 +2,18 @@
 
 ## Now
 
-**Phase 3e — mail billing decision, by 2026-10-14.** Inbound **already works** — the earlier
-"does not receive" finding was wrong and is corrected in HANDOFF. MX still points at Hostinger,
-SPF is intact, Cloudflare is nameserver-only. The live constraint is the **Hostinger email trial
-expiring 2026-10-14**. Renew (paid, keeps sending) or move to Cloudflare Email Routing (free,
-receive-only, rewrites MX). Nothing else in this phase can be built until that is chosen.
+**Phase 3g — search visibility after the domain move.** Code fix is committed (`98ff772`) but
+**not deployed**. Shivam: `vercel --prod`, `npm run verify:domain`, then DOMAIN-SETUP Step 5b
+(Change of Address from the old vercel.app property). Then wait 2–4 weeks.
+**Deadline alongside it:** Hostinger email trial ends 2026-10-14 (Phase 3e).
 
 ## Next 3
 
 1. **Phase 3e — mail.** Pick a mail provider before the 2026-10-14 trial expiry, then SMTP so
    the contact form notifies instead of only storing the lead.
-2. **Phase 4 — above-the-fold performance.** Mobile LCP ~5.3s against a 2.5s target. Paint and
-   compositing cost in the effects system, not bytes. Detail below.
-3. **Phase 5 — search results watch.** 4–8 weeks after indexing, check `shivam bhadoriya` and
-   `web developer navsari` logged-out, and decide what the data says to change.
+2. **Phase 3f — off-site entity signals.** Put shivambhadoriya.com in the website field of every
+   `sameAs` profile. Manual, free, the biggest ranking lever left.
+3. **Phase 4 — above-the-fold performance.** Mobile LCP ~5.3s against a 2.5s target.
 
 ---
 
@@ -29,6 +27,7 @@ receive-only, rewrites MX). Nothing else in this phase can be built until that i
 | 3d | Database | **Done** — 2026-09-14 | Dedicated `shivambhadoriya` database on Atlas. `projects` + `settings` seeded from lib/site.ts. Live `/api/stats` reports `configured: true`. |
 | 3e | Mailbox + SMTP | **Open — decision, deadline 2026-10-14** | Inbound **is** working (verified 2026-09-15: MX → Hostinger, SPF intact, message delivered). Hostinger email trial expires 2026-10-14. Renew vs Cloudflare Email Routing is Shivam's call; SMTP follows it. |
 | 3f | Off-site entity signals | **Open — highest priority for ranking** | On-site SEO verified clean. `sameAs` claims five profiles, none link back. Add shivambhadoriya.com to the website field on LinkedIn, GitHub, X and Instagram; fix GitHub location Ahmedabad → Navsari. Manual, free, off-repo. |
+| 3g | Search visibility after the move | **Code done, deploy + manual pending** — 2026-09-16 | Old vercel.app GSC verification tag restored (redesign had dropped it); redirects now 301. Needs `vercel --prod` and Change of Address (DOMAIN-SETUP 5b). |
 | 4 | Above-the-fold performance | **Not started** | Deliberately not absorbed. Detail below. |
 | 5 | Confirm unverified facts | **Done** — 2026-09-14 | Phone, timelines, app confidentiality, Instagram and the real AI-PULSE stack (read from the GitHub API, not guessed) are all in the code. |
 
