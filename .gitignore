@@ -49,4 +49,5 @@ Extra/
 
 # local browser session for the go-live steps — never commit cookies
 .browser-profile/
+.browser-profile-cdp/
 .browser-shots/
