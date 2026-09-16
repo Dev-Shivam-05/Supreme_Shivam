@@ -104,3 +104,12 @@ Google sign-in refuses Playwright-launched Chrome. `scripts/cdp.mjs start` opens
 with a localhost-only debugging port and its own profile; Shivam signs in and approves every
 OAuth consent personally, then the script attaches. Used to confirm the Google Change of Address
 and set up Bing Webmaster Tools. Final confirm buttons are clicked only for steps Shivam asked for.
+
+## 2026-09-16 — Social profiles are edited by hand, except GitHub
+
+Phase 3f needed shivambhadoriya.com on every `sameAs` profile. GitHub profile fields have an API
+(`gh api -X PATCH user`), so GitHub is the only one the agent edits. LinkedIn loads a PerimeterX
+anti-scraping frame that froze the CDP session, and editing the profile risks a restriction on
+Shivam's account. The permission classifier also blocks the agent from changing a real account.
+Instagram needs a sign-in the agent does not have. LinkedIn's "Greater Surat Area" is accepted
+as the location: it is LinkedIn's metro area for Navsari.

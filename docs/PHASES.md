@@ -2,18 +2,18 @@
 
 ## Now
 
-**Phase 3g — search visibility after the domain move.** Deployed; Google Change of Address
-confirmed 2026-09-16; indexing requested; Bing set up. Left: Bing Site Move after Bing finishes
-processing (after 2026-09-18). Then watch Search Console for 2–6 weeks.
-**Deadline alongside it:** Hostinger email trial ends 2026-10-14 (Phase 3e).
+**Phase 3f — off-site entity signals: nearly done.** GitHub, X, WakaTime and the LinkedIn
+website field link back (verified 2026-09-16). Left, by hand: the LinkedIn About line that still
+says `shivam-bhadoriya-dev.vercel.app`, and the Instagram decision (add a link or drop it from `sameAs`).
+**Phase 3g — waiting on Bing:** do the Site Move on or after 2026-09-18, then watch Search Console for 2–6 weeks.
+**Deadline:** Hostinger email trial ends 2026-10-14 (Phase 3e).
 
 ## Next 3
 
-1. **Phase 3e — mail.** Pick a mail provider before the 2026-10-14 trial expiry, then SMTP so
-   the contact form notifies instead of only storing the lead.
-2. **Phase 3f — off-site entity signals.** Put shivambhadoriya.com in the website field of every
-   `sameAs` profile. Manual, free, the biggest ranking lever left.
-3. **Phase 4 — above-the-fold performance.** Mobile LCP ~5.3s against a 2.5s target.
+1. **Phase 3g close-out.** Bing Site Move for the old host (from 2026-09-18).
+2. **Phase 4 — above-the-fold performance.** Mobile LCP ~5.3s against a 2.5s target.
+3. **Phase 3e — mail.** Shivam picks Hostinger renewal or Cloudflare Email Routing before
+   2026-10-14; SMTP follows so the contact form notifies.
 
 ---
 

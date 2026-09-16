@@ -1,65 +1,51 @@
-# HANDOFF — Supreme_Shivam — Phase 3g (search visibility after the domain move) — 2026-09-16
+# HANDOFF — Supreme_Shivam — Phase 3f (off-site entity signals) — 2026-09-16
 
 ## Done
 
-- **Audit: why "Shivam Bhadoriya" did not show shivambhadoriya.com.** Nothing on the site blocks
-  Google (apex 200, `www` and old host 301 path-for-path, robots allows, `index, follow`,
-  canonical correct). The cause was the move itself: the domain went live 2026-09-14 and Google
-  had ranked the *vercel.app* URL for seven months.
-- **Old property verification restored and deployed.** The redesign (`899c7f2`) had removed the
-  `google-site-verification` tag for `shivam-bhadoriya-dev.vercel.app`. It is back in
-  `layout.tsx` (`98ff772`), and legacy/www redirects now send 301. Shivam deployed it; live
-  check: old host `/` → `301 https://shivambhadoriya.com/`. `npm run verify:domain` →
-  **29 passed, 1 warning, 0 failed**.
-- **Google Change of Address: CONFIRMED 2026-09-16.** Search Console shows "This site is
-  currently moving": `shivam-bhadoriya-dev.vercel.app` → `shivambhadoriya.com`. Validation
-  passed all three checks (homepage 301, both sites verified, sample pages `/about`, `/lab`).
-  The first two attempts said "Couldn't fetch the page" minutes after the deploy; the third
-  passed — it was Google-side lag, not a site fault.
-- **Google indexing requests:** old homepage (recrawl so Google sees the 301), and on the new
-  domain `/about`, `/services`, `/writing`, `/work` and all five service/hire pages. The new
-  homepage was already "URL is on Google". Sitemap: Success, 26 URLs, read 2026-09-16.
-- **Bing Webmaster Tools set up.** Shivam signed in with Google and granted read-only Search
-  Console access; all 8 verified sites imported. `https://shivambhadoriya.com/sitemap.xml`
-  submitted directly (the import brought no sitemap for the domain property) — status
-  Processing.
-- **`scripts/cdp.mjs`** — attaches to a Chrome window Shivam signs into by hand. Used for all of
-  the above; no password or 2FA code passed through the session.
+- **Four of the five `sameAs` profiles now link back, checked against the live pages.**
+  - GitHub: website `https://shivambhadoriya.com/`, location "Navsari, Gujarat, India" (read with `gh api user`).
+  - X: website shivambhadoriya.com, location "Navsari, Gujarat, 396445".
+  - WakaTime: website `http://shivambhadoriya.com/`, location "Navsari, India".
+  - LinkedIn: the contact-info Website field is `shivambhadoriya.com (Portfolio)` and the location
+    is "Greater Surat Area", LinkedIn's metro area for Navsari. Shivam made both edits by hand.
+- **Phase 3g re-checked:** the Bing Site Move page for the old host still says "No pages found".
+  Bing has not finished processing it, so the move was not done.
 
 ## Files changed
 
-- `src/app/layout.tsx` — `metadata.verification.google` for the old property.
-- `next.config.ts` — legacy/www redirects `statusCode: 301`.
-- `scripts/cdp.mjs` — CDP driver: `start`, `tabs`, `goto`, `shot`, `text`, `dialog`, `run`,
-  `click`, `fill`, `wait`.
-- `.gitignore` — `.browser-profile-cdp/`.
-- `docs/DOMAIN-SETUP.md` — Step 5b, Change of Address.
-- `AGENTS.md` — the verification tag is load-bearing; Search Console automation notes.
+- `docs/PHASES.md` — Phase 3f status and notes; `## Now` and `## Next 3` updated.
+- `AGENTS.md` — new rule: never automate LinkedIn or Instagram; GitHub profile fields go through `gh api`.
+- `docs/DECISIONS.md` — decision on profile edits (below).
+- `docs/HANDOFF.md` — this file.
 
 ## Decisions made
 
-- **Restore the meta tag rather than exempt a verification file from the redirect** — Search
-  Console follows redirects for meta tags, not for HTML files.
-- **Explicit 301 over 308** — the Change of Address check is documented against 301.
-- **Plain Chrome + CDP instead of Playwright-launched Chrome** — Google sign-in rejects the
-  latter; the owner signs in and approves every consent screen personally.
+- **Edit social profiles by hand, except GitHub.** LinkedIn loads a PerimeterX anti-scraping frame
+  (`uc=scraping`), and it hung the CDP session within three page loads. The permission classifier
+  also blocks the agent from editing a real account. GitHub has an API, so use that instead.
+- **Accept "Greater Surat Area" on LinkedIn.** It is the metro area LinkedIn offers for Navsari.
+  It is no longer Ahmedabad, which was the actual conflict with the site's address.
 
 ## Known broken / deliberately skipped
 
-- **Bing Site Move for the old host not done** — its page shows "No pages found" while Bing
-  processes the newly imported sites ("up to 48 hours"). Redo after 2026-09-18.
-- **Production deploys are blocked for the agent** by the permission classifier; Shivam deploys.
-- Carried over: **Hostinger email trial ends 2026-10-14** (Phase 3e); SMTP unset; mobile LCP
-  ~5.3s (Phase 4); `.hud` contrast; Cloudflare token + Atlas password to rotate; `sameAs`
-  profiles do not link back (Phase 3f). Do **not** run `scripts/cloudflare-email.mjs --apply`
-  while the Hostinger mailbox is wanted.
+- **LinkedIn About section** still ends with `Portfolio: shivam-bhadoriya-dev.vercel.app`. The
+  agent was blocked from editing it; Shivam changes it to `shivambhadoriya.com`.
+- **Instagram `__https.shivu`** is a personal account and has no website link. The agent cannot
+  sign in to it. Shivam decides: add the site, or remove Instagram from `sameAs` in
+  `src/components/seo/json-ld.tsx`.
+- **Bing Site Move** is not done because Bing is still processing (shows "No pages found").
+  It can be done on or after 2026-09-18.
+- Carried over: **Hostinger email trial ends 2026-10-14** (Phase 3e, Shivam's decision); SMTP
+  unset; mobile LCP ~5.3s (Phase 4); `.hud` contrast needs a design call; Cloudflare token and
+  Atlas password still need rotating; production deploys are done by Shivam.
 
 ## Next session starts here
 
-- Phase 3g close-out: Bing Site Move (old host → shivambhadoriya.com), then only watch Search
-  Console for 2–6 weeks. Keep the redirect and the meta tag for at least 180 days.
-- First command: `node scripts/cdp.mjs start` (sign in if the profile has expired), then
+- Phase 4: bring mobile LCP from ~5.3s toward 2.5s by measuring and trimming the hero paint
+  stack (see Phase 4 in `docs/PHASES.md`). **If the date is 2026-09-18 or later, first finish the
+  Phase 3g Bing Site Move.**
+- First command: `node scripts/cdp.mjs start`, then
   `node scripts/cdp.mjs goto "https://www.bing.com/webmasters/sitemove?siteUrl=https://shivam-bhadoriya-dev.vercel.app/"`
-- Watch out for: Search Console buttons are CSS-uppercased — match with `/^request indexing$/i`,
-  not the exact visible text; and in Git Bash use single quotes for `curl -w` formats or `\n`
-  is mangled into `/n` and looks like a double-slash redirect.
+- Watch out for: `scripts/cdp.mjs` hangs for 30s on `connectOverCDP` once a tab freezes (a
+  screenshot timeout or LinkedIn's bot check). `curl http://127.0.0.1:9333/json` still answers;
+  close the frozen tabs with `/json/close/<id>` or restart with `cdp.mjs start`.
