@@ -84,6 +84,13 @@ async function buildPortrait(out) {
 /**
  * The favicon / PWA / apple-touch set.
  *
+ * SIZE RULE — do not "round up" these numbers. Google only uses a site's favicon
+ * in search results if the file is a multiple of 48px square (48, 96, 144, 192...).
+ * icon.png was 256x256 and favicon.ico was 32x32; neither qualifies, and the
+ * result listing showed the generic globe instead of his face for five days after
+ * the domain went live. 192 and 48 are the two sizes that keep it compliant.
+ * apple-icon stays 180 — that is Apple's spec and is never a search-result icon.
+ *
  * The originals were a *different* photograph of him — a casual selfie — and one
  * of them was 563KB for a 512px icon. Google clusters a person entity partly by
  * image similarity, so a second face in the favicon is a second weak signal
