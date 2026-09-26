@@ -7,7 +7,6 @@ import { Nav } from "@/components/layout/nav";
 import { Footer } from "@/components/layout/footer";
 import { ScrollProgress } from "@/components/ux/scroll-progress";
 import { CommandPalette } from "@/components/ux/command-palette";
-import { Preloader } from "@/components/ux/preloader";
 import { Beacon } from "@/components/analytics/beacon";
 import { JsonLd, siteGraphLd } from "@/components/seo/json-ld";
 import { getSettings, toPublicContent } from "@/lib/content";
@@ -31,6 +30,9 @@ const sacramento = Sacramento({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-sacramento",
+  // Only the signature far down the page uses it, so it must not compete with
+  // the hero fonts for the first bytes.
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -132,20 +134,12 @@ export default async function RootLayout({
         {/* The person entity rides on every route, not just the home page — it is
             what ties this site, LinkedIn, GitHub, X and the photograph together. */}
         <JsonLd data={siteGraphLd} />
-        {/* skip the cold-open on repeat visits in the same tab — runs before paint */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{if(sessionStorage.getItem('booted'))document.documentElement.classList.add('booted')}catch(e){}",
-          }}
-        />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem={false}
           disableTransitionOnChange
         >
-          <Preloader />
           <Beacon />
           <SmoothScroll>
             <ScrollProgress />

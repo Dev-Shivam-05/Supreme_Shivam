@@ -114,9 +114,17 @@ function Plane() {
   );
 }
 
-export default function ShaderScene({ active = true }: { active?: boolean }) {
+export default function ShaderScene({
+  active = true,
+  onReady,
+}: {
+  active?: boolean;
+  /** Fires once the WebGL context exists, so the parent can fade the canvas in. */
+  onReady?: () => void;
+}) {
   return (
     <Canvas
+      onCreated={() => onReady?.()}
       className="absolute! inset-0"
       dpr={[1, 1.5]}
       frameloop={active ? "always" : "never"}

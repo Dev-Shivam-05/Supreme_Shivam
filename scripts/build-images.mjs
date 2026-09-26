@@ -17,6 +17,7 @@
  *
  *   public/images/shivam-bhadoriya-ai-engineer.jpg   1000×1000  canonical avatar
  *   public/images/shivam-bhadoriya-portrait.jpg       576×1024  full photograph
+ *     (+ .avif / .webp siblings for <picture>; the .jpg stays canonical)
  *   public/og/shivam-bhadoriya.jpg                   1200× 630  social card
  *
  * Run with: npm run images
@@ -74,11 +75,19 @@ async function buildAvatar(out) {
     .toFile(out);
 }
 
-/** The full photograph, re-encoded at the source resolution (no fake upscale). */
+/**
+ * The full photograph, re-encoded at the source resolution (no fake upscale).
+ *
+ * The .avif and .webp siblings are for <picture> only. The .jpg stays the <img src>,
+ * the JSON-LD image and the sitemap entry, so the name-carrying URL Google indexes
+ * never changes — browsers just download a third of the bytes (Phase 4, row 6).
+ */
 async function buildPortrait(out) {
   await sharp(SRC_FULL)
     .jpeg({ quality: 86, mozjpeg: true })
     .toFile(out);
+  await sharp(SRC_FULL).avif({ quality: 40, effort: 9 }).toFile(out.replace(/\.jpg$/, ".avif"));
+  await sharp(SRC_FULL).webp({ quality: 70, effort: 6 }).toFile(out.replace(/\.jpg$/, ".webp"));
 }
 
 /**
@@ -210,7 +219,8 @@ async function main() {
   await buildIcons(icons);
   await buildFaviconIco(favicon);
 
-  for (const f of [avatar, portrait, og, ...icons.map((i) => i.file)]) {
+  const portraitVariants = [".avif", ".webp"].map((ext) => portrait.replace(/\.jpg$/, ext));
+  for (const f of [avatar, portrait, ...portraitVariants, og, ...icons.map((i) => i.file)]) {
     const m = await sharp(f).metadata();
     const kb = ((await stat(f)).size / 1024).toFixed(1);
     console.log(path.relative(ROOT, f).split(String.fromCharCode(92)).join('/') + '  ' + m.width + 'x' + m.height + '  ' + kb + 'KB');
