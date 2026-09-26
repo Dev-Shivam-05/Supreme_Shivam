@@ -17,7 +17,10 @@
 
   --fg: #f3f3ef;
   --fg-muted: #8f8f88;
-  --fg-faint: #565650;
+  /* The smallest step up from #565650 (2.71:1) that meets WCAG AA (4.5:1) for the
+     small mono .hud labels on every dark ground they sit on: 5.17 on --bg, 4.90 on
+     --bg-elev, 4.52 on --surface. #7a7a73 passed on --bg only. Phase 4, row 2. */
+  --fg-faint: #82827b;
 
   --accent: #cbff3c;      /* acid lime — the one loud colour */
   --accent-ink: #0a0a08;  /* text that sits ON lime */
@@ -40,7 +43,7 @@
 
   --fg: #0c0c0e;
   --fg-muted: #55554e;
-  --fg-faint: #9a9a90;
+  --fg-faint: #6b6b63; /* 4.53:1 on --bg (was #9a9a90, 2.39:1) */
 
   --accent: #a6e000;
   --accent-ink: #0a0a08;
@@ -291,6 +294,7 @@
 
   /* generic hero fade-up — CSS so hero body copy (the LCP element) never waits on JS */
   @keyframes hero-fade { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes shader-in { from { opacity: 0; } to { opacity: 1; } }
   .hero-fade { opacity: 0; animation: hero-fade 0.85s cubic-bezier(0.7,0,0.1,1) both; }
 
   /* scroll-reveal — a lightweight IntersectionObserver toggles .in; CSS does the
@@ -317,17 +321,6 @@
   .reveal-stagger.in > *:nth-child(6) { transition-delay: 0.39s; }
   .reveal-stagger.in > *:nth-child(7) { transition-delay: 0.46s; }
   .reveal-stagger.in > *:nth-child(n+8) { transition-delay: 0.5s; }
-
-  /* brand cold-open — fully CSS so it NEVER gates LCP on JS hydration.
-     Holds the lime SB monogram, then wipes up to reveal the site. */
-  @keyframes preloader-wipe { 0%, 56% { transform: translateY(0); } 100% { transform: translateY(-100%); } }
-  @keyframes sb-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-  @keyframes preloader-bar { from { width: 0; } to { width: 100%; } }
-  .preloader { animation: preloader-wipe 1.05s cubic-bezier(0.7,0,0.1,1) forwards; }
-  .preloader-mark { clip-path: inset(0 100% 0 0); animation: sb-draw 0.6s cubic-bezier(0.7,0,0.1,1) forwards; }
-  .preloader-bar { width: 0; animation: preloader-bar 0.62s linear forwards; }
-  /* repeat visits in the same tab skip the cold-open entirely (set by inline head script) */
-  html.booted .preloader { display: none; }
 }
 
 /* ============================================================

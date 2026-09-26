@@ -7,6 +7,7 @@ import { useRef } from "react";
 import { HeroCanvas } from "./hero-canvas";
 import { HeroReveal } from "./hero-reveal";
 import { Magnetic } from "@/components/ux/magnetic";
+import { Portrait } from "@/components/ux/portrait";
 import { site, type PublicContent } from "@/lib/site";
 
 function PosterLine({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -113,21 +114,8 @@ export function Hero({ content }: { content: PublicContent }) {
             style={{ animationDelay: "0.56s" }}
           >
             <div className="relative overflow-hidden border border-border">
-              {/* eslint-disable-next-line @next/next/no-img-element -- stable,
-                  name-carrying /images/… path is the point; next/image rewrites it to
-                  /_next/image?url=… which carries no filename signal for image search. */}
-              <img
-                src={site.images.portrait}
-                alt={site.images.alt}
-                width={576}
-                height={1024}
-                // eager, but not fetchPriority="high": React emits a <link rel=preload>
-                // for a high-priority image, which put 100KB ahead of the stylesheet and
-                // the fonts. The portrait is above the fold but it is not the LCP element.
-                loading="eager"
-                decoding="async"
-                className="img-duotone block aspect-[4/5] w-full object-cover object-top"
-              />
+              {/* eager, but not fetchPriority="high" — see Portrait. */}
+              <Portrait loading="eager" className="img-duotone block aspect-[4/5] w-full object-cover object-top" />
               <div className="tint-accent absolute inset-0 opacity-25" />
               <div className="scanlines pointer-events-none absolute inset-0 opacity-50" />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/85 to-transparent" />

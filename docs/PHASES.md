@@ -2,6 +2,12 @@
 
 ## Now
 
+**Phase 4 — PageSpeed (2026-09-26): built on `perf/phase-4`, not deployed.** Accessibility 100 on
+mobile and desktop (was 96); three.js no longer loads on page load; preloader removed; AVIF portrait.
+Mobile performance stays ~85 locally, not the 95 target — the rest needs a design decision. Shivam:
+approve row 2's amended hex and row 11, then merge and `vercel --prod`. Spec and numbers:
+`docs/spec/phase-4-pagespeed.md`.
+
 **Phase 3f — off-site entity signals: nearly done.** GitHub, X, WakaTime and the LinkedIn
 website field link back (verified 2026-09-16). Left, by hand: the LinkedIn About line that still
 says `shivam-bhadoriya-dev.vercel.app`, and the Instagram decision (add a link or drop it from `sameAs`).
@@ -11,7 +17,8 @@ says `shivam-bhadoriya-dev.vercel.app`, and the Instagram decision (add a link o
 ## Next 3
 
 1. **Phase 3g close-out.** Bing Site Move for the old host (from 2026-09-18).
-2. **Phase 4 — above-the-fold performance.** Mobile LCP ~5.3s against a 2.5s target.
+2. **Phase 4 deploy** — Shivam approves rows 2 (amended) and 11, merges `perf/phase-4`, runs
+   `vercel --prod`; then 3 PageSpeed runs per strategy against the live URL.
 3. **Phase 3e — mail.** Shivam picks Hostinger renewal or Cloudflare Email Routing before
    2026-10-14; SMTP follows so the contact form notifies.
 
@@ -28,7 +35,7 @@ says `shivam-bhadoriya-dev.vercel.app`, and the Instagram decision (add a link o
 | 3e | Mailbox + SMTP | **Open — decision, deadline 2026-10-14** | Inbound **is** working (verified 2026-09-15: MX → Hostinger, SPF intact, message delivered). Hostinger email trial expires 2026-10-14. Renew vs Cloudflare Email Routing is Shivam's call; SMTP follows it. |
 | 3f | Off-site entity signals | **Nearly done — 2026-09-16; two hand edits left** | Verified 2026-09-16. Link back + Navsari: GitHub (`gh api user`), X, WakaTime. LinkedIn: Website field now shivambhadoriya.com (Portfolio), location Greater Surat Area (LinkedIn's metro area for Navsari). **Left, by hand:** (1) LinkedIn About ends with `Portfolio: shivam-bhadoriya-dev.vercel.app` — change to `shivambhadoriya.com`; the agent is blocked from editing the profile. (2) Instagram `__https.shivu` is a personal account with no link — add the site or drop it from `sameAs` (Shivam's call). Do not automate LinkedIn: it loads PerimeterX (`uc=scraping`) and hung the CDP session. |
 | 3g | Search visibility after the move | **Nearly done** — 2026-09-16 | Verification tag restored, 301s live, Google Change of Address confirmed, 10 URLs requested, Bing imported + sitemap. Bing Site Move pending Bing's 48h processing. |
-| 4 | Above-the-fold performance | **Not started** | Deliberately not absorbed. Detail below. |
+| 4 | Above-the-fold performance | **Built, not deployed** — 2026-09-26 | Spec `docs/spec/phase-4-pagespeed.md` (approved `GO`). A11y 96 → 100; shader deferred to first interaction; preloader gone; AVIF portrait; `template.tsx` no longer hides the page until hydration (row 11, pending OK). Mobile perf ~85 locally, target 95 not met — needs a design decision. Detail below is the older investigation. |
 | 5 | Confirm unverified facts | **Done** — 2026-09-14 | Phone, timelines, app confidentiality, Instagram and the real AI-PULSE stack (read from the GitHub API, not guessed) are all in the code. |
 
 ## Phase 2 — what shipped

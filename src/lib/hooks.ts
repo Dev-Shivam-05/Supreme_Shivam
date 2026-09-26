@@ -31,6 +31,18 @@ export function useIsTouch() {
   return touch;
 }
 
+/**
+ * True only for a mouse-like pointer that can hover. Starts false, so a hover-only
+ * effect never renders on the server or on a phone's first client pass.
+ */
+export function useFinePointer() {
+  const [fine, setFine] = useState(false);
+  useEffect(() => {
+    setFine(window.matchMedia("(hover: hover) and (pointer: fine)").matches);
+  }, []);
+  return fine;
+}
+
 /** True on small viewports — used to drop WebGL / heavy effects on phones. */
 export function useIsMobile(maxWidth = 768) {
   const [mobile, setMobile] = useState(false);

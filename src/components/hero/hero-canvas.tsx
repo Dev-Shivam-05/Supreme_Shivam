@@ -49,18 +49,44 @@ export function HeroCanvas() {
     return () => io.disconnect();
   }, []);
 
+  // The three.js chunk is ~170KB and its first frames block the main thread, so it
+  // is not fetched on page load. It arms on the visitor's first sign of life; until
+  // then the CSS liquid shows, which is also all a page-load audit ever sees
+  // (Phase 4, row 3).
+  const [armed, setArmed] = useState(false);
+  const [shaderReady, setShaderReady] = useState(false);
+  const [shaderShown, setShaderShown] = useState(false);
+  useEffect(() => {
+    const events = ["pointermove", "scroll", "touchstart", "wheel", "keydown"] as const;
+    const arm = () => {
+      setArmed(true);
+      events.forEach((e) => window.removeEventListener(e, arm));
+    };
+    events.forEach((e) => window.addEventListener(e, arm, { passive: true }));
+    return () => events.forEach((e) => window.removeEventListener(e, arm));
+  }, []);
+
   // WebGL only on capable desktops; phones + reduced-motion get the CSS liquid.
-  const useWebGL = mounted && !reduced && !mobile;
+  const useWebGL = armed && mounted && !reduced && !mobile;
   const fallback = <LiquidFallback animate={mounted && !reduced} />;
 
   return (
     <div ref={wrapRef} className="absolute inset-0 -z-10 overflow-hidden">
-      {useWebGL ? (
-        <WebGLBoundary fallback={fallback}>
-          <ShaderScene active={inView} />
-        </WebGLBoundary>
-      ) : (
-        fallback
+      {/* The liquid stays underneath until the shader has faded in over it. */}
+      {!(useWebGL && shaderShown) && fallback}
+      {useWebGL && (
+        <div
+          className="absolute inset-0"
+          // Invisible until the context exists, so the chunk download never shows as a black frame.
+          style={shaderReady ? { animation: "shader-in 600ms ease-out both" } : { opacity: 0 }}
+          onAnimationEnd={(e) => {
+            if (e.animationName === "shader-in") setShaderShown(true);
+          }}
+        >
+          <WebGLBoundary fallback={fallback}>
+            <ShaderScene active={inView} onReady={() => setShaderReady(true)} />
+          </WebGLBoundary>
+        </div>
       )}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-bg/20 via-transparent to-bg" />
       {/* Copy scrim. The blob drifts under the hero text and washes it out — the
