@@ -200,17 +200,61 @@ proofs (the site has no visitor accounts — the kind is accepted by the engine,
 marketing purpose (no marketing) · Companies House (UK registry; Shivam's audience is Indian and
 nothing here needs company registration data).
 
-## 9. Acceptance criteria (binary)
+## 9. Acceptance criteria (binary) — verified 2026-10-23
 
-- [ ] All 32 reference invariants pass as TypeScript tests against the production engine.
-- [ ] No journey event is stored before `POST /api/vi/grant`; verified against a real server.
-- [ ] A grant → page views → CTA → enquiry with "link" ticked shows up in `/admin` → Visitors with
-      entry category, pages, CTAs, the linked lead, and at least one insight with alternatives.
-- [ ] Withdrawal removes every `vi_*` document for that epoch except the tombstone, and a replayed
-      event is rejected.
-- [ ] A `gender` or `email` property is rejected with a code and nothing else is logged.
-- [ ] RDAP returns an owner for a known public network and never sends a full address.
-- [ ] `npm run build` passes, 0 ESLint errors.
-- [ ] `/privacy-policy` describes exactly what is built.
-- [ ] Screenshots: consent card, privacy choices, contact form with link box, admin Visitors list,
-      journey detail.
+- [x] All 32 reference invariants pass as TypeScript tests against the production engine
+      (`npm run test:vi`: 101 tests, 101 pass — the 32 under their original names, plus 69 more).
+- [x] No journey event is stored before `POST /api/vi/grant` — end-to-end against `next start`:
+      no cookie, no event and no state request before consent.
+- [x] Grant → page views → CTA → enquiry with "link" ticked appears in `/admin` → Visitors with
+      entry `search`, the pages, `start_project`, the linked lead, Reliance Jio as network owner
+      and `development_interest_v0` with its alternatives.
+- [x] Withdrawal leaves only the tombstone (events, insights, links, proofs, sessions, evidence all
+      0) and the replayed event is refused; the lead itself is kept.
+- [x] `gender` and URL-shaped properties rejected with a code; the log row holds code, source and
+      time only.
+- [x] RDAP returns owners for 8.8.8.0/24 (Google LLC, hosting) and 49.36.0.0/24 (Reliance Jio,
+      mobile carrier); queries carry the network address only.
+- [x] `npm run build` passes; ESLint 0 errors (18 warnings, all `set-state-in-effect`, the pattern
+      the codebase already uses).
+- [x] `/privacy-policy` rewritten against the code (claims table at the top of `lib/legal.ts`).
+- [x] Screenshots in `.browser-shots/phase-6/`.
+
+End-to-end: **50/50** checks, run against an isolated Atlas database
+(`shivambhadoriya_vi_test`, dropped afterwards). The production database was read, never written.
+
+## 10. Independent security review (2026-10-23)
+
+A separate agent with no access to the design reasoning reviewed the code adversarially. Nine
+findings, all traced, all fixed, all pinned by unit tests and the end-to-end run:
+
+| # | Severity | Finding | Fix |
+|---|---|---|---|
+| 1 | High | A linked enquiry's identity was presented across the whole journey, not the one linked session | List payload carries a link reference only; detail scopes identity to the linked events and marks them |
+| 2 | Med-high | One free grant could drive unbounded writes and O(n²) inference | 500 events / 50 sessions per epoch; inference debounced; instance grant ceiling; pruned limiter; bounded admin query |
+| 3 | Medium | A withdrawal failing part-way could leave a revoked-but-visible journey | Tombstone before revocation; idempotent withdraw; admin reads hide revoked grants |
+| 4 | Medium | Contact IP hash was plain sha256 with a default salt; policy called it irreversible | HMAC under a server-only key for every IP-derived hash; nothing stored without a key; policy corrected |
+| 5 | Low-med | The lead kept its visit-link pointer after erasure | Erasure clears it |
+| 6 | Low | Erasure left the window and a plain epoch id on the consent record | Window deleted; epoch id replaced by its keyed hash |
+| 7 | Low | A proof was written before the grant was re-checked | Full grant check first |
+| 8 | Low | A private-person registrant could be shown as owner; registry handles spell out address ranges | Individuals skipped; handles not cached or stored |
+| 9 | Low | Late event after withdrawal survived until the sweep; TTL removed windows before the sweep saw them; window-less epochs not erasable | Late event deleted at once; window kept one day past expiry for the sweep; erase keyed on the grant |
+
+Areas the reviewer checked and found sound: cookie/context forging, admin auth and input
+validation, NoSQL injection, the RDAP fetch (allowlist, no redirects, caps, prefix only), the
+IDs-only journey channel, and the time-window boundaries against `reference.py`.
+
+## 11. Sources added to the register
+
+The reference's 44 sources stand. The network lookup added these, consulted 2026-10-23:
+
+| Source | Supports |
+|---|---|
+| RFC 9224 — https://www.rfc-editor.org/rfc/rfc9224 | IANA RDAP bootstrap format, longest-prefix match |
+| RFC 9082 — https://www.rfc-editor.org/rfc/rfc9082 | `ip/<addr>` and `ip/<addr>/<len>` query paths |
+| RFC 9083 — https://www.rfc-editor.org/rfc/rfc9083 | IP network response: entities, roles, vcardArray, country |
+| RFC 7095 — https://www.rfc-editor.org/rfc/rfc7095 | jCard `fn` and `kind` (a `kind: individual` admin contact is never stored as an owner) |
+| RFC 5952 — https://www.rfc-editor.org/rfc/rfc5952 | Canonical IPv6 text form |
+| RFC 6890, RFC 4193, RFC 3849; IANA special-purpose registries | Reserved and private ranges that are never looked up |
+| https://data.iana.org/rdap/ipv4.json, ipv6.json | Live registry mapping |
+| https://rdap.arin.net/registry/ip/8.8.8.0/24, https://rdap.apnic.net/ip/49.36.0.0/24 | Real response shapes behind the test fixtures |

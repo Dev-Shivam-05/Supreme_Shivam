@@ -146,3 +146,75 @@ one client component, `src/components/layout/chrome.tsx`, which checks `usePathn
 routes render exactly what `layout.tsx` rendered before; `/admin` gets a bare `<main>`. This was
 preferred over duplicating the root layout or adding a pathname check inside each of Nav, Footer,
 ScrollProgress and the public CommandPalette.
+
+
+## 2026-10-23 — Visitor intelligence is consent-gated and gender is never inferred
+
+Shivam asked to know whether a visitor is male or female, a person or an organisation, how they
+arrived and why. His own research package, `visitor_intelligence_reference/`, settles the first
+one: its README rejects "gender fields" and "sensitive-trait scoring", and `test_no_gender_property`
+asserts the rejection. There is also no honest signal for gender in web traffic. The ingest refuses
+any `gender` key and the admin shows "Gender — not collected (policy)" as `not_applicable`, so the
+decision is visible rather than silent.
+
+The other three are built the way the reference allows. Person-or-organisation becomes two separate
+rows that are never merged: what the visitor typed on the contact form (`self_reported`), and the
+public registry owner of their network (`inferred`, `possible_network_association`, confidence
+null) — never "they work at X". Arrival is a controlled category, not a URL. "Why" is four
+abstaining, unvalidated rules that list their evidence, the alternatives and the unknowns, and
+never trigger outreach. Nothing journey-level is collected until the visitor opts in to each
+purpose separately; the cookieless aggregate tier from Phase 2 keeps running for everyone.
+
+## 2026-10-23 — Network owner from public RDAP, by prefix, with no vendor
+
+The reference lists IPinfo, Leadfeeder, Bombora and others as holds: none has a measured accuracy
+for this site, and each needs an account and a contract. Public RDAP gives the registered owner of
+a network for free. The lookup uses the IANA bootstrap and five allowlisted registries, follows no
+redirects, and sends the /24 (IPv4) or /48 (IPv6) network address — never the visitor's address,
+which is not stored anywhere. Results are cached 30 days under an HMAC of the prefix. It runs only
+for visitors who granted the `organization` purpose, so it will cover few visits; that is the cost
+of doing it honestly.
+
+## 2026-10-23 — Enquiries stay at 24 months, against the reference's 90-day suggestion
+
+The reference suggests deleting inquiry records 90 days after last activity and calls it "a design
+proposal, not a universal legal requirement". The privacy policy already discloses 24 months, and
+an enquiry is how an agreement with a client is evidenced; three months could destroy that trail.
+Everything else in the reference's retention table is followed as written.
+
+## 2026-10-23 — The engine is a port of reference.py, tested by the reference's own tests
+
+Rather than reinterpret the Python model, `src/lib/vi/engine.ts` ports it check for check, over an
+async `Store` so MongoDB serves production and memory serves tests. The 32 tests of
+`test_reference.py` run under their original names against the production engine with the
+reference's synthetic catalog — the two schema tests execute the reference `schema.sql` in Node's
+built-in SQLite. Where TypeScript forced an adaptation (no naive Date; retries now back off), the
+test header says so. Storage stays MongoDB rather than the PostgreSQL the reference suggests,
+because the codebase is Mongo; tenant keys become `siteId` in every filter.
+
+
+## 2026-10-23 — A link names a session's events, not a journey
+
+The independent review caught the admin presenting a linked enquiry's name and email as if they
+described the whole 22-day journey. The reference's links are event-scoped, and the privacy policy
+promises that only "the pages you viewed in that browser session" are attached. The list view now
+knows only that a link exists; the detail shows the identity with its scope on every row it
+touches and marks exactly the linked events. Network evidence and other sessions are never shown
+as belonging to the person.
+
+## 2026-10-23 — Erasure order is tombstone, revoke, delete
+
+Revoking first meant a failed tombstone write left a revoked grant that every retry and sweep
+skipped, with the journey still readable. The tombstone now lands first: from that instant every
+read and every new event treats the epoch as gone, and a retry of an idempotent withdraw finishes
+whatever was interrupted. On erasure the production store also drops the window and replaces the
+epoch id on the 90-day consent record with its keyed hash, so nothing left behind can be joined
+back to anything.
+
+## 2026-10-23 — Every IP-derived hash is keyed
+
+`sha256(salt|ip)` with a default salt is reversible by hashing the whole IPv4 space. The contact
+form's spam hash and the aggregate tier's daily visitor id are now HMACs under ANALYTICS_SALT or a
+labelled subkey of ADMIN_SECRET. The contact form stores no hash at all when neither exists. The
+privacy policy now says "without the server's key it cannot be turned back", which is true,
+instead of "cannot be turned back", which was not.

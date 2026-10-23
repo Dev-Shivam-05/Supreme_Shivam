@@ -1,99 +1,92 @@
-# HANDOFF — Supreme_Shivam — Phase 5a (Admin v2 "Signal Deck") — 2026-10-23
+# HANDOFF — Supreme_Shivam — Phase 6 (Visitor intelligence) — 2026-10-23
 
-Branch `feat/phase-5a-admin-deck`, pushed, **not deployed**. Two commits:
-`a325aff` (the deck) and `1630864` (palette height). Spec:
-`docs/spec/phase-5-admin-signal-deck.md`, approved `go`.
+Branch `feat/phase-6-visitor-intelligence` (branched from the unmerged `feat/phase-5a-admin-deck`),
+pushed, **not deployed**. Spec: `docs/spec/phase-6-visitor-intelligence.md`. Contract:
+`visitor_intelligence_reference/` (now committed, minus the zip, which is byte-identical).
 
 ## Done
 
-- **The panel's numbers are now honest.** Every event is labelled `human | untagged | bot` by a
-  `$switch` in the aggregation, so the rule applies to the 257 events banked before the field
-  existed. Default view is HUMAN: **179 pageviews, 149 session-days, 16 of them reading a second
-  page**. ALL shows 258 / 162. A provenance strip prints the whole split and the four counts sum
-  to the total.
-- **What the old numbers were hiding, now visible:** 38 events are this project's own headless
-  Chrome (Lighthouse, `scripts/cdp.mjs`); 2026-09-26 alone logged 53 views across 7 sessions,
-  which was Phase 4 PageSpeed day. 40 more carried no `x-vercel-ip-country` header. `sessionId`
-  rotates at UTC midnight, so "unique visitors" was always counting session-days, and the KPI now
-  says so on its face. 85% of human views land on `/` and stop. `utmSource` has never once been
-  populated.
-- **The one lead is a test record.** `Kimberly Morrow`, created 34 seconds after the first pageview
-  in the database. Left in place — deleting it is Shivam's call.
-- **Login card no longer names `ADMIN_PASSWORDS` / `ADMIN_SECRET`** to anonymous visitors.
-  Verified by reading the rendered form text, not by eye.
-- **Grouped sidebar**, each group stating what it answers. 264px rail at >=1280px, 68px icon rail
-  1024–1279, drawer below 1024. Session expiry counts down in the user card.
-- **Live feed** polling `/api/admin/feed` every 20s, only while the tab is visible. Verified: a
-  pageview on `/services` appeared in the feed in **12 seconds** and the live dot fired.
-- **Cmd-K palette** — 8 pages plus Refresh and Sign out; Enter navigates, Esc closes and returns
-  focus to the trigger.
-- **Trend chart** stacked by class, with the duplicate-tick bug fixed. It now reads
-  `53 · 42 · 28 · 14 · 0` where it used to read `4 · 3 · 2 · 3 · 3`.
-- **Verified, not assumed:** `npm run build` clean, 0 ESLint errors (10 pre-existing warnings),
-  light-theme contrast measured at **4.96** and **6.93** on the sidebar, no page errors in console.
-  Ten screenshots in `.browser-shots/phase-5a/` at 1600, 1100 and 480px in both themes.
+- **Shivam's reference package implemented in full.** Every requirement in the README, every
+  invariant in `reference.py`, every table in `schema.sql` and every shape in `examples.json` is
+  mapped in spec §3 to where it lives and how it is checked.
+- **The engine is a port of `reference.py`.** Its 32 tests run under their original names against
+  the production engine — the two schema tests execute the reference `schema.sql` in Node's
+  built-in SQLite. `npm run test:vi`: **101 tests, 101 pass.**
+- **Nothing journey-level happens without consent.** A card appears after 20 s or 40 % scroll with
+  three separate opt-ins (pages and buttons; link to an enquiry; organisation lookup) and equal-
+  weight "No thanks" / "Allow selected". Verified end-to-end: no cookie, no event, no state request
+  before consent; a decline sets no cookie and is not asked again.
+- **Only IDs cross the wire.** Pages as content IDs, buttons as CTA IDs, arrival as a category,
+  palette searches as a topic. Gender, email and URL-shaped values are rejected with a code.
+- **Person or organisation, honestly.** Self-reported on the contact form, and the public registry
+  owner of the visitor's network from RDAP — queried by /24 or /48, never the address. Live:
+  Reliance Jio → mobile carrier, Google LLC → hosting. Shown as `possible_network_association`.
+- **Why, without pretending.** Four abstaining rules with evidence, alternatives, unknowns,
+  confidence `null`, and a next action that never contacts anyone.
+- **Withdrawal erases at once.** Footer "Privacy choices" → tombstone, revoke, delete; the lead
+  itself is kept; a replayed event is refused. Verified: only the tombstone remains.
+- **Admin → Visitors.** Journey list, journey detail with the six independent dimensions (gender
+  shown as "not collected — policy"), insight cards, network evidence, scoped linked enquiry,
+  Reverse link, Erase, Run sweep, and panels for rejections, consent counts, arrivals, network
+  kinds, deletion jobs and retention.
+- **Independent security review: 9 findings, all fixed** (spec §10), including a high-severity
+  scope leak of a linked enquiry's identity.
+- **End-to-end 50/50** against `next start` on an isolated Atlas database, dropped afterwards. The
+  production database was read (counts, referrer shapes) and never written.
 
 ## Files changed
 
-- `src/lib/analytics.ts` — rewritten. `$switch` classifier, range + class filters, stacked daily
-  series with zero-filled gaps, session/engagement stats, provenance, `getLiveFeed`.
-- `src/models/event.ts` — `visitorClass` field, indexed.
-- `src/app/api/collect/route.ts` — classifies at write time with the same rule.
-- `src/app/api/admin/data/route.ts` — `range` and `class` params, allowlisted; returns session expiry.
-- `src/app/api/admin/feed/route.ts` — **new.** 25 newest events.
-- `src/lib/auth.ts` — `tokenExpiry()`, because the cookie is httpOnly and the UI cannot read it.
-- `src/components/layout/chrome.tsx` — **new.** Public nav/footer/Lenis everywhere except `/admin`.
-- `src/app/layout.tsx` — routes the chrome through it.
-- `src/app/admin/page.tsx` — dropped `pt-28`; the deck owns the viewport.
-- `src/components/admin/` — `admin-app.tsx` rewritten; **new**: `sidebar.tsx`, `nav.ts`,
-  `overview.tsx`, `live-feed.tsx`, `trend-chart.tsx`, `primitives.tsx`, `command-palette.tsx`,
-  `leads.tsx`.
-- `src/app/globals.css` — `--chart-2` in both themes, `deck-*` utilities (shimmer, rise, row-in,
-  pulse, grid).
-- `docs/spec/phase-5-admin-signal-deck.md` — **new**, the contract.
+- `src/lib/vi/` — `engine.ts`, `policy.ts`, `catalog.ts`, `rules.ts`, `config.ts`, `cookies.ts`,
+  `server.ts`, `models.ts`, `mongo-store.ts`, `memory-store.ts`, `network-core.ts`, `network.ts`,
+  `sweep.ts`, `admin-queries.ts`, three `*.test.ts`, `node-sqlite.d.ts`.
+- `src/app/api/vi/{grant,event,withdraw,state,consent-stat,sweep}/route.ts` — public endpoints.
+- `src/app/api/admin/vi/{summary,journeys,journeys/[epochId],erase,reverse-link,sweep}/route.ts`.
+- `src/components/vi/{vi-client,tracker,consent-card,vi-root}` — consent and tracking.
+- `src/components/admin/{visitors,journey-detail,evidence-badge}.tsx`; `admin-app.tsx`, `nav.ts`,
+  `leads.tsx` updated.
+- `src/app/api/contact/route.ts`, `src/models/lead.ts`, `src/lib/mail.ts`,
+  `src/components/sections/contact.tsx` — self-reported fields and visit linking.
+- `src/app/api/collect/route.ts` — referrer host only, token-shaped UTM, keyed visitor hash.
+- `src/lib/keyed-hash.ts` — HMAC for every IP-derived hash.
+- `src/lib/legal.ts`, `src/components/legal/legal-page.tsx`, `src/app/privacy-policy/page.tsx` —
+  policy rewritten against the code, with a `#visit-insights` anchor.
+- `src/components/layout/{chrome,footer}.tsx`, `src/components/ux/command-palette.tsx`.
+- `vercel.json` (daily sweep cron), `tsconfig.json` (`allowImportingTsExtensions`), `package.json`
+  (`test:vi`), `.gitignore`.
 
 ## Decisions made
 
-- **Classification runs in the aggregation, not off the stored field.** 257 rows predate the field;
-  a number that only counts rows written after the fix is worse than no number. `collect` stores
-  the same label too, so one rule governs both — change one, change the other.
-- **`country: "Unknown"` is its own `untagged` class, never "self-traffic".** The absent header is
-  provable; "it was localhost" is not.
-- **Bot rows are classified at read time, never deleted.** Deleting evidence to make a chart look
-  better is how the panel got untrustworthy in the first place.
-- **`/admin` drops the public chrome.** Lenis's transformed wrapper breaks `position: sticky`
-  inside it, the fixed nav and footer eat ~220px, and the public Cmd-K binding would fight the
-  deck's own palette. A nested layout cannot remove a parent layout's chrome in the App Router,
-  so the split is one client component.
-- **Default range is ALL, not 30d** as row 7 first said. With 40 days of data, 30d would have
-  contradicted the acceptance criteria in the same spec. Noted here rather than silently changed.
-- **No enrichment, no cookies, no fingerprinting.** `/privacy-policy`'s cookieless claim is
-  currently true and nothing in this phase makes it false.
+- **Gender is never inferred.** The reference forbids it and there is no honest signal.
+- **No vendor.** RDAP by prefix instead of IPinfo/Leadfeeder/Bombora, which the reference lists as
+  unverified holds.
+- **MongoDB, not PostgreSQL** — the codebase convention; tenant keys become `siteId` everywhere.
+- **Enquiries stay at 24 months** against the reference's 90-day *suggestion* (deviation, D2).
+- **Four rules, not one**, all in the reference rule's exact shape.
+- **Tombstone → revoke → delete**, and every IP-derived hash is keyed. Full list in
+  `docs/DECISIONS.md`.
 
 ## Known broken / deliberately skipped
 
-- **Audience and Status pages are placeholders.** Phase 5b. Audience waits on Shivam's
-  visitor-identification requirements file.
-- **Leads, Projects, Writing and Media still use the Phase 3b components.** They work and are
-  mounted in the new shell, but they have not been redesigned. Phase 5b.
-- **`getPublicStats()` still counts bots**, so `/stats` shows 258 while `/admin` shows 179. The
-  spec put public pages out of scope. One-line fix in 5b, but it needs a decision: the public
-  number going down is a visible change.
-- **Verifying the feed wrote one real event** to the production database — a headless hit on
-  `/services`. It classified as `bot`, so HUMAN stayed at 179 / 149 while ALL moved to 258 / 162.
-  Left in place, correctly labelled.
-- **10 pre-existing ESLint warnings** (`react-hooks/set-state-in-effect`), 4 of them in new files,
-  the same rule the Phase 3b admin tabs already trip. 0 errors.
-- **Not deployed.** Phase 4's `perf/phase-4` is also still unmerged; decide the order before
-  running `vercel --prod`.
+- **Not deployed.** Merge 5a first, then 6.
+- **`CRON_SECRET` is not set in Vercel.** Until it is, the daily sweep returns 401. TTL indexes
+  still delete everything on schedule; only the "expired" audit rows and backup reconciliation
+  wait. Set it, and Vercel sends it to the cron automatically.
+- **Coverage will be small.** Journey data exists only for visitors who say yes, and organisation
+  lookups only for those who also tick that box. This is what doing it honestly costs.
+- **No vendor integrations, no booking provider, no downloads, no site search** — the matching
+  events (`booking_confirmed`, `download_requested`) exist in the schema but can never be accepted
+  here; `search_submitted` comes from the Cmd-K palette as a topic only.
+- **18 ESLint warnings** (`set-state-in-effect`), 0 errors — the pattern the codebase already uses.
+- **Rotating `ADMIN_SECRET`** without first setting `VI_SECRET` resets every consent (visitors are
+  asked again) and orphans existing tombstone hashes for their 90 days.
+- `/stats` still counts bots (open since 5a).
 
 ## Next session starts here
 
-- **Phase 5b:** redesign Leads, Projects, Writing, Media and Status to match the deck, and build
-  the Audience page from Shivam's requirements file once it arrives.
-- **First command:** `git checkout feat/phase-5a-admin-deck && npm run build`
-- **Watch out for:** the classifier lives in **two** places — the `$switch` in
-  `src/lib/analytics.ts` and `classify()` in `src/app/api/collect/route.ts`. They must stay
-  identical or new rows will disagree with old ones and the provenance strip will stop summing to
-  the total. That strip is the regression test: if human + untagged + bot does not equal the ALL
-  pageview count, the two rules have drifted.
+- **Phase 6 deploy, then Phase 5b:** merge `feat/phase-5a-admin-deck` and
+  `feat/phase-6-visitor-intelligence`, set `CRON_SECRET` in Vercel, `vercel --prod`, then one
+  consented visit on the live site and check it in /admin → Visitors.
+- **First command:** `git checkout feat/phase-6-visitor-intelligence && npm run test:vi && npm run build`
+- **Watch out for:** `src/lib/vi/engine.ts` is Shivam's written policy in code. If a change makes
+  one of the 32 reference tests fail, it is a policy change: update the spec and `/privacy-policy`
+  with it, or don't make it.
