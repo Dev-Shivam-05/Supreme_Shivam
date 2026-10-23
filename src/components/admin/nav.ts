@@ -39,7 +39,7 @@ export const NAV: NavGroup[] = [
     items: [
       { id: "overview", label: "Overview", icon: Activity },
       { id: "feed", label: "Live feed", icon: Radio },
-      { id: "audience", label: "Audience", icon: Users },
+      { id: "audience", label: "Visitors", icon: Users },
     ],
   },
   {
@@ -71,7 +71,7 @@ export const ALL_ITEMS: NavItem[] = NAV.flatMap((g) => g.items);
 export const PAGE_TITLE: Record<PageId, { eyebrow: string; title: string; blurb: string }> = {
   overview: { eyebrow: "Live telemetry", title: "Overview", blurb: "Traffic, sources and what the numbers actually mean." },
   feed: { eyebrow: "Event stream", title: "Live feed", blurb: "Every pageview as it lands, newest first." },
-  audience: { eyebrow: "Segments", title: "Audience", blurb: "Who the visitors are, beyond a country code." },
+  audience: { eyebrow: "Consented journeys", title: "Visitors", blurb: "Who arrived, how, and what their visit suggests — every claim labelled." },
   leads: { eyebrow: "CRM-lite", title: "Leads", blurb: "Enquiries from the contact form." },
   projects: { eyebrow: "Case studies", title: "Projects", blurb: "The work shown on /work." },
   writing: { eyebrow: "Site copy", title: "Writing", blurb: "Headlines and section content." },
