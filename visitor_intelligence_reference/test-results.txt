@@ -1,0 +1,37 @@
+test_abstain_one_page (test_reference.CoreTests.test_abstain_one_page) ... ok
+test_browser_cannot_backdate (test_reference.CoreTests.test_browser_cannot_backdate) ... ok
+test_content_allowlist (test_reference.CoreTests.test_content_allowlist) ... ok
+test_day_15_excluded (test_reference.CoreTests.test_day_15_excluded) ... ok
+test_deletion_job_retries_until_verified (test_reference.CoreTests.test_deletion_job_retries_until_verified) ... ok
+test_denied_purpose (test_reference.CoreTests.test_denied_purpose) ... ok
+test_duplicate_conflict (test_reference.CoreTests.test_duplicate_conflict) ... ok
+test_duplicate_once (test_reference.CoreTests.test_duplicate_once) ... ok
+test_explainable_rule (test_reference.CoreTests.test_explainable_rule) ... ok
+test_explicit_scoped_link (test_reference.CoreTests.test_explicit_scoped_link) ... ok
+test_late_provider_allowed (test_reference.CoreTests.test_late_provider_allowed) ... ok
+test_missing_permission (test_reference.CoreTests.test_missing_permission) ... ok
+test_network_not_person_proof (test_reference.CoreTests.test_network_not_person_proof) ... ok
+test_no_gender_property (test_reference.CoreTests.test_no_gender_property) ... ok
+test_no_naive_time (test_reference.CoreTests.test_no_naive_time) ... ok
+test_no_raw_email_in_event (test_reference.CoreTests.test_no_raw_email_in_event) ... ok
+test_out_of_scope_event_proof (test_reference.CoreTests.test_out_of_scope_event_proof) ... ok
+test_provider_cannot_start_window (test_reference.CoreTests.test_provider_cannot_start_window) ... ok
+test_provider_future_time (test_reference.CoreTests.test_provider_future_time) ... ok
+test_provider_too_late (test_reference.CoreTests.test_provider_too_late) ... ok
+test_repeated_same_case_not_two_cases (test_reference.CoreTests.test_repeated_same_case_not_two_cases) ... ok
+test_retention_expiry (test_reference.CoreTests.test_retention_expiry) ... ok
+test_reverse_link (test_reference.CoreTests.test_reverse_link) ... ok
+test_session_cannot_change_epoch (test_reference.CoreTests.test_session_cannot_change_epoch) ... ok
+test_start_and_fixed_window (test_reference.CoreTests.test_start_and_fixed_window) ... ok
+test_tenant_boundary (test_reference.CoreTests.test_tenant_boundary) ... ok
+test_unknown_schema (test_reference.CoreTests.test_unknown_schema) ... ok
+test_unknown_source (test_reference.CoreTests.test_unknown_source) ... ok
+test_withdrawal_purge_and_replay_block (test_reference.CoreTests.test_withdrawal_purge_and_replay_block) ... ok
+test_wrong_session_proof (test_reference.CoreTests.test_wrong_session_proof) ... ok
+test_example_json_parses (test_reference.SchemaTests.test_example_json_parses) ... ok
+test_schema_creation_and_integrity (test_reference.SchemaTests.test_schema_creation_and_integrity) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 0.004s
+
+OK
