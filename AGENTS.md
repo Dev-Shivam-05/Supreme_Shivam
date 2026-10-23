@@ -122,6 +122,16 @@ one of those tests is a change to Shivam's written policy, not a refactor — up
   `shivambhadoriya_vi_test`, check `mongoose.connection.name` before writing, drop it afterwards.
 - **To exercise the RDAP path locally**, send `x-forwarded-for` with a public address — localhost
   resolves to a private range and is deliberately never looked up.
+- **`vi_insights` keeps the Insight under `record`.** Query `"record.ruleVersion"` and
+  `record.evidenceIds`, not top-level fields, or a test reports "no insight" for a run that worked.
+- **The end-to-end harness assumes an empty test database.** Leftover `events` and `leads` rows
+  from an earlier run fail "later views are internal", "lead carries the link id" and "lead kept
+  after withdrawal". Drop `shivambhadoriya_vi_test`, then restart `next start` so Mongoose rebuilds
+  the TTL and unique indexes, before trusting a failure.
+- **To call `src/lib/vi/jobs.ts` (or anything importing `@/...`) from a scratchpad script**,
+  run it with `node --import ./register.mjs`, where `register.mjs` registers a resolve hook
+  that maps `@/` to `src/` and adds `.ts` to extensionless imports. Set `MONGODB_URI` and
+  `ADMIN_SECRET` in `process.env` before the first `await import(...)`.
 - The visitor-identity key is `VI_SECRET`, or a labelled subkey of `ADMIN_SECRET`. Rotating
   `ADMIN_SECRET` without setting `VI_SECRET` invalidates every consent cookie (visitors are simply
   asked again) and orphans existing tombstone hashes for their 90 days.

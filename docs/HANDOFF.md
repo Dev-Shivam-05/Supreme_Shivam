@@ -1,56 +1,63 @@
-# HANDOFF — Supreme_Shivam — Phase 6b (Data from the first page load) — 2026-10-23
+# HANDOFF — Supreme_Shivam — Phase 6c (Radar orchestration) — 2026-10-23
 
-Branch `feat/phase-6b-first-click`, pushed, **no PR yet, not deployed**. Spec:
-`docs/spec/phase-6b-first-click.md` (approved `go`, row 8 approved `go`). It sits on `origin/main`,
-which already contains Phases 5a and 6 (PRs #4 and #5).
+Branch `feat/phase-6c-radar`, pushed, **no PR yet, not deployed**. It is stacked on
+`feat/phase-6b-first-click` (also unmerged), so a PR from 6c contains 6b as well.
+Spec: `docs/spec/phase-6c-radar-orchestration.md` (approved `go`; row 3 amended twice, both approved).
 
 ## Done
-- With no stored choice, a compact consent card (No thanks · Allow · Choose) is visible ~1.0–1.2 s
-  after first load, no scroll. It is bottom-right at ≥ 640 px and a 140 px bottom strip on phones,
-  and covers no hero link or button at 1440×900, 1366×768, 390×844. Allow grants `journey`; Choose
-  opens the full three-switch card in place.
-- Every `/api/collect` pageview now stores `entry` (arrival category on the landing view, `internal`
-  after), `contentId` (derived server-side, `unlisted` fallback), `region`, `timezone`, and
-  `geoSource: "ip_network"`. Bad input becomes `unknown` / `Unknown`. City is never stored.
-- Admin → Overview has an "Arrival and landing — every visitor" panel.
-- The privacy policy describes all of it, including the card appearing on first open.
-- Verified: `npm run test:vi` 101/101; end-to-end 63/63 on `shivambhadoriya_vi_test`; mobile
-  Lighthouse median 85 vs 85 on `origin/main` (5 alternating runs each, CLS 0); screenshots at
-  1440/1366/390 checked by eye.
+- Rule runs and RDAP lookups now go through a durable `vi_jobs` queue. Jobs are enqueued inside the
+  request and drained from `after()` (3 jobs / 8 s) and by the daily sweep (200 / 50 s).
+- A burst of 20 events produces exactly 1 `infer` job. The first event runs at once, and later runs
+  come at most once every 10 s per journey, with no event left unscored.
+- An RDAP lookup that fails is retried after 1, 2, 4 and 8 min. If all 5 attempts fail, the job is
+  `failed` and one `unknown` row is written. A retry that succeeds writes the normal `inferred` row.
+- The /24 or /48 network block is kept AES-256-GCM-sealed for at most 24 h and is removed once the
+  job settles. A scan of `vi_jobs` found no plaintext address.
+- Withdrawal deletes the epoch's jobs, and nothing is written for that epoch afterwards.
+- The privacy policy now discloses the sealed retry.
+- Verified: `npm run test:vi` 114/114. The new queue end-to-end suite passed 22/22 and the
+  regression end-to-end suite 63/63, both on a freshly dropped `shivambhadoriya_vi_test`, which was
+  dropped again afterwards.
 
 ## Files changed
-- `src/components/vi/vi-root.tsx` — card chunk loads on idle, capped at 1200 ms.
-- `src/components/vi/consent-card.tsx` — prompts on mount; compact first-load variant (row 8).
-- `src/components/analytics/beacon.tsx` — sends `entry` via `classifyEntry()` on the landing view.
-- `src/app/api/collect/route.ts` — validates `entry`; derives `contentId`; reads region/timezone headers.
-- `src/models/event.ts` — five new fields with defaults.
-- `src/lib/analytics.ts` — `topLanding()` for landing views; `landingEntries` / `landingPages`.
-- `src/components/admin/overview.tsx` — the new panel; `visitors.tsx` exports `entryLabel`.
-- `src/lib/legal.ts` — privacy policy text.
-- `docs/spec/phase-6b-first-click.md`, `docs/spec/GLOSSARY.md` (new), `docs/DECISIONS.md`, `docs/PHASES.md`.
+- `src/lib/vi/jobs-core.ts` (new): the queue policy as pure functions (keys, coalescing, backoff, the 5-attempt ceiling, the lease).
+- `src/lib/vi/jobs-core.test.ts` (new): 13 tests for that policy and for the sealed block.
+- `src/lib/vi/jobs.ts` (new): the MongoDB side: `queueInfer` (pipeline upsert), `queueNetwork`, `drainJobs`.
+- `src/lib/vi/cookies.ts`: `sealPrefix` / `openPrefix` under the `job-prefix` subkey.
+- `src/lib/vi/network.ts`: `recordNetworkEvidence` split into `prefixFor`, `recordUnknownNetwork` and `runNetworkLookup` (which returns whether to retry).
+- `src/lib/vi/models.ts`: the `vi_jobs` schema (TTL on `expiresAt`, plus a `state,nextAttemptAt` index).
+- `src/lib/vi/mongo-store.ts`: `eraseEpochData` also deletes `vi_jobs`.
+- `src/lib/vi/sweep.ts`: the sweep drains radar jobs and reports `radarRun`.
+- `src/app/api/vi/event/route.ts`, `src/app/api/vi/grant/route.ts`: enqueue, then drain in `after()`. The `lastInfer` debounce map is gone.
+- `src/app/api/vi/sweep/route.ts`, `src/app/api/admin/vi/sweep/route.ts`: `maxDuration = 60`.
+- `src/lib/legal.ts`: one sentence on the sealed retry.
+- Docs: the spec, `docs/DECISIONS.md`, `docs/PHASES.md`, `docs/spec/GLOSSARY.md`, and `AGENTS.md` (traps).
 
 ## Decisions made
-- The master "Visitor Radar" prompt is split into phases 6b–6g on the board. Its 60–70%
-  no-consent figure is not a target; measured coverage is (6f).
-- Compact first-load card, because the full card covered both hero CTAs (breaks Phase 6 D4).
-- No city in the aggregate tier: city + daily hash + device narrows to one person in a small town.
-- Network-kind aggregate counts (row 7) not built: Shivam replied `go` without `yes 7`.
+- The network block is sealed, not hashed: a hash cannot be looked up again. It lives at most
+  24 h, and a root-key rotation makes pending jobs fail permanently (`payload_unreadable`).
+- Jobs are enqueued inside the request, not in `after()`, so the work outlives the instance. The
+  cost is one extra DB write per event (the beacon uses keepalive, so no visitor waits on it).
+- `lastRunAt` + 10 s holds back the next run, because without it a slow-clicking visitor got one
+  run per event.
+- Run Radar moved to 6c.2 and per-purpose withdrawal to 6c.3, to stay within the file budget.
 
 ## Known broken / deliberately skipped
-- Region/timezone on real traffic are unverified. Vercel's headers exist only in production;
-  tested with injected headers.
-- `CRON_SECRET` is still not set in Vercel, and the deploy of 5a + 6 has not been confirmed live.
-- Left behind because the cleanup command was denied: scratchpad worktree `wt-main`
-  (`git worktree list` shows it) and the `shivambhadoriya_vi_test` database (holds synthetic rows).
-- 18 ESLint `set-state-in-effect` warnings (pre-existing), 0 errors.
+- No admin Run Radar button yet (6c.2). On a quiet site a trailing rule run or retry waits for the
+  next visitor, the 03:30 sweep, or someone opening the journey in the admin.
+- If no request comes within 24 h, a network job expires through TTL and leaves no `network_owner`
+  row for that session (neither `inferred` nor `unknown`).
+- The `after()` duration on Vercel is unmeasured: a lookup can overrun the 8 s budget (it is checked
+  before each claim). Check a function log after deploy.
+- Still open from 6b: `CRON_SECRET` is not set in Vercel, and the 5a/6 deploy is not confirmed.
+- The old scratchpad worktree `wt-main` is still registered (`git worktree list`) because
+  removing it was denied earlier.
+- The end-to-end harness is still not in the repo (see below).
 
 ## Next session starts here
-- Phase 6c: Radar orchestration. A durable `vi_jobs` queue with idempotent keys and bounded
-  retries replaces fire-and-forget `after()`; plus RDAP retry and a one-click Run Radar per journey
-  and global. Spec-lock first.
-- First command: `git checkout feat/phase-6b-first-click && git pull && npm run test:vi`
-- Watch out for: the end-to-end harness is **not in the repo**. It lives in
-  `C:\Users\shiva\AppData\Local\Temp\claude\d--Projects-Supreme-Shivam\f6030c84-07b5-4ecd-873e-973fdf417b35\scratchpad\e2e-vi.mjs`
-  (+ `serve.mjs`, `drop-test.mjs`, `test.env.json`, `cta-overlap.mjs`). Temp folders get
-  cleaned, so copy them out before relying on them, and never point them at anything but
-  `shivambhadoriya_vi_test`.
+- Phase 6c.2: an admin Run Radar button (per journey and global) plus a pending/failed jobs line in journey detail. Spec-lock first.
+- First command: `git checkout feat/phase-6c-radar && git pull && npm run test:vi`
+- Watch out for: the harness lives only in
+  `C:\Users\shiva\AppData\Local\Temp\claude\d--Projects-Supreme-Shivam\597078ea-0185-4dba-9de7-73d7b201374d\scratchpad\e2e\`
+  (`e2e-vi.mjs`, `e2e-6c.mjs`, `serve.mjs`, `drop-test.mjs`, `register.mjs`, `alias-hooks.mjs`,
+  `test.env.json`). Copy it out first. Drop the test DB before a run, or leftover rows fail 3 checks.
