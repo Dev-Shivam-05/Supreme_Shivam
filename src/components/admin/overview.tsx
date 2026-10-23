@@ -125,10 +125,16 @@ export function Overview({
             <BarListSkeleton />
           ) : (
             <div className="space-y-4">
-              <BarList items={data.landingEntries.map((e) => ({ label: entryLabel(e.label), count: e.count }))} />
-              <BarList
-                items={data.landingPages.map((e) => ({ label: CONTENT[e.label]?.title ?? e.label, count: e.count }))}
-              />
+              <div>
+                <div className="hud mb-2">How they arrived</div>
+                <BarList items={data.landingEntries.map((e) => ({ label: entryLabel(e.label), count: e.count }))} />
+              </div>
+              <div>
+                <div className="hud mb-2">Where they landed</div>
+                <BarList
+                  items={data.landingPages.map((e) => ({ label: CONTENT[e.label]?.title ?? e.label, count: e.count }))}
+                />
+              </div>
             </div>
           )}
         </Panel>
