@@ -1,3 +1,4 @@
+import { Portrait } from "@/components/ux/portrait";
 import { Reveal } from "@/components/ux/reveal";
 import { facts, site } from "@/lib/site";
 
@@ -27,16 +28,8 @@ export function About({ paragraphs }: { paragraphs: string[] }) {
         <div>
           <div className="brackets md:sticky md:top-28">
             <div className="group relative aspect-[4/5] overflow-hidden border border-border">
-              {/* eslint-disable-next-line @next/next/no-img-element -- stable,
-                  name-carrying /images/… path is the point; next/image rewrites it to
-                  /_next/image?url=… which carries no filename signal for image search. */}
-              <img
-                src={site.images.portrait}
-                alt={site.images.alt}
-                width={576}
-                height={1024}
+              <Portrait
                 loading="lazy"
-                decoding="async"
                 className="img-duotone absolute inset-0 h-full w-full object-cover transition-all duration-700 group-hover:scale-[1.03]"
               />
               <div className="tint-accent absolute inset-0 opacity-30 transition-opacity duration-700 group-hover:opacity-0" />

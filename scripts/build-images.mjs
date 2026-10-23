@@ -17,6 +17,7 @@
  *
  *   public/images/shivam-bhadoriya-ai-engineer.jpg   1000×1000  canonical avatar
  *   public/images/shivam-bhadoriya-portrait.jpg       576×1024  full photograph
+ *     (+ .avif / .webp siblings for <picture>; the .jpg stays canonical)
  *   public/og/shivam-bhadoriya.jpg                   1200× 630  social card
  *
  * Run with: npm run images
@@ -33,7 +34,7 @@ const SRC_PROFILE = path.join(ROOT, "images/shivam-profile-image-2.jpg");
 const CIRCLE_CROP = { left: 0, top: 89, width: 576, height: 576 };
 
 /**
- * A tighter head-and-shoulders square for the icons. At 32px the ring is an
+ * A tighter head-and-shoulders square for the icons. At 48px the ring is an
  * unreadable smudge, so favicons crop inside it — same photograph, so the entity
  * signal stays single, just framed for the size.
  */
@@ -74,15 +75,30 @@ async function buildAvatar(out) {
     .toFile(out);
 }
 
-/** The full photograph, re-encoded at the source resolution (no fake upscale). */
+/**
+ * The full photograph, re-encoded at the source resolution (no fake upscale).
+ *
+ * The .avif and .webp siblings are for <picture> only. The .jpg stays the <img src>,
+ * the JSON-LD image and the sitemap entry, so the name-carrying URL Google indexes
+ * never changes — browsers just download a third of the bytes (Phase 4, row 6).
+ */
 async function buildPortrait(out) {
   await sharp(SRC_FULL)
     .jpeg({ quality: 86, mozjpeg: true })
     .toFile(out);
+  await sharp(SRC_FULL).avif({ quality: 40, effort: 9 }).toFile(out.replace(/\.jpg$/, ".avif"));
+  await sharp(SRC_FULL).webp({ quality: 70, effort: 6 }).toFile(out.replace(/\.jpg$/, ".webp"));
 }
 
 /**
  * The favicon / PWA / apple-touch set.
+ *
+ * SIZE RULE — do not "round up" these numbers. Google only uses a site's favicon
+ * in search results if the file is a multiple of 48px square (48, 96, 144, 192...).
+ * icon.png was 256x256 and favicon.ico was 32x32; neither qualifies, and the
+ * result listing showed the generic globe instead of his face for five days after
+ * the domain went live. 192 and 48 are the two sizes that keep it compliant.
+ * apple-icon stays 180 — that is Apple's spec and is never a search-result icon.
  *
  * The originals were a *different* photograph of him — a casual selfie — and one
  * of them was 563KB for a 512px icon. Google clusters a person entity partly by
@@ -102,16 +118,16 @@ async function buildIcons(targets) {
 }
 
 /**
- * A minimal .ico wrapper around a 32×32 PNG. ICO has allowed PNG-compressed
+ * A minimal .ico wrapper around a 48×48 PNG. ICO has allowed PNG-compressed
  * entries since Vista and every current browser reads them; sharp cannot write
  * the container itself, and /favicon.ico is still requested by convention.
  */
 async function buildFaviconIco(out) {
   const png = await sharp(SRC_PROFILE)
     .extract(ICON_CROP)
-    .resize(32, 32, { kernel: "lanczos3" })
+    .resize(48, 48, { kernel: "lanczos3" })
     // RGBA, not palette: Next's ICO decoder rejects indexed-colour PNGs inside
-    // an .ico ("The PNG is not in RGBA format"), and at 32x32 it costs ~1KB.
+    // an .ico ("The PNG is not in RGBA format"), and at 48x48 it costs ~2KB.
     .ensureAlpha()
     .png({ compressionLevel: 9, palette: false })
     .toBuffer();
@@ -120,8 +136,8 @@ async function buildFaviconIco(out) {
   header.writeUInt16LE(1, 2); // type: icon
   header.writeUInt16LE(1, 4); // one image
   const entry = Buffer.alloc(16);
-  entry[0] = 32; // width
-  entry[1] = 32; // height
+  entry[0] = 48; // width
+  entry[1] = 48; // height
   entry[2] = 0; // no colour-palette table
   entry[3] = 0; // reserved
   entry.writeUInt16LE(1, 4); // colour planes
@@ -192,7 +208,7 @@ async function main() {
   const icons = [
     { file: path.join(ROOT, "public/icon-192.png"), size: 192 },
     { file: path.join(ROOT, "public/icon-512.png"), size: 512 },
-    { file: path.join(ROOT, "src/app/icon.png"), size: 256 },
+    { file: path.join(ROOT, "src/app/icon.png"), size: 192 },
     { file: path.join(ROOT, "src/app/apple-icon.png"), size: 180 },
   ];
   const favicon = path.join(ROOT, "src/app/favicon.ico");
@@ -203,12 +219,13 @@ async function main() {
   await buildIcons(icons);
   await buildFaviconIco(favicon);
 
-  for (const f of [avatar, portrait, og, ...icons.map((i) => i.file)]) {
+  const portraitVariants = [".avif", ".webp"].map((ext) => portrait.replace(/\.jpg$/, ext));
+  for (const f of [avatar, portrait, ...portraitVariants, og, ...icons.map((i) => i.file)]) {
     const m = await sharp(f).metadata();
     const kb = ((await stat(f)).size / 1024).toFixed(1);
     console.log(path.relative(ROOT, f).split(String.fromCharCode(92)).join('/') + '  ' + m.width + 'x' + m.height + '  ' + kb + 'KB');
   }
-  console.log(`src/app/favicon.ico  32x32  ${((await stat(favicon)).size / 1024).toFixed(1)}KB`);
+  console.log(`src/app/favicon.ico  48x48  ${((await stat(favicon)).size / 1024).toFixed(1)}KB`);
   // A README next to the generated files so nobody hand-edits them.
   await writeFile(
     path.join(ROOT, "public/images/README.txt"),

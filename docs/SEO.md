@@ -145,6 +145,16 @@ decorative ring in the profile shot rather than guessing at it, so square crops 
 **Do not rename the outputs** — the JSON-LD, the image sitemap and the OG tags reference the
 exact paths.
 
+**Do not resize the icons either.** Google only uses a site's own favicon in a search result if
+the file is a **multiple of 48px square** (48, 96, 144, 192…). `icon.png` shipped at 256×256 and
+`favicon.ico` at 32×32 — both held the right photograph, but neither size qualifies, so the
+listing showed Google's grey globe placeholder instead of his face. Fixed 2026-09-20 to 192×192
+and 48×48. `apple-icon.png` stays 180×180; that is Apple's spec and never appears in results.
+
+After any favicon change Google has to **recrawl the home page** before the result updates —
+days to a few weeks, and there is no API to force it. The only push available is Search Console →
+URL Inspection → Request Indexing on `https://shivambhadoriya.com/`.
+
 ## 5. How to judge this, 4–8 weeks after the domain is live
 
 Search `shivam bhadoriya` in a logged-out incognito window. The win condition is your site,

@@ -97,3 +97,52 @@ needs that property verified. Search Console follows redirects for meta-tag veri
 for HTML files), so the tag is served on the new site and reaches Google through the redirect.
 Legacy and www redirects now send an explicit 301 instead of Next's default 308, since the
 Change of Address check is documented against 301.
+
+## 2026-09-16 — Console automation drives a hand-signed-in Chrome over CDP
+
+Google sign-in refuses Playwright-launched Chrome. `scripts/cdp.mjs start` opens plain Chrome
+with a localhost-only debugging port and its own profile; Shivam signs in and approves every
+OAuth consent personally, then the script attaches. Used to confirm the Google Change of Address
+and set up Bing Webmaster Tools. Final confirm buttons are clicked only for steps Shivam asked for.
+
+## 2026-09-16 — Social profiles are edited by hand, except GitHub
+
+Phase 3f needed shivambhadoriya.com on every `sameAs` profile. GitHub profile fields have an API
+(`gh api -X PATCH user`), so GitHub is the only one the agent edits. LinkedIn loads a PerimeterX
+anti-scraping frame that froze the CDP session, and editing the profile risks a restriction on
+Shivam's account. The permission classifier also blocks the agent from changing a real account.
+Instagram needs a sign-in the agent does not have. LinkedIn's "Greater Surat Area" is accepted
+as the location: it is LinkedIn's metro area for Navsari.
+
+## 2026-10-23 — Analytics events are classified, never deleted, and the rule runs at read time
+
+The admin panel reported 257 pageviews and 161 unique visitors. Both were true reads and both
+flattered the site: 38 events were this project's own headless Chrome (Lighthouse and
+`scripts/cdp.mjs` — 2026-09-26 alone logged 53 views across 7 sessions, Phase 4 PageSpeed day),
+40 more carried no `x-vercel-ip-country` header, and `sessionId` rotates at UTC midnight so the
+"unique visitors" figure was always counting session-days rather than people.
+
+Every event is now labelled `human | untagged | bot`. The rule runs as a `$switch` inside the
+aggregation rather than reading a stored field, because 257 rows were banked before the field
+existed and a number that only counts rows written after the fix is worse than no number;
+`api/collect` writes the same label going forward, so one rule governs old and new rows and the
+two implementations must be changed together. Bot rows are classified, never deleted — removing
+evidence to improve a chart is how the panel became untrustworthy in the first place.
+
+`country: "Unknown"` is its own `untagged` class and is never described as self-traffic. The
+missing header is provable; "it was localhost" is not. A provenance strip prints the full split
+under every view, and human + untagged + bot summing to the ALL total is the regression test that
+the two copies of the rule have not drifted.
+
+## 2026-10-23 — /admin renders without the public nav, footer and Lenis
+
+The admin deck is a full-height application, not a page on the site, and the public shell actively
+prevented three things it needs: a sidebar pinned to the viewport (Lenis's transformed wrapper
+breaks `position: sticky` inside it), the whole viewport height (the fixed nav and footer eat
+~220px), and Cmd-K for its own palette (the public one binds that key globally).
+
+A nested layout cannot remove a parent layout's chrome in the App Router, so the split lives in
+one client component, `src/components/layout/chrome.tsx`, which checks `usePathname()`. Public
+routes render exactly what `layout.tsx` rendered before; `/admin` gets a bare `<main>`. This was
+preferred over duplicating the root layout or adding a pathname check inside each of Nav, Footer,
+ScrollProgress and the public CommandPalette.

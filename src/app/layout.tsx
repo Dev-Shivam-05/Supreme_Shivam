@@ -2,12 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Anton, Inter, JetBrains_Mono, Sacramento, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { SmoothScroll } from "@/components/providers/smooth-scroll";
-import { Nav } from "@/components/layout/nav";
-import { Footer } from "@/components/layout/footer";
-import { ScrollProgress } from "@/components/ux/scroll-progress";
-import { CommandPalette } from "@/components/ux/command-palette";
-import { Preloader } from "@/components/ux/preloader";
+import { Chrome } from "@/components/layout/chrome";
 import { Beacon } from "@/components/analytics/beacon";
 import { JsonLd, siteGraphLd } from "@/components/seo/json-ld";
 import { getSettings, toPublicContent } from "@/lib/content";
@@ -31,6 +26,9 @@ const sacramento = Sacramento({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-sacramento",
+  // Only the signature far down the page uses it, so it must not compete with
+  // the hero fonts for the first bytes.
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -132,29 +130,15 @@ export default async function RootLayout({
         {/* The person entity rides on every route, not just the home page — it is
             what ties this site, LinkedIn, GitHub, X and the photograph together. */}
         <JsonLd data={siteGraphLd} />
-        {/* skip the cold-open on repeat visits in the same tab — runs before paint */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{if(sessionStorage.getItem('booted'))document.documentElement.classList.add('booted')}catch(e){}",
-          }}
-        />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem={false}
           disableTransitionOnChange
         >
-          <Preloader />
           <Beacon />
-          <SmoothScroll>
-            <ScrollProgress />
-            <div className="grain-overlay" aria-hidden />
-            <Nav />
-            <CommandPalette />
-            <main>{children}</main>
-            <Footer content={toPublicContent(content)} />
-          </SmoothScroll>
+          {/* Public chrome everywhere but /admin — see components/layout/chrome.tsx */}
+          <Chrome content={toPublicContent(content)}>{children}</Chrome>
         </ThemeProvider>
       </body>
     </html>

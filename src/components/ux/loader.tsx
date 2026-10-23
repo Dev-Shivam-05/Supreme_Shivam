@@ -31,8 +31,7 @@ export function Loader() {
  * Raw-HTML readers saw "LOAD SHIVAM" where the name should be, and the browser
  * painted a full-screen panel before the real LCP element.
  *
- * Every route here is static or ISR, and the cold-open Preloader already covers
- * the first visit, so the boundary bought nothing. Kept for a future route that
+ * Every route here is static or ISR, so the boundary bought nothing. Kept for a future route that
  * genuinely does slow work on demand — add `loading.tsx` in *that* segment, not
  * at the root.
  */
