@@ -107,7 +107,9 @@ export function CommandPalette({
           <kbd className="shrink-0 border border-border px-1.5 py-0.5 font-mono text-[0.6rem] text-fg-faint">esc</kbd>
         </div>
 
-        <div className="max-h-[320px] overflow-y-auto p-2">
+        {/* Tall enough that the Actions group is visible without scrolling —
+            eight pages plus two commands and their headings come to ~400px. */}
+        <div className="max-h-[420px] overflow-y-auto p-2">
           {results.length === 0 ? (
             <p className="px-2 py-6 text-center font-mono text-xs text-fg-faint">Nothing matches “{query}”</p>
           ) : (
