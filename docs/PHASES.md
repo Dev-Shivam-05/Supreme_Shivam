@@ -23,11 +23,14 @@ says `shivam-bhadoriya-dev.vercel.app`, and the Instagram decision (add a link o
 
 ## Next 3
 
-1. **Phase 3g close-out.** Bing Site Move for the old host (from 2026-09-18).
-2. **Phase 4 deploy** — Shivam approves rows 2 (amended) and 11, merges `perf/phase-4`, runs
-   `vercel --prod`; then 3 PageSpeed runs per strategy against the live URL.
-3. **Phase 3e — mail.** Shivam picks Hostinger renewal or Cloudflare Email Routing before
-   2026-10-14; SMTP follows so the contact form notifies.
+1. **Phase 5b — the rest of the deck.** Leads, Projects, Writing, Media and Status redesigned to
+   match. The Audience page waits on Shivam's visitor-identification requirements file. Also
+   decide whether `/stats` should drop bots too — it currently shows 258 where `/admin` shows 179,
+   and lowering the public number is a visible change.
+2. **Deploy order.** `perf/phase-4` and `feat/phase-5a-admin-deck` are both built and unmerged.
+   Pick an order, merge, `vercel --prod`, then `npm run verify:domain`.
+3. **Phase 3e — mail.** Hostinger renewal vs Cloudflare Email Routing. The 2026-10-14 trial
+   deadline has now passed — check what the mailbox is actually doing before anything else.
 
 ---
 

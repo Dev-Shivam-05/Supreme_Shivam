@@ -84,6 +84,42 @@ Shivam's own account. Profile edits there are done by hand. GitHub profile field
   authoritative record has changed. Check with `nslookup <host> 1.1.1.1` and the authoritative
   nameserver before believing a failure, and `ipconfig /flushdns` between tests.
 
+## The admin panel
+
+`.env.local` holds **only** `MONGODB_URI` — no `ADMIN_PASSWORDS`, no `ADMIN_SECRET`. So `/admin`
+locally returns "Admin is not configured" until you supply them. Pass them in the **process
+environment** for that run; never append them to `.env.local` (see the trailing-newline trap
+above). Generate a throwaway pair, write them to a file in the session scratchpad, and launch
+`next start` from a small Node wrapper that spreads them into `env`. Print the key names, never
+the values.
+
+The visitor classifier is written **twice** — the `$switch` in `src/lib/analytics.ts` and
+`classify()` in `src/app/api/collect/route.ts`. They must stay identical or events written after
+a change will disagree with the 257 banked before it. The provenance strip under Overview is the
+test: human + untagged + bot must equal the ALL pageview count.
+
+`/admin` is excluded from the analytics beacon, so driving it with a browser costs nothing. Loading
+a **public** page to test the live feed does write a real row to the production database.
+
+## Recharts
+
+**A negative `margin.left` silently clips the Y-axis labels.** `margin={{ left: -20 }}` put the
+axis outside the SVG viewport and sliced the first character off every tick: `53 42 28 14` rendered
+as `3 2 8 4`, which reads like corrupted data, not a layout bug. Use `left: 0` and widen the axis.
+
+**Let recharts pick integer ticks on a small domain and it will repeat them.** With
+`allowDecimals={false}` and a 0–4 domain it produced `4, 3, 2, 3, 3`. Generate the ticks yourself
+and pass `ticks` — `yTicks()` in `src/components/admin/trend-chart.tsx` does it.
+
+Colours must be `var(--token)`, not hex. Presentation attributes accept `var()`, and the hardcoded
+`#cbff3c` in the old charts was invisible against the light theme.
+
+## Playwright from a scratchpad script
+
+`node_modules/playwright` is CommonJS, so a scratchpad ESM script cannot name-import it:
+`import { chromium } from "file:///.../playwright/index.js"` throws. Default-import the package and
+destructure. Scripts inside the repo are fine — only out-of-tree ones need the absolute file URL.
+
 ## Verify against the live site, not the build
 
 `npm run verify:domain` checks the redirect, canonical, schema, images, sitemap, every service
