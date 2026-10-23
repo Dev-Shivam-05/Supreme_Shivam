@@ -2,6 +2,12 @@
 
 ## Now
 
+**Phase 6c — Radar orchestration: built on `feat/phase-6c-radar` (stacked on 6b), not deployed.**
+Durable `vi_jobs` queue for rule runs and RDAP lookups: coalesced to one run per 10 s per journey,
+5 attempts with 1/2/4/8 min backoff, network block sealed ≤ 24 h for retries, erased with the
+journey. 114/114 unit, 22/22 queue end-to-end, 63/63 regression end-to-end.
+Spec: `docs/spec/phase-6c-radar-orchestration.md`.
+
 **Phase 6b — Data from the first page load: built on `feat/phase-6b-first-click`, not deployed.**
 Compact consent card on first load (≤ 1.2 s, clear of the hero CTAs at 1440/1366/390); arrival
 category, landing content ID, region and time zone for every visitor in the cookieless tier, no
@@ -24,8 +30,10 @@ Spec: `docs/spec/phase-6-visitor-intelligence.md`.
 1. **Ship 6b (Shivam).** Open a PR from `feat/phase-6b-first-click`; set `CRON_SECRET` in Vercel;
    deploy; check one first-load visit's row in /admin → Overview "Arrival and landing" shows a
    real region (Vercel headers exist only in production).
-2. **Phase 6c — Radar orchestration** (durable job queue, RDAP retry, one-click Run Radar).
-3. **Phase 5b — the rest of the deck** (Leads, Projects, Writing, Media, Status; `/stats` bots).
+2. **Ship 6c** after 6b (PR from `feat/phase-6c-radar`; it contains 6b). After deploy, check one
+   Vercel function log for `/api/vi/event` duration and one `vi_jobs` row reaching `done`.
+3. **Phase 6c.2 — Run Radar** (admin button per journey + global, jobs line in journey detail).
+4. **Phase 5b — the rest of the deck** (Leads, Projects, Writing, Media, Status; `/stats` bots).
 
 ---
 
@@ -44,7 +52,7 @@ Spec: `docs/spec/phase-6-visitor-intelligence.md`.
 | 5a | Admin v2 — Signal Deck | **Built, not deployed** — 2026-10-23 | Spec `docs/spec/phase-5-admin-signal-deck.md`, approved `go`. Visitor classification (human/untagged/bot) computed in a `$switch` so it applies to the 257 events banked before the field existed; 38 were this project's own headless Chrome. Grouped sidebar, live feed polling `/api/admin/feed` at 20s while visible, Cmd-K palette, provenance strip. `/admin` no longer renders the public nav/footer/Lenis (`components/layout/chrome.tsx`) — a nested layout cannot remove a parent's chrome. Verified against the live database and screenshotted in both themes at 1600/1100/480px. |
 | 6 | Visitor intelligence | **Built, not deployed** — 2026-10-23 | Implements `visitor_intelligence_reference/` (README, reference.py, schema.sql, examples.json, tests). Engine ported from reference.py; its 32 tests pass under their original names, 94 in all. Consent-gated journeys (15-day window, deleted at 22 days), contact-form linking, RDAP network owner by prefix, four abstaining rules, tombstone-first erasure, daily sweep, admin Visitors page. Independent security review: 9 findings, all fixed. 101 unit tests; 50/50 end-to-end on an isolated test database. Gender not inferred (forbidden by the reference). Enquiries kept at 24 months (deviation, see DECISIONS). |
 | 6b | Data from the first click | **Built, not deployed** — 2026-10-23. Compact first-load card; `entry`, `contentId`, `region`, `timezone`, `geoSource` in the aggregate tier; row 7 not built. Was: | Shivam's goal: collect from the moment a visitor opens the site. Today journey data starts only at "Allow" (card after 20 s / 40 % scroll). Build within the reference: card on first load; entry category + landing content ID in the cookieless aggregate tier; ask about aggregate network-kind counts. Per-visitor collection before consent is forbidden by the reference — see DECISIONS 2026-10-23. **Spec-lock pending (2026-10-23).** First of the "Visitor Radar" master prompt phases (6b–6g). |
-| 6c | Radar orchestration | **In progress** — 2026-10-23, `feat/phase-6c-radar` | Spec `docs/spec/phase-6c-radar-orchestration.md` (approved `go`). Durable `vi_jobs` queue (idempotent keys, 5 attempts, 1/2/4/8 min backoff) replacing fire-and-forget `after()`; RDAP retry with the network block sealed for ≤ 24 h; rule runs coalesced, not dropped by the 10 s debounce. |
+| 6c | Radar orchestration | **Built, not deployed** — 2026-10-23, `feat/phase-6c-radar`. 114/114 unit, 22/22 queue end-to-end, 63/63 regression end-to-end on the test database. | Spec `docs/spec/phase-6c-radar-orchestration.md` (approved `go`). Durable `vi_jobs` queue (idempotent keys, 5 attempts, 1/2/4/8 min backoff) replacing fire-and-forget `after()`; RDAP retry with the network block sealed for ≤ 24 h; rule runs coalesced, not dropped by the 10 s debounce. |
 | 6c.2 | Run Radar | **Open** | Split from 6c (file budget). Admin **Run Radar** per journey + global over `vi_jobs`; jobs line (pending/failed) in journey detail. |
 | 6c.3 | Per-purpose withdrawal | **Open** | Split from 6c. Withdraw `organization` or `linking` alone without erasing the journey. Changes the reference's withdrawal policy — needs its own spec and a privacy-policy change. |
 | 6d | Interest profile + journey geography | **Open** | Per-journey topic profile from catalog `type`/`topic` (observed counts) beside rule hypotheses (inferred) and an explicit unknown; consented journey sessions get Vercel IP region/city/timezone labelled `inferred`, source `ip_network`, confidence null; card copy updated to disclose it. |

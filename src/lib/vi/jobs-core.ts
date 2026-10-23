@@ -23,6 +23,8 @@ export type Job = {
   errorCode: string | null;
   /** Bumped by every enqueue. A run that finishes with a different seq missed an event. */
   seq: number;
+  /** When the last successful run finished; the next one waits INFER_COALESCE_MS past it. */
+  lastRunAt: Date | null;
   expiresAt: Date;
 };
 
@@ -45,12 +47,15 @@ const plus = (d: Date, ms: number) => new Date(d.getTime() + ms);
 
 /**
  * An accepted event for this journey. A job that is not pending becomes due
- * now (the leading edge); one that is pending or running only records, via
- * `seq`, that there is something new to score.
+ * now (the leading edge), or 10 s after its last run if that was more recent —
+ * otherwise a visitor clicking slower than a run takes would get one run per
+ * event. A job that is pending or running only records, via `seq`, that there
+ * is something new to score.
  */
 export function enqueueInfer(existing: Job | null, siteId: string, epochId: string, now: Date): Job {
   const expiresAt = plus(now, INFER_JOB_TTL_MS);
   if (existing && existing.state === "pending") return { ...existing, seq: existing.seq + 1, expiresAt };
+  const gapEnd = existing?.lastRunAt ? plus(existing.lastRunAt, INFER_COALESCE_MS) : null;
   return {
     id: inferJobKey(epochId),
     kind: "infer",
@@ -58,10 +63,11 @@ export function enqueueInfer(existing: Job | null, siteId: string, epochId: stri
     epochId,
     state: "pending",
     attempts: 0,
-    nextAttemptAt: now,
+    nextAttemptAt: gapEnd && gapEnd.getTime() > now.getTime() ? gapEnd : now,
     lockedUntil: null,
     errorCode: null,
     seq: (existing?.seq ?? 0) + 1,
+    lastRunAt: existing?.lastRunAt ?? null,
     expiresAt,
   };
 }
@@ -87,9 +93,9 @@ export function settle(claimed: Job, current: Job, outcome: RunOutcome, now: Dat
   if (outcome.ok) {
     if (current.seq !== claimed.seq) {
       // Events arrived during the run: score them once, after the coalescing gap.
-      return { ...current, attempts: 0, errorCode: null, lockedUntil: null, nextAttemptAt: plus(now, INFER_COALESCE_MS) };
+      return { ...current, attempts: 0, errorCode: null, lockedUntil: null, nextAttemptAt: plus(now, INFER_COALESCE_MS), lastRunAt: now };
     }
-    return { ...current, state: "done", errorCode: null, lockedUntil: null, nextAttemptAt: null };
+    return { ...current, state: "done", errorCode: null, lockedUntil: null, nextAttemptAt: null, lastRunAt: now };
   }
   if (claimed.attempts >= JOB_MAX_ATTEMPTS || outcome.permanent) {
     return { ...current, state: "failed", errorCode: outcome.code, lockedUntil: null, nextAttemptAt: null };

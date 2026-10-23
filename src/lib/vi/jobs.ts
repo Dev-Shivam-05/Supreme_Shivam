@@ -11,6 +11,7 @@
 import { dbConnect } from "@/lib/db";
 import { openPrefix, sealPrefix } from "./cookies.ts";
 import {
+  INFER_COALESCE_MS,
   INFER_JOB_TTL_MS,
   JOB_LEASE_MS,
   JOB_MAX_ATTEMPTS,
@@ -47,6 +48,7 @@ const toJob = (d: Doc): Job => ({
   lockedUntil: (d.lockedUntil as Date) ?? null,
   errorCode: (d.errorCode as string) ?? null,
   seq: (d.seq as number) ?? 0,
+  lastRunAt: (d.lastRunAt as Date) ?? null,
   expiresAt: d.expiresAt as Date,
 });
 
@@ -68,7 +70,14 @@ export async function queueInfer(siteId: string, epochId: string, now: Date): Pr
           epochId,
           seq: { $add: [{ $ifNull: ["$seq", 0] }, 1] },
           attempts: { $cond: [pending, "$attempts", 0] },
-          nextAttemptAt: { $cond: [pending, "$nextAttemptAt", now] },
+          // Not pending: due now, or INFER_COALESCE_MS after the last run if that is later.
+          nextAttemptAt: {
+            $cond: [
+              pending,
+              "$nextAttemptAt",
+              { $max: [now, { $add: [{ $ifNull: ["$lastRunAt", new Date(0)] }, INFER_COALESCE_MS] }] },
+            ],
+          },
           lockedUntil: { $cond: [pending, "$lockedUntil", null] },
           errorCode: { $cond: [pending, "$errorCode", null] },
           state: "pending",
@@ -210,6 +219,7 @@ async function finish(claimed: Job, outcome: RunOutcome): Promise<Job["state"] |
           nextAttemptAt: next.nextAttemptAt,
           lockedUntil: null,
           errorCode: next.errorCode,
+          lastRunAt: next.lastRunAt,
         },
         // The sealed block goes the moment it is no longer needed (spec row 6).
         ...(terminal ? { $unset: { payload: 1 } } : {}),

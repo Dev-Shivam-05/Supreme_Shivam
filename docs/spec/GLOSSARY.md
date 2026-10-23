@@ -12,3 +12,6 @@ Terms with a fixed meaning in this project. Do not redefine them in a later spec
 | Network location | Country, region, time zone from Vercel's IP headers (`geoSource: "ip_network"`). Where the connection appears to be, not where the person is. |
 | Compact card | The first-load consent prompt: No thanks · Allow (journey only) · Choose (opens the full card). |
 | Full card | The three-switch consent card; opened by Choose or by the footer's Privacy choices. |
+| Radar job | One row of `vi_jobs`: an `infer` (rule run) for a journey or a `network` (RDAP lookup) for a session. `_id` is the idempotency key. |
+| Drain | `drainJobs()` in `lib/vi/jobs.ts`: claims due jobs under a 60 s lease and runs them, bounded by a count and a time budget. |
+| Sealed block | A network block encrypted for a queued RDAP retry (`sealPrefix` in `lib/vi/cookies.ts`); lives ≤ 24 h. |

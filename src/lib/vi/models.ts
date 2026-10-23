@@ -270,6 +270,7 @@ const JobSchema = new Schema(
     lockedUntil: { type: Date, default: null },
     errorCode: { type: String, default: null },
     seq: { type: Number, default: 0 },
+    lastRunAt: { type: Date, default: null },
     payload: Mixed,
     expiresAt: { type: Date, required: true },
   },

@@ -254,3 +254,21 @@ counts were not built (no `yes 7`).
 The master "Visitor Radar" prompt of the same day is split into phases 6b–6g on the board. Its
 "60–70% collection without consent" figure is not adopted as a target; measured coverage is
 (Phase 6f). Per-visitor 30/60-day forecasts are not possible while journeys are erased at day 22.
+
+## 2026-10-23 — Phase 6c: radar work goes through a durable queue; the network block is sealed for retries
+
+Approved `go` (spec `docs/spec/phase-6c-radar-orchestration.md`). Rule runs and RDAP lookups move
+from fire-and-forget `after()` to `vi_jobs`, enqueued inside the request and drained from `after()`
+(3 jobs / 8 s) and the daily sweep (200 / 50 s). Vercel cron here is daily, so traffic has to drive
+most runs.
+
+A retry needs the network after the request is gone, and a keyed hash cannot be looked up. So the
+/24 or /48 block (never the address) is stored AES-256-GCM-sealed under a labelled subkey of the VI
+root key, for at most 24 h, and unset the moment the job settles. The privacy policy says so.
+Rotating the root key makes pending blocks unreadable: those jobs fail permanently and record
+`unknown` (`payload_unreadable`), they are not retried forever.
+
+Row 3 was amended twice during the build, both approved: the first event of a burst runs at once
+(not after 10 s, which on a quiet site waited for the next visitor), and a job is not re-run within
+10 s of its last run (found end-to-end: a visitor clicking slower than a run takes got one run per
+event). The 10 s / O(n²) protection from Phase 6 security finding #2 holds.

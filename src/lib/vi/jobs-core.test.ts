@@ -62,14 +62,36 @@ describe("coalescing", () => {
     assert.ok(isClaimable(after, at(2000 + INFER_COALESCE_MS)));
   });
 
-  test("a run with nothing new behind it is done, and the next event wakes it", () => {
+  test("a run with nothing new behind it is done; the next event waits out the gap", () => {
     const claimed = claim(enqueueInfer(null, "site", "ep", T0), T0);
     const done = settle(claimed, claimed, { ok: true }, at(500));
     assert.equal(done.state, "done");
     const again = enqueueInfer(done, "site", "ep", at(900));
     assert.equal(again.state, "pending");
     assert.equal(again.attempts, 0);
-    assert.equal(again.nextAttemptAt?.getTime(), at(900).getTime());
+    assert.equal(again.nextAttemptAt?.getTime(), at(500 + INFER_COALESCE_MS).getTime());
+  });
+
+  test("events slower than a run still get at most one run per 10 s", () => {
+    let j: Job | null = null;
+    let runs = 0;
+    // One event every 400 ms for 20 s, a drain after each, each run taking 100 ms.
+    for (let t = 0; t < 20_000; t += 400) {
+      j = enqueueInfer(j, "site", "ep", at(t));
+      if (isClaimable(j, at(t))) {
+        const c = claim(j, at(t));
+        j = settle(c, c, { ok: true }, at(t + 100));
+        runs++;
+      }
+    }
+    assert.ok(runs <= 2, `${runs} runs in 20 s`);
+  });
+
+  test("an event long after the last run is due at once", () => {
+    const c = claim(enqueueInfer(null, "site", "ep", T0), T0);
+    const done = settle(c, c, { ok: true }, at(100));
+    const later = enqueueInfer(done, "site", "ep", at(60_000));
+    assert.equal(later.nextAttemptAt?.getTime(), at(60_000).getTime());
   });
 });
 
