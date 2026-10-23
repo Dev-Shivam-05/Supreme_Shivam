@@ -62,6 +62,12 @@ export async function POST(req: NextRequest) {
     const now = new Date();
     const result = await engine.ingest(body, ctx, now);
     const res = json({ ok: true, result });
+    if (result === "accepted") {
+      // Keep the stored hypotheses current so the admin list can show them
+      // without a write on read. infer() recomputes from scratch and abstains,
+      // so running it per event can never accumulate a stale claim.
+      after(() => engine.infer(ctx.siteId, ctx.epochId, new Date()).catch(() => logRejection("infer_failed")));
+    }
 
     if (mintedSession && result === "accepted") {
       setSessionCookie(res, ctx.sessionId, ctx.epochId);

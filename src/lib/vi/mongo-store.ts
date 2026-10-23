@@ -223,17 +223,22 @@ export class MongoStore implements Store {
     await VILink.updateOne({ _id: l.linkId }, { $set: { ...l, expiresAt: l.validUntil } }, { upsert: true });
   }
 
+  /**
+   * One row per (epoch, rule), upserted. infer() runs after every accepted
+   * event, so two can overlap; delete-then-insert would let both inserts land
+   * and duplicate a hypothesis. Keyed upserts converge whatever the order.
+   */
   async replaceInsights(siteId: string, epochId: string, insights: Insight[]) {
-    await VIInsight.deleteMany({ siteId, entityId: epochId });
+    const ids = insights.map((i) => `${epochId}|${i.ruleVersion}`);
+    await VIInsight.deleteMany({ siteId, entityId: epochId, _id: { $nin: ids } });
     if (insights.length === 0) return;
-    await VIInsight.insertMany(
-      insights.map((i) => ({
-        _id: i.insightId,
-        siteId,
-        entityScope: i.entityScope,
-        entityId: epochId,
-        record: i,
-        expiresAt: i.expiresAt,
+    await VIInsight.bulkWrite(
+      insights.map((i, n) => ({
+        replaceOne: {
+          filter: { _id: ids[n] },
+          replacement: { _id: ids[n], siteId, entityScope: i.entityScope, entityId: epochId, record: i, expiresAt: i.expiresAt },
+          upsert: true,
+        },
       })),
     );
   }

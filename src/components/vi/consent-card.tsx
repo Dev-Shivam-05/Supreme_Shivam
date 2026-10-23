@@ -270,7 +270,10 @@ export default function ConsentCard({ openRequest }: { openRequest: number }) {
               );
             })}
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-3">
+          {/* Pinned to the bottom edge of the card: on a phone the card scrolls
+              inside a 46svh cap, and both choices must stay visible without
+              scrolling — a hidden "No thanks" is a dark pattern by omission. */}
+          <div className="sticky -bottom-5 -mx-5 mt-4 grid grid-cols-2 gap-3 border-t border-border bg-bg-elev px-5 pb-5 pt-3">
             <button type="button" onClick={onDecline} disabled={busy} className={cn(button, "text-fg")}>
               No thanks
             </button>
