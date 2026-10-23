@@ -1,6 +1,6 @@
 # Phase 6b — Data from the first page load
 
-Status: **approved `go` 2026-10-23.** First of the "Visitor Radar" master-prompt phases (6b–6g, see
+Status: **approved `go` 2026-10-23; built and verified 2026-10-23** (63/63 e2e, 101/101 unit, Lighthouse mobile median 85 vs 85 on origin/main over 5 runs each). First of the "Visitor Radar" master-prompt phases (6b–6g, see
 `docs/PHASES.md`). Built inside `visitor_intelligence_reference/`: no per-visitor record before
 consent.
 
@@ -25,13 +25,13 @@ consent.
 
 ## Acceptance criteria (binary)
 
-- [ ] With no stored choice, the card is visible ≤ 2 s after first load at 1440 px and 390 px (screenshots).
-- [ ] Row 8: no hero link or button under the compact card at 1440×900, 1366×768, 390×844; at 390 the strip is ≤ 150 px and both main buttons are fully on screen.
-- [ ] Mobile Lighthouse Performance on `/` within 2 points of `main`.
-- [ ] A new `/api/collect` row on the test database carries `entry`, `contentId`, `region`, `timezone`, `geoSource`; an invalid `entry` is stored as `"unknown"`.
-- [ ] human + untagged + bot still sum to all pageviews.
-- [ ] `npm run test:vi` green; end-to-end re-run green on the test database.
-- [ ] Privacy policy names the four new fields.
+- [x] With no stored choice, the card is visible ≤ 2 s after first load at 1440 px and 390 px (screenshots).
+- [x] Row 8: no hero link or button under the compact card at 1440×900, 1366×768, 390×844; at 390 the strip is ≤ 150 px and both main buttons are fully on screen.
+- [x] Mobile Lighthouse Performance on `/` within 2 points of `main`.
+- [x] A new `/api/collect` row on the test database carries `entry`, `contentId`, `region`, `timezone`, `geoSource`; an invalid `entry` is stored as `"unknown"`.
+- [x] human + untagged + bot still sum to all pageviews.
+- [x] `npm run test:vi` green; end-to-end re-run green on the test database.
+- [x] Privacy policy names the four new fields.
 
 ## Risks
 
