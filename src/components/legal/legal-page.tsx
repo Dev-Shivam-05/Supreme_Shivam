@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmailLink } from "@/components/ux/email-link";
 import { LEGAL_UPDATED, type LegalSection } from "@/lib/legal";
+import { cn } from "@/lib/utils";
 
 /** Shared renderer for /privacy-policy and /terms. Plain prose, no theatre. */
 export function LegalPageView({
@@ -28,7 +29,8 @@ export function LegalPageView({
           <p className="hud">Last updated · {LEGAL_UPDATED}</p>
 
           {sections.map((s, i) => (
-            <div key={s.h} className={i === 0 ? "mt-10" : "mt-12"}>
+            // `id` gives a section a stable anchor — the visit-insights card links to #visit-insights.
+            <div key={s.h} id={s.id} className={cn(i === 0 ? "mt-10" : "mt-12", s.id && "scroll-mt-28")}>
               <h2 className="font-display text-2xl font-semibold leading-tight md:text-3xl">{s.h}</h2>
               {s.p && (
                 <div className="mt-5 space-y-5">

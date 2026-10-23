@@ -34,6 +34,17 @@ function classify(browser: string, os: string, country: string) {
   return "human";
 }
 
+/**
+ * README "Redact … secret URL parameters": this tier keeps only what an
+ * aggregate needs. A full referrer path can be someone's profile URL, and a UTM
+ * value is free text that can carry an email address — so the referrer is cut
+ * to its host and a UTM value survives only as a short campaign-code token.
+ */
+const UTM_CODE_RE = /^[a-z0-9][a-z0-9._-]{0,39}$/i;
+function utmCode(value: string | null) {
+  return value && UTM_CODE_RE.test(value) ? value.toLowerCase() : "";
+}
+
 /** Analytics beacon. Never throws to the client — always returns 204. */
 export async function POST(req: NextRequest) {
   try {
@@ -66,11 +77,12 @@ export async function POST(req: NextRequest) {
     await Event.create({
       type: "pageview",
       path: rawPath.split("?")[0],
-      referrer,
+      // The full URL is read above only to derive the host; it is never written.
+      referrer: "",
       referrerHost,
-      utmSource: qs.get("utm_source") || "",
-      utmMedium: qs.get("utm_medium") || "",
-      utmCampaign: qs.get("utm_campaign") || "",
+      utmSource: utmCode(qs.get("utm_source")),
+      utmMedium: utmCode(qs.get("utm_medium")),
+      utmCampaign: utmCode(qs.get("utm_campaign")),
       country,
       device: parsed.device?.type || "desktop",
       browser,

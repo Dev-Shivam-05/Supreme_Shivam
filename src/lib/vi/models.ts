@@ -185,6 +185,13 @@ const EvidenceSchema = new Schema(
   { versionKey: false, minimize: false },
 );
 EvidenceSchema.index({ expiresAt: 1 }, ttl);
+// One network_owner row per session. recordNetworkEvidence runs inside after()
+// and two first requests of a session can race; the index settles it in the
+// database rather than in a read-then-write check.
+EvidenceSchema.index(
+  { siteId: 1, entityScope: 1, entityId: 1, fieldId: 1 },
+  { unique: true, partialFilterExpression: { fieldId: "network_owner" } },
+);
 export const VIEvidence = model("VIEvidence", "vi_evidence", EvidenceSchema);
 
 const TombstoneSchema = new Schema(

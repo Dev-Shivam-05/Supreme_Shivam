@@ -89,8 +89,23 @@ export function clientIp(req: NextRequest): string | null {
   return isIP(raw) ? raw : null;
 }
 
+/**
+ * Rejections written per instance per minute. Every rejection is logged, but a
+ * flood of junk requests must not turn into a flood of database writes — past
+ * the cap the request is still refused, just not recorded.
+ */
+const LOG_CAP_PER_MINUTE = 120;
+let logWindowStart = 0;
+let logCount = 0;
+
 /** Code-only rejection log (R28). Never throws, never blocks a response. */
 export async function logRejection(code: string, sourceId = "web") {
+  const now = Date.now();
+  if (now - logWindowStart > 60_000) {
+    logWindowStart = now;
+    logCount = 0;
+  }
+  if (++logCount > LOG_CAP_PER_MINUTE) return;
   try {
     if (!(await dbConnect())) return;
     await VISecurityLog.create({ code: code.slice(0, 64), sourceId, at: new Date() });
