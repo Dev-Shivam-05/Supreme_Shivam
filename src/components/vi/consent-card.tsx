@@ -17,6 +17,10 @@ const TOGGLES: { purpose: Purpose; label: string; hint?: string }[] = [
   },
 ];
 
+/** Phase 6b row 8: the first-load card is compact, so it never covers the hero CTAs. */
+const COMPACT_BODY =
+  "May I record which pages and buttons you use here, for 15 days? No URLs or personal traits; deleted at 22 days or when you withdraw.";
+
 const BODY =
   "With your permission this site records which of its pages you open and which buttons you use, for 15 days, so I can see what brought you here. No URLs, no typing, no gender or other personal traits, no advertising. Everything is deleted after 22 days, or the moment you withdraw.";
 
@@ -55,6 +59,8 @@ export default function ConsentCard({ openRequest }: { openRequest: number }) {
     linking: false,
     organization: false,
   });
+  /** The prompt starts compact; "Choose" opens the three switches in place. */
+  const [expanded, setExpanded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<{ text: string; tone: "ok" | "error" } | null>(null);
 
@@ -175,6 +181,56 @@ export default function ConsentCard({ openRequest }: { openRequest: number }) {
   const button =
     "sweep inline-flex items-center justify-center border border-border-strong px-4 py-3 text-sm font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50";
 
+  // Entrance: 240ms fade + 8px rise, pure CSS; globals.css zeroes it for reduced motion.
+  const entrance = "transition-[opacity,translate] duration-[240ms] ease-out starting:translate-y-2 starting:opacity-0";
+
+  // Phase 6b row 8. The hero CTAs sit bottom-left, so on a wide screen the
+  // compact card sits bottom-right; on a phone it is a strip of at most 150px
+  // under them. Everything the full card says is one click away (Choose).
+  if (mode === "prompt" && !expanded) {
+    return (
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className={cn(
+          "fixed inset-x-0 bottom-0 z-[70] max-h-[150px] border-t border-border bg-bg-elev px-4 py-3 shadow-[var(--shadow-soft)] outline-none",
+          "sm:inset-x-auto sm:bottom-4 sm:right-4 sm:max-h-none sm:w-[380px] sm:border sm:p-5",
+          entrance,
+        )}
+      >
+        <h2 id={titleId} className="text-sm font-semibold leading-tight text-fg sm:text-base">
+          Help me understand why people visit
+        </h2>
+        <p className="mt-1 text-[0.72rem] leading-snug text-fg-muted sm:mt-2 sm:text-[0.8rem] sm:leading-relaxed">
+          {COMPACT_BODY}{" "}
+          <Link href="/privacy-policy#visit-insights" className="text-fg-faint underline underline-offset-2 hover:text-fg">
+            Details
+          </Link>
+        </p>
+        <div className="mt-2 grid grid-cols-[1fr_1fr_auto] items-center gap-2 sm:mt-4 sm:gap-3">
+          <button type="button" onClick={onDecline} disabled={busy} className={cn(button, "px-3 py-2 text-fg sm:py-3")}>
+            No thanks
+          </button>
+          <button type="button" onClick={onAllow} disabled={busy} className={cn(button, "px-3 py-2 text-accent sm:py-3")}>
+            Allow
+          </button>
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            disabled={busy}
+            className="px-1 font-mono text-xs text-fg-muted underline underline-offset-2 hover:text-fg disabled:opacity-50"
+          >
+            Choose
+          </button>
+        </div>
+        {note && <p className={cn("mt-2 font-mono text-xs", note.tone === "ok" ? "text-accent" : "text-signal")}>{note.text}</p>}
+      </div>
+    );
+  }
+
   return (
     <div
       ref={panelRef}
@@ -188,9 +244,10 @@ export default function ConsentCard({ openRequest }: { openRequest: number }) {
         // Under the nav (z-90), the mobile menu (z-80) and the palette (z-120);
         // capped in height so it never reaches the middle of a phone screen.
         "fixed inset-x-4 bottom-4 z-[70] max-h-[46svh] overflow-y-auto border border-border bg-bg-elev p-5 shadow-[var(--shadow-soft)] outline-none",
-        "sm:right-auto sm:w-[380px] lg:max-h-[calc(100svh-2rem)]",
-        // Entrance: 240ms fade + 8px rise, pure CSS; globals.css zeroes it for reduced motion.
-        "transition-[opacity,translate] duration-[240ms] ease-out starting:translate-y-2 starting:opacity-0",
+        // An expanded prompt stays where the compact one was; Privacy choices opens bottom-left.
+        isManage ? "sm:right-auto" : "sm:left-auto",
+        "sm:w-[380px] lg:max-h-[calc(100svh-2rem)]",
+        entrance,
       )}
     >
       <div className="flex items-start justify-between gap-4">
