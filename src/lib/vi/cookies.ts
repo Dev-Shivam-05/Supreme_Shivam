@@ -10,7 +10,7 @@
  * fixed label, so production works without a new variable and the admin
  * signing key itself is never reused verbatim. No key → the feature is off.
  */
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 function rootKey(): Buffer | null {
   const vi = process.env.VI_SECRET;
@@ -73,4 +73,40 @@ export function scopeHash(siteId: string, epochId: string) {
 /** Keyed hash of a network prefix, so the org cache never stores an address range in the clear. */
 export function networkKey(prefix: string) {
   return mac("network", prefix).slice(0, 43);
+}
+
+/*
+ * A queued RDAP retry needs the network block after the request is gone, and a
+ * hash cannot be looked up. So the block is encrypted, under its own subkey,
+ * for the at most 24 h the job lives (spec 6c row 6). GCM also authenticates:
+ * a tampered or foreign value opens to null, never to a different network.
+ */
+const SEAL_LABEL = "job-prefix";
+
+function sealKey() {
+  const key = rootKey();
+  if (!key) throw new Error("vi_key_unavailable");
+  return createHmac("sha256", key).update(SEAL_LABEL).digest();
+}
+
+export function sealPrefix(prefix: string): string {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", sealKey(), iv);
+  cipher.setAAD(Buffer.from(SEAL_LABEL));
+  const body = Buffer.concat([cipher.update(prefix, "utf8"), cipher.final()]);
+  return Buffer.concat([iv, cipher.getAuthTag(), body]).toString("base64url");
+}
+
+export function openPrefix(sealed: unknown): string | null {
+  if (typeof sealed !== "string" || !rootKey()) return null;
+  try {
+    const raw = Buffer.from(sealed, "base64url");
+    if (raw.length < 29) return null;
+    const decipher = createDecipheriv("aes-256-gcm", sealKey(), raw.subarray(0, 12));
+    decipher.setAAD(Buffer.from(SEAL_LABEL));
+    decipher.setAuthTag(raw.subarray(12, 28));
+    return Buffer.concat([decipher.update(raw.subarray(28)), decipher.final()]).toString("utf8");
+  } catch {
+    return null;
+  }
 }

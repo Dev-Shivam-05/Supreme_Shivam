@@ -15,9 +15,9 @@ Approved `go` by Shivam, 2026-10-23. Branch `feat/phase-6c-radar` (off `feat/pha
 
 | # | Topic | Locked value |
 |---|---|---|
-| 1 | Queue | Collection `vi_jobs`. `_id` = idempotency key. Fields `kind` (`infer`\|`network`), `siteId`, `epochId`, `state` (`pending`\|`done`\|`failed`), `attempts`, `nextAttemptAt`, `lockedUntil`, `errorCode` (code only, never a message), `payload`, `expiresAt` (TTL). |
+| 1 | Queue | Collection `vi_jobs`. `_id` = idempotency key. Fields `kind` (`infer`\|`network`), `siteId`, `epochId`, `state` (`pending`\|`done`\|`failed`), `attempts`, `nextAttemptAt`, `lockedUntil`, `errorCode` (code only, never a message), `payload`, `seq`, `expiresAt` (TTL). `expiresAt` = last enqueue + 48 h for `infer` (outlives the gap between daily sweeps), + 24 h for `network` (row 6). |
 | 2 | Idempotency keys | `infer:<epochId>`, `network:<sessionId>`. Enqueue is an upsert; a duplicate is a no-op. |
-| 3 | Debounce replacement | Each accepted event upserts `infer:<epochId>`: an existing `pending` job is left alone, otherwise it becomes `pending` with `nextAttemptAt = now + 10 s` and `attempts = 0`. Bursts coalesce; no run is lost. The in-memory `lastInfer` map is removed. |
+| 3 | Debounce replacement (amended, approved 2026-10-23) | Each accepted event upserts `infer:<epochId>` and bumps its `seq`. A job that is not `pending` becomes `pending`, due **now** (leading edge, as the old debounce). An event that arrives while the job is pending or running only bumps `seq`. A run that finishes with `seq` unchanged marks the job `done`; with `seq` changed it stays `pending`, due **10 s after the run**. So at most one run per 10 s per journey, and no event is left unscored: the trailing run is picked up by the next request, the daily sweep, or opening the journey in the admin (which already recomputes). The in-memory `lastInfer` map is removed. Was: every run due at `now + 10 s`, which on a quiet site would wait for the next visitor. |
 | 4 | Retries | Max 5 attempts. Backoff `backoffMs()` from `engine.ts`: 1, 2, 4, 8 min. After the 5th failure the job is `failed`. |
 | 5 | RDAP failures retried | `lookup_failed`, `rate_limited`. Terminal at once (unknown evidence, as before): `no_address`, `private_address`, `invalid_address`, `no_registry`. A job that exhausts its attempts writes `unknown` evidence with its last reason. |
 | 6 | Network job payload (security) | The /24 or /48 network block only, never the full IP, sealed with AES-256-GCM under a subkey labelled `job-prefix` of the VI root key. `expiresAt` = enqueue + 24 h. Payload is unset when the job reaches `done` or `failed`. |
@@ -37,8 +37,8 @@ Approved `go` by Shivam, 2026-10-23. Branch `feat/phase-6c-radar` (off `feat/pha
 
 - [ ] `npm run test:vi`: the 101 existing tests plus new `jobs-core` tests (key format, coalescing,
       backoff 1/2/4/8 min, `failed` after 5, lease expiry, seal/open round trip) all pass.
-- [ ] E2E on `shivambhadoriya_vi_test`: 20 events within 5 s → exactly 1 `infer` job; stored
-      insights reflect all 20 events.
+- [ ] E2E on `shivambhadoriya_vi_test`: 20 events within 5 s → exactly 1 `infer` job; after
+      the next drain (≥ 10 s later) the job is `done` and stored insights reflect all 20 events.
 - [ ] E2E: RDAP fails once then succeeds → one `network_owner` row `inferred`, job `done`, `attempts = 2`.
 - [ ] E2E: RDAP always fails → job `failed` after 5 attempts; one `unknown` row, reason `lookup_failed`.
 - [ ] E2E: withdraw while a job is pending → 0 `vi_jobs` rows for that epoch; no evidence written after.
