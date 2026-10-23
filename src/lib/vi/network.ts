@@ -1,8 +1,9 @@
 /**
  * Network-owner evidence — the server half (R25, R26, D3).
  *
- * Called inside `after()` by the event and grant routes, once per new session
- * that holds the `organization` purpose. Reduces the connecting address to its
+ * Run from the radar queue (jobs.ts), once per new session that holds the
+ * `organization` purpose; a lookup that fails or is rate limited is retried
+ * with backoff instead of being written off. Reduces the connecting address to its
  * /24 or /48 network (network-core.ts), asks the responsible RIR's public RDAP
  * service who holds that network, and records the answer as an `inferred`
  * `possible_network_association` — a candidate, never an employer.
@@ -18,6 +19,7 @@ import { ERASING_ACTIONS } from "./engine.ts";
 import { networkKey, scopeHash } from "./cookies.ts";
 import { VIEvidence, VIGrant, VIOrgCache, VITombstone } from "./models.ts";
 import { RETENTION } from "./policy.ts";
+import { RETRYABLE_NETWORK_REASONS, type RunOutcome } from "./jobs-core.ts";
 import {
   classifyNetwork,
   describeNetwork,
@@ -28,6 +30,7 @@ import {
   rdapFallbackUrl,
   rdapQueryUrl,
   type NetworkKind,
+  type NetworkPrefix,
 } from "./network-core.ts";
 
 export type NetworkEvidenceInput = {
@@ -41,7 +44,7 @@ export type NetworkEvidenceInput = {
   grantExpiresAt: Date;
 };
 
-type UnknownReason = "no_address" | "private_address" | "invalid_address" | "no_registry" | "lookup_failed" | "rate_limited";
+export type UnknownReason = "no_address" | "private_address" | "invalid_address" | "no_registry" | "lookup_failed" | "rate_limited";
 
 type OwnerFacts = {
   owner: string;
@@ -211,7 +214,7 @@ async function lookupOwner(
 }
 
 /** R08: permission is checked at processing time, not trusted from when the request arrived. */
-async function stillPermitted(input: NetworkEvidenceInput): Promise<boolean> {
+async function stillPermitted(input: NetworkJobContext): Promise<boolean> {
   const now = new Date();
   const grant = await VIGrant.findOne({
     _id: input.grantId,
@@ -245,57 +248,42 @@ const UNKNOWN_TEXT: Record<UnknownReason, string> = {
   rate_limited: "The registry lookup was skipped: the per-minute lookup limit was reached.",
 };
 
-/** Records `network_owner` evidence for one session. Never throws. */
-export async function recordNetworkEvidence(input: NetworkEvidenceInput): Promise<void> {
+export type NetworkJobContext = Omit<NetworkEvidenceInput, "ip">;
+
+/**
+ * The connecting address reduced to what a lookup needs. A reason here is a
+ * fact about the address, so it is recorded at once and never queued.
+ */
+export function prefixFor(ip: string | null): NetworkPrefix | { reason: UnknownReason } {
+  if (!ip) return { reason: "no_address" };
+  const prefix = networkPrefix(ip);
+  if ("reason" in prefix) return { reason: prefix.reason === "invalid" ? "invalid_address" : "private_address" };
+  return prefix;
+}
+
+async function writeEvidence(input: NetworkJobContext, result: OwnerFacts | { reason: UnknownReason }) {
+  const now = input.now;
+  const expiresAt = new Date(Math.min(now.getTime() + RETENTION.orgCacheMs, input.grantExpiresAt.getTime()));
+  const common = {
+    siteId: input.siteId,
+    epochId: input.epochId,
+    entityScope: "session",
+    entityId: input.sessionId,
+    fieldId: "network_owner",
+    sourceId: "rdap",
+    sourceKind: "registry",
+    observedAt: now,
+    collectedAt: new Date(),
+    validFrom: now,
+    verificationScope: null,
+    confidence: { probability: null, description: "Registry data about the network owner; not independently evaluated" },
+    authorizationId: input.grantId,
+    contradictions: [],
+    unknowns: ["visitor_identity", "employment", "representation_authority"],
+    expiresAt,
+  };
+
   try {
-    if (!(await dbConnect())) return;
-    if (!(await stillPermitted(input))) return;
-    const exists = await VIEvidence.exists({
-      siteId: input.siteId,
-      entityScope: "session",
-      entityId: input.sessionId,
-      fieldId: "network_owner",
-    });
-    if (exists) return;
-
-    let result: OwnerFacts | { reason: UnknownReason };
-    if (!input.ip) result = { reason: "no_address" };
-    else {
-      const prefix = networkPrefix(input.ip);
-      if ("reason" in prefix) result = { reason: prefix.reason === "invalid" ? "invalid_address" : "private_address" };
-      else {
-        try {
-          result = await lookupOwner(prefix.network, prefix.length, prefix.family);
-        } catch {
-          result = { reason: "lookup_failed" };
-        }
-      }
-    }
-
-    // The lookup can take seconds; the visitor may have withdrawn meanwhile.
-    if (!(await stillPermitted(input))) return;
-
-    const now = input.now;
-    const expiresAt = new Date(Math.min(now.getTime() + RETENTION.orgCacheMs, input.grantExpiresAt.getTime()));
-    const common = {
-      siteId: input.siteId,
-      epochId: input.epochId,
-      entityScope: "session",
-      entityId: input.sessionId,
-      fieldId: "network_owner",
-      sourceId: "rdap",
-      sourceKind: "registry",
-      observedAt: now,
-      collectedAt: now,
-      validFrom: now,
-      verificationScope: null,
-      confidence: { probability: null, description: "Registry data about the network owner; not independently evaluated" },
-      authorizationId: input.grantId,
-      contradictions: [],
-      unknowns: ["visitor_identity", "employment", "representation_authority"],
-      expiresAt,
-    };
-
     if ("reason" in result) {
       await VIEvidence.create({
         ...common,
@@ -331,7 +319,54 @@ export async function recordNetworkEvidence(input: NetworkEvidenceInput): Promis
       explanation: `${describeNetwork(result.kind, result.owner)} Matched ${result.matchedRule}.`,
     });
   } catch (err) {
-    // Code only: the message could carry a registry URL, which embeds the network.
+    // The unique index already holds this session's row: another run got there first.
+    if ((err as { code?: number })?.code !== 11000) throw err;
+  }
+}
+
+async function alreadyRecorded(input: NetworkJobContext) {
+  return VIEvidence.exists({
+    siteId: input.siteId,
+    entityScope: "session",
+    entityId: input.sessionId,
+    fieldId: "network_owner",
+  });
+}
+
+/** Records an address-level `unknown` (no address, private, invalid) without a lookup. Never throws. */
+export async function recordUnknownNetwork(input: NetworkJobContext, reason: UnknownReason): Promise<void> {
+  try {
+    if (!(await dbConnect())) return;
+    if (!(await stillPermitted(input))) return;
+    if (await alreadyRecorded(input)) return;
+    await writeEvidence(input, { reason });
+  } catch (err) {
     console.error("[vi] network evidence skipped:", (err as { name?: string })?.name ?? "error");
   }
+}
+
+/**
+ * One queued lookup attempt. A transient failure (RETRYABLE_NETWORK_REASONS)
+ * is returned for the queue to back off and retry; on the `final` attempt it
+ * is recorded as `unknown` instead, so every session still ends with one row.
+ * A withdrawn or expired grant settles the job without writing anything (R08).
+ */
+export async function runNetworkLookup(input: NetworkJobContext, prefix: NetworkPrefix, final: boolean): Promise<RunOutcome> {
+  if (!(await dbConnect())) return { ok: false, code: "db_unavailable" };
+  if (!(await stillPermitted(input))) return { ok: true };
+  if (await alreadyRecorded(input)) return { ok: true };
+
+  let result: OwnerFacts | { reason: UnknownReason };
+  try {
+    result = await lookupOwner(prefix.network, prefix.length, prefix.family);
+  } catch {
+    result = { reason: "lookup_failed" };
+  }
+  const retryable = "reason" in result && (RETRYABLE_NETWORK_REASONS as readonly string[]).includes(result.reason);
+  if (retryable && !final) return { ok: false, code: (result as { reason: UnknownReason }).reason };
+
+  // The lookup can take seconds; the visitor may have withdrawn meanwhile.
+  if (!(await stillPermitted(input))) return { ok: true };
+  await writeEvidence(input, result);
+  return retryable ? { ok: false, code: (result as { reason: UnknownReason }).reason } : { ok: true };
 }

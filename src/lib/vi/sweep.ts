@@ -8,6 +8,7 @@
  * backup left behind (spec D7, D8), and drive remote deletion jobs.
  */
 import type { DeletionAdapter } from "./engine.ts";
+import { drainJobs } from "./jobs.ts";
 import { getEngine } from "./server.ts";
 import { SITE_ID } from "./policy.ts";
 
@@ -18,7 +19,7 @@ import { SITE_ID } from "./policy.ts";
  */
 export const DESTINATIONS: Record<string, DeletionAdapter> = {};
 
-export type SweepResult = { expired: number; closed: number; reconciled: number; jobsRun: number };
+export type SweepResult = { expired: number; closed: number; reconciled: number; jobsRun: number; radarRun: number };
 
 /** Null when the feature is off or the database is unreachable. */
 export async function runSweep(now = new Date()): Promise<SweepResult | null> {
@@ -39,5 +40,8 @@ export async function runSweep(now = new Date()): Promise<SweepResult | null> {
     return adapter(job);
   }, now);
 
-  return { expired, closed, reconciled, jobsRun };
+  // The catch-all for radar jobs no visitor's request picked up (spec 6c row 8).
+  const radar = await drainJobs({ limit: 200, budgetMs: 50_000 });
+
+  return { expired, closed, reconciled, jobsRun, radarRun: radar?.ran ?? 0 };
 }

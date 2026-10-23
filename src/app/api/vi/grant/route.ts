@@ -2,7 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { after, NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { rateLimit } from "@/lib/ratelimit";
-import { recordNetworkEvidence } from "@/lib/vi/network";
+import { drainJobs, queueNetwork } from "@/lib/vi/jobs";
 import { CONSENT_UI_VERSION, POLICY_VERSION, PURPOSES, SITE_ID } from "@/lib/vi/policy";
 import {
   bumpConsentStat,
@@ -97,18 +97,18 @@ export async function POST(req: NextRequest) {
     });
 
     if (purposes.includes("organization")) {
-      // After the response: an RDAP lookup must never slow down the consent click.
-      after(() =>
-        recordNetworkEvidence({
-          siteId: grant.siteId,
-          epochId: grant.epochId,
-          sessionId,
-          grantId: grant.grantId,
-          ip,
-          now,
-          grantExpiresAt: grant.expiresAt,
-        }),
-      );
+      // Queued now, looked up after the response: an RDAP lookup must never
+      // slow down the consent click, and a failed one is retried by the queue.
+      const id = await queueNetwork({
+        siteId: grant.siteId,
+        epochId: grant.epochId,
+        sessionId,
+        grantId: grant.grantId,
+        ip,
+        now,
+        grantExpiresAt: grant.expiresAt,
+      }).catch(() => logRejection("queue_failed").then(() => null));
+      if (id) after(() => drainJobs({ limit: 3, budgetMs: 8000, first: [id] }).catch(() => logRejection("drain_failed")));
     }
     return res;
   } catch {

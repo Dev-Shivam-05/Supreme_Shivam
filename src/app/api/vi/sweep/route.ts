@@ -5,6 +5,8 @@ import { runSweep } from "@/lib/vi/sweep";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// The radar drain is budgeted at 50 s (spec 6c row 8); the platform default can be lower.
+export const maxDuration = 60;
 
 const NO_STORE = { "Cache-Control": "no-store" };
 const json = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: NO_STORE });

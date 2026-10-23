@@ -1,7 +1,7 @@
 import { after, NextResponse, type NextRequest } from "next/server";
 import { rateLimit } from "@/lib/ratelimit";
 import { Rejected } from "@/lib/vi/engine";
-import { recordNetworkEvidence } from "@/lib/vi/network";
+import { drainJobs, queueInfer, queueNetwork } from "@/lib/vi/jobs";
 import {
   clearContextCookies,
   clearSessionCookie,
@@ -15,22 +15,6 @@ import {
 
 export const runtime = "nodejs";
 
-/**
- * At most one inference per epoch per 10 s per instance. infer() reads every
- * event of the epoch; per-event runs would cost O(n²) for a burst. A skipped
- * run is caught up by the next event or by opening the journey in the admin.
- */
-const INFER_DEBOUNCE_MS = 10_000;
-const lastInfer = new Map<string, number>();
-function shouldInfer(epochId: string, now: number) {
-  if (lastInfer.size > 5_000) {
-    for (const [k, t] of lastInfer) if (now - t > INFER_DEBOUNCE_MS) lastInfer.delete(k);
-  }
-  const last = lastInfer.get(epochId) ?? 0;
-  if (now - last < INFER_DEBOUNCE_MS) return false;
-  lastInfer.set(epochId, now);
-  return true;
-}
 export const dynamic = "force-dynamic";
 
 const NO_STORE = { "Cache-Control": "no-store" };
@@ -79,11 +63,14 @@ export async function POST(req: NextRequest) {
     const now = new Date();
     const result = await engine.ingest(body, ctx, now);
     const res = json({ ok: true, result });
-    if (result === "accepted" && shouldInfer(ctx.epochId, now.getTime())) {
-      // Keep the stored hypotheses current so the admin list can show them
-      // without a write on read. infer() recomputes from scratch and abstains,
-      // so running it per event can never accumulate a stale claim.
-      after(() => engine.infer(ctx.siteId, ctx.epochId, new Date()).catch(() => logRejection("infer_failed")));
+    // Queued inside the request so the work outlives the instance; run after
+    // the response. The queue coalesces a burst into at most one rule run per
+    // 10 s per journey and keeps the hypotheses current for the admin list.
+    const first: string[] = [];
+    if (result === "accepted") {
+      await queueInfer(ctx.siteId, ctx.epochId, now)
+        .then((id) => first.push(id))
+        .catch(() => logRejection("queue_failed"));
     }
 
     if (mintedSession && result === "accepted") {
@@ -92,19 +79,21 @@ export async function POST(req: NextRequest) {
       // Re-read the grant rather than trusting the cookie: purposes live server-side.
       const grant = await engine.store.getGrant(ctx.grantId);
       if (grant?.purposes.includes("organization")) {
-        const ip = clientIp(req);
-        after(() =>
-          recordNetworkEvidence({
-            siteId: ctx.siteId,
-            epochId: ctx.epochId,
-            sessionId: ctx.sessionId,
-            grantId: ctx.grantId,
-            ip,
-            now,
-            grantExpiresAt: grant.expiresAt,
-          }),
-        );
+        await queueNetwork({
+          siteId: ctx.siteId,
+          epochId: ctx.epochId,
+          sessionId: ctx.sessionId,
+          grantId: ctx.grantId,
+          ip: clientIp(req),
+          now,
+          grantExpiresAt: grant.expiresAt,
+        })
+          .then((id) => id && first.push(id))
+          .catch(() => logRejection("queue_failed"));
       }
+    }
+    if (first.length) {
+      after(() => drainJobs({ limit: 3, budgetMs: 8000, first }).catch(() => logRejection("drain_failed")));
     }
     return res;
   } catch (err) {

@@ -94,6 +94,13 @@ describe("retries", () => {
     assert.ok(!isClaimable(j, at(365 * 24 * 60 * MIN)));
   });
 
+  test("a permanent failure stops at once", () => {
+    const c = claim(enqueueInfer(null, "site", "ep", T0), T0);
+    const j = settle(c, c, { ok: false, code: "payload_unreadable", permanent: true }, T0);
+    assert.equal(j.state, "failed");
+    assert.equal(j.attempts, 1);
+  });
+
   test("a run that died keeps its lease for 60 s, then can be claimed again", () => {
     const c = claim(enqueueInfer(null, "site", "ep", T0), T0);
     assert.ok(!isClaimable(c, at(JOB_LEASE_MS - 1)));

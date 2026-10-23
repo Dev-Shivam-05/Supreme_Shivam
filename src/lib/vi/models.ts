@@ -252,6 +252,33 @@ const DeletionJobSchema = new Schema(
 DeletionJobSchema.index({ purgeAt: 1 }, ttl);
 export const VIDeletionJob = model("VIDeletionJob", "vi_deletion_jobs", DeletionJobSchema);
 
+/*
+ * Radar jobs (spec 6c): rule runs and RDAP lookups, durable instead of
+ * fire-and-forget. `_id` is the idempotency key (`infer:<epochId>`,
+ * `network:<sessionId>`). A network job's `payload.sealed` is the encrypted
+ * /24 or /48 block — never the address — and is unset when the job settles.
+ */
+const JobSchema = new Schema(
+  {
+    _id: String,
+    kind: { type: String, enum: ["infer", "network"], required: true },
+    siteId: { type: String, required: true },
+    epochId: { type: String, required: true, index: true },
+    state: { type: String, enum: ["pending", "done", "failed"], required: true },
+    attempts: { type: Number, default: 0 },
+    nextAttemptAt: { type: Date, default: null },
+    lockedUntil: { type: Date, default: null },
+    errorCode: { type: String, default: null },
+    seq: { type: Number, default: 0 },
+    payload: Mixed,
+    expiresAt: { type: Date, required: true },
+  },
+  { versionKey: false, minimize: false },
+);
+JobSchema.index({ state: 1, nextAttemptAt: 1 });
+JobSchema.index({ expiresAt: 1 }, ttl);
+export const VIJob = model("VIJob", "vi_jobs", JobSchema);
+
 /** Code-only rejection log (R28). No IP, no payload, no identifier. */
 const SecurityLogSchema = new Schema(
   { code: String, sourceId: String, at: { type: Date, required: true } },

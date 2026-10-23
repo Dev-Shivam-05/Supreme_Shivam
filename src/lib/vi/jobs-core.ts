@@ -76,7 +76,8 @@ export function claim(job: Job, now: Date): Job {
   return { ...job, attempts: job.attempts + 1, lockedUntil: plus(now, JOB_LEASE_MS) };
 }
 
-export type RunOutcome = { ok: true } | { ok: false; code: string };
+/** `permanent`: retrying cannot help (for example a sealed block that no longer opens). */
+export type RunOutcome = { ok: true } | { ok: false; code: string; permanent?: boolean };
 
 /**
  * What a finished run leaves behind. `current` is the job as stored now, which
@@ -90,7 +91,7 @@ export function settle(claimed: Job, current: Job, outcome: RunOutcome, now: Dat
     }
     return { ...current, state: "done", errorCode: null, lockedUntil: null, nextAttemptAt: null };
   }
-  if (claimed.attempts >= JOB_MAX_ATTEMPTS) {
+  if (claimed.attempts >= JOB_MAX_ATTEMPTS || outcome.permanent) {
     return { ...current, state: "failed", errorCode: outcome.code, lockedUntil: null, nextAttemptAt: null };
   }
   return {

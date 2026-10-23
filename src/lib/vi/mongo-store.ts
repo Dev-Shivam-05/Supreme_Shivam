@@ -26,6 +26,7 @@ import {
   VIExport,
   VIGrant,
   VIInsight,
+  VIJob,
   VILink,
   VIProof,
   VISession,
@@ -281,6 +282,7 @@ export class MongoStore implements Store {
       VISession.deleteMany({ siteId, epochId }),
       VIEvidence.deleteMany({ siteId, epochId }),
       VIWindow.deleteMany({ siteId, epochId }),
+      VIJob.deleteMany({ siteId, epochId }),
       grantIds.length ? VIProof.deleteMany({ siteId, grantId: { $in: grantIds } }) : Promise.resolve(),
       linkIds.length ? Lead.updateMany({ visitLinkId: { $in: linkIds } }, { $set: { visitLinkId: "" } }) : Promise.resolve(),
       grantIds.length
