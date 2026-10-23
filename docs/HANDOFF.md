@@ -1,78 +1,56 @@
-# HANDOFF — Supreme_Shivam — Phase 6 (Visitor intelligence) — 2026-10-23
+# HANDOFF — Supreme_Shivam — Phase 6b (Data from the first page load) — 2026-10-23
 
-Branch `feat/phase-6-visitor-intelligence` (on top of the unmerged `feat/phase-5a-admin-deck`),
-pushed, **not deployed**. Spec: `docs/spec/phase-6-visitor-intelligence.md`. Contract:
-`visitor_intelligence_reference/`.
+Branch `feat/phase-6b-first-click`, pushed, **no PR yet, not deployed**. Spec:
+`docs/spec/phase-6b-first-click.md` (approved `go`, row 8 approved `go`). It sits on `origin/main`,
+which already contains Phases 5a and 6 (PRs #4 and #5).
 
 ## Done
+- With no stored choice, a compact consent card (No thanks · Allow · Choose) is visible ~1.0–1.2 s
+  after first load, no scroll. It is bottom-right at ≥ 640 px and a 140 px bottom strip on phones,
+  and covers no hero link or button at 1440×900, 1366×768, 390×844. Allow grants `journey`; Choose
+  opens the full three-switch card in place.
+- Every `/api/collect` pageview now stores `entry` (arrival category on the landing view, `internal`
+  after), `contentId` (derived server-side, `unlisted` fallback), `region`, `timezone`, and
+  `geoSource: "ip_network"`. Bad input becomes `unknown` / `Unknown`. City is never stored.
+- Admin → Overview has an "Arrival and landing — every visitor" panel.
+- The privacy policy describes all of it, including the card appearing on first open.
+- Verified: `npm run test:vi` 101/101; end-to-end 63/63 on `shivambhadoriya_vi_test`; mobile
+  Lighthouse median 85 vs 85 on `origin/main` (5 alternating runs each, CLS 0); screenshots at
+  1440/1366/390 checked by eye.
 
-- `visitor_intelligence_reference/` implemented: engine ported from `reference.py`, its 32 tests
-  passing under their original names; `npm run test:vi` → 101/101.
-- Consent card (three separate opt-ins) → journey events as content/CTA IDs, arrival category,
-  contact-form linking, RDAP network owner by /24 or /48, four abstaining rules, withdrawal that
-  erases at once, admin → Visitors with every claim labelled.
-- Independent security review: 9 findings, all fixed. End-to-end 50/50 on an isolated database.
-- Gender is not inferred anywhere — the reference forbids it.
-
-## What happens when a visitor opens the site today — read this first
-
-Shivam's stated goal (2026-10-23): **gather data from the moment a visitor opens the site with one
-click.** Today that is only partly true:
-
-| Moment | What is collected | Consent needed |
-|---|---|---|
-| First page load, every visitor | Path, referrer **host**, campaign codes, country, device, browser, OS, a keyed daily visitor hash (the Phase 2 aggregate tier) | No |
-| After 20 s or 40 % scroll | The consent card appears | — |
-| After "Allow selected" | Journey: content IDs, CTA IDs, arrival category, optional link and network owner, hypotheses | **Yes** |
-
-So journey data starts at the click on "Allow", which today cannot happen before 20 s / 40 %
-scroll. Pages viewed before that are never recorded at journey level.
-
-**The reference itself forbids collecting journey data before consent.** README: "Default deny
-individual-journey collection until explicitly authorized" and "Start at the first accepted,
-permitted page-view report, not the first HTTP hit". `reference.py` rejects events outside the
-grant. Organisation enrichment is a separate purpose that needs its own authorization. India's DPDP
-Act 2023 and the GDPR point the same way. Phase 6b must close the gap **inside** those rules.
-
-## Files changed this session
-
-See `git log main..feat/phase-6-visitor-intelligence`: core in `src/lib/vi/`, public endpoints in
-`src/app/api/vi/`, admin endpoints in `src/app/api/admin/vi/`, client in `src/components/vi/`,
-admin UI in `src/components/admin/{visitors,journey-detail,evidence-badge}.tsx`, contact form
-and lead model, `src/lib/keyed-hash.ts`, the privacy policy, `vercel.json`.
+## Files changed
+- `src/components/vi/vi-root.tsx` — card chunk loads on idle, capped at 1200 ms.
+- `src/components/vi/consent-card.tsx` — prompts on mount; compact first-load variant (row 8).
+- `src/components/analytics/beacon.tsx` — sends `entry` via `classifyEntry()` on the landing view.
+- `src/app/api/collect/route.ts` — validates `entry`; derives `contentId`; reads region/timezone headers.
+- `src/models/event.ts` — five new fields with defaults.
+- `src/lib/analytics.ts` — `topLanding()` for landing views; `landingEntries` / `landingPages`.
+- `src/components/admin/overview.tsx` — the new panel; `visitors.tsx` exports `entryLabel`.
+- `src/lib/legal.ts` — privacy policy text.
+- `docs/spec/phase-6b-first-click.md`, `docs/spec/GLOSSARY.md` (new), `docs/DECISIONS.md`, `docs/PHASES.md`.
 
 ## Decisions made
-
-- Gender never inferred; RDAP by prefix, no vendor; MongoDB; enquiries 24 months (deviation);
-  tombstone → revoke → delete; every IP-derived hash keyed. Full list in `docs/DECISIONS.md`.
-- **2026-10-23 (end of session):** the "data from the first click" goal goes to Phase 6b, built
-  within the reference, with the one grey-area item put to Shivam as an explicit decision.
+- The master "Visitor Radar" prompt is split into phases 6b–6g on the board. Its 60–70%
+  no-consent figure is not a target; measured coverage is (6f).
+- Compact first-load card, because the full card covered both hero CTAs (breaks Phase 6 D4).
+- No city in the aggregate tier: city + daily hash + device narrows to one person in a small town.
+- Network-kind aggregate counts (row 7) not built: Shivam replied `go` without `yes 7`.
 
 ## Known broken / deliberately skipped
-
-- Not deployed. `CRON_SECRET` not set in Vercel (the TTL indexes still delete on schedule).
-- Journey collection starts at "Allow", not at page open — Phase 6b below.
-- 18 ESLint warnings (`set-state-in-effect`), 0 errors. `/stats` still counts bots.
+- Region/timezone on real traffic are unverified. Vercel's headers exist only in production;
+  tested with injected headers.
+- `CRON_SECRET` is still not set in Vercel, and the deploy of 5a + 6 has not been confirmed live.
+- Left behind because the cleanup command was denied: scratchpad worktree `wt-main`
+  (`git worktree list` shows it) and the `shivambhadoriya_vi_test` database (holds synthetic rows).
+- 18 ESLint `set-state-in-effect` warnings (pre-existing), 0 errors.
 
 ## Next session starts here
-
-- **Phase 6b — data from the first click, within the reference.** Run `/spec-lock` first and put
-  this exact table to Shivam; build only the rows he approves:
-
-  | # | Change | Reference status | Default |
-  |---|---|---|---|
-  | 1 | Consent card on the **first page load** (0 s, no scroll trigger), still non-modal with equal buttons, so one click on "Allow" starts the journey on the landing page | Allowed | Build |
-  | 2 | Add the arrival **category** and the landing **content ID** to the cookieless aggregate event, so "how they came" and "where they landed" are known for 100 % of visitors from the first hit, with no identifier and no profile | Allowed (aggregate statistics) | Build |
-  | 3 | Aggregate **network-kind counts** for every visitor without consent: RDAP by prefix on first hit, kept only as daily counters (e.g. "mobile carrier: 12, corporate network: 3") with no link to any visit, address never stored | **Grey area** — README makes organisation enrichment a separate authorized purpose | Ask Shivam explicitly; do not build without a yes |
-  | 4 | Any per-visitor journey, link, network owner or hypothesis **before** consent; buffering pre-consent pages in the browser and sending them after "Allow"; gender | **Forbidden** by the reference (default deny; browser time never authorizes historical collection) and a DPDP/GDPR risk | Not built by default. State the conflict in one line; if Shivam reaffirms after hearing it, that is his call — record it in DECISIONS and make the privacy policy say exactly what is collected |
-
-  Acceptance for rows 1–2: the card visible within 2 s of first load at 1440 and 390 widths
-  without hurting Phase 4 PageSpeed; `/api/collect` rows carry `entry` and `content_id`; privacy
-  policy updated to match; `npm run test:vi` green; end-to-end re-run on the test database.
-
-- **Before or alongside 6b:** merge and deploy (Shivam). Merge order: `feat/phase-5a-admin-deck`,
-  then `feat/phase-6-visitor-intelligence`. Set `CRON_SECRET` in Vercel.
-- **First command:** `git checkout feat/phase-6-visitor-intelligence && git pull && npm run test:vi`
-- **Watch out for:** row 4. "Collect on open" is the goal, but per-visitor collection before
-  consent is exactly what Shivam's own reference forbids. Say so in one line, offer rows 1–3, and
-  never let the privacy policy claim less than the code collects.
+- Phase 6c: Radar orchestration. A durable `vi_jobs` queue with idempotent keys and bounded
+  retries replaces fire-and-forget `after()`; plus RDAP retry and a one-click Run Radar per journey
+  and global. Spec-lock first.
+- First command: `git checkout feat/phase-6b-first-click && git pull && npm run test:vi`
+- Watch out for: the end-to-end harness is **not in the repo**. It lives in
+  `C:\Users\shiva\AppData\Local\Temp\claude\d--Projects-Supreme-Shivam\f6030c84-07b5-4ecd-873e-973fdf417b35\scratchpad\e2e-vi.mjs`
+  (+ `serve.mjs`, `drop-test.mjs`, `test.env.json`, `cta-overlap.mjs`). Temp folders get
+  cleaned, so copy them out before relying on them, and never point them at anything but
+  `shivambhadoriya_vi_test`.

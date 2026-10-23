@@ -145,6 +145,17 @@ Colours must be `var(--token)`, not hex. Presentation attributes accept `var()`,
 `import { chromium } from "file:///.../playwright/index.js"` throws. Default-import the package and
 destructure. Scripts inside the repo are fine — only out-of-tree ones need the absolute file URL.
 
+## Building another branch side by side
+
+**Turbopack rejects a `node_modules` junction that points outside the project root** ("Symlink
+[project]/node_modules is invalid"). A worktree for a baseline build needs its own `npm ci`. Remove
+a junction with `cmd /c rmdir <path>`, never `Remove-Item -Recurse` — that can follow it into the
+real `node_modules`. Local `main` can be stale: compare against `origin/main` after `git fetch`.
+
+**Playwright `networkidle` can hang forever on a reload of `/`.** Cache-served RSC prefetches
+(`/?_rsc=`) never report finished to Playwright, though Resource Timing shows them done with HTTP
+200. Reload with `waitUntil: "load"` plus a fixed wait.
+
 ## Verify against the live site, not the build
 
 `npm run verify:domain` checks the redirect, canonical, schema, images, sitemap, every service
