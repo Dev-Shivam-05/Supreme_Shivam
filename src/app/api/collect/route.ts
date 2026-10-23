@@ -23,6 +23,17 @@ function dailySessionId(ip: string, ua: string) {
   return createHash("sha256").update(`${salt}|${day}|${ip}|${ua}`).digest("hex").slice(0, 32);
 }
 
+/**
+ * The same human | untagged | bot rule the admin aggregation applies, so a row
+ * carries its label from the moment it is written. Kept in step with the
+ * `$switch` in lib/analytics.ts — change one and you must change the other.
+ */
+function classify(browser: string, os: string, country: string) {
+  if (!browser || browser === "Chrome Headless" || !os) return "bot";
+  if (country === "Unknown") return "untagged";
+  return "human";
+}
+
 /** Analytics beacon. Never throws to the client — always returns 204. */
 export async function POST(req: NextRequest) {
   try {
@@ -48,6 +59,10 @@ export async function POST(req: NextRequest) {
 
     const qs = rawPath.includes("?") ? new URLSearchParams(rawPath.split("?")[1]) : new URLSearchParams();
 
+    const country = req.headers.get("x-vercel-ip-country") || "Unknown";
+    const browser = parsed.browser?.name || "";
+    const os = parsed.os?.name || "";
+
     await Event.create({
       type: "pageview",
       path: rawPath.split("?")[0],
@@ -56,11 +71,12 @@ export async function POST(req: NextRequest) {
       utmSource: qs.get("utm_source") || "",
       utmMedium: qs.get("utm_medium") || "",
       utmCampaign: qs.get("utm_campaign") || "",
-      country: req.headers.get("x-vercel-ip-country") || "Unknown",
+      country,
       device: parsed.device?.type || "desktop",
-      browser: parsed.browser?.name || "",
-      os: parsed.os?.name || "",
+      browser,
+      os,
       sessionId,
+      visitorClass: classify(browser, os, country),
     });
   } catch (err) {
     console.error("[collect] ignored:", (err as Error).message);

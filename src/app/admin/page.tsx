@@ -7,9 +7,7 @@ export const metadata: Metadata = {
 };
 
 export default function AdminPage() {
-  return (
-    <div className="pt-28">
-      <AdminApp />
-    </div>
-  );
+  // No top padding: /admin renders without the public nav, so the deck owns the
+  // whole viewport (see components/layout/chrome.tsx).
+  return <AdminApp />;
 }

@@ -15,6 +15,13 @@ const EventSchema = new Schema(
     browser: { type: String, default: "" },
     os: { type: String, default: "" },
     sessionId: { type: String, default: "", index: true },
+    /**
+     * human | untagged | bot, decided at write time by the same rule the
+     * aggregation applies (see lib/analytics.ts). Stored so a future query can
+     * filter cheaply; the aggregation still recomputes it, because 257 events
+     * were banked before this field existed.
+     */
+    visitorClass: { type: String, enum: ["human", "untagged", "bot"], default: "human", index: true },
   },
   { timestamps: { createdAt: true, updatedAt: false } },
 );

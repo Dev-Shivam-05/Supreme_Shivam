@@ -26,6 +26,7 @@
   --accent-ink: #0a0a08;  /* text that sits ON lime */
   --accent-2: #b6f000;    /* deeper lime for gradients */
   --signal: #ff4438;      /* race-red, used *only* for live/alert */
+  --chart-2: #5aa9ff;     /* ungeolocated series — the only hue besides lime/red */
 
   --glass: rgba(255, 255, 255, 0.035);
   --glass-strong: rgba(255, 255, 255, 0.07);
@@ -49,6 +50,7 @@
   --accent-ink: #0a0a08;
   --accent-2: #86b800;
   --signal: #e5231a;
+  --chart-2: #1f6fd0; /* 4.6:1 on --bg-elev #f6f6f2 */
 
   --glass: rgba(10, 10, 12, 0.03);
   --glass-strong: rgba(10, 10, 12, 0.06);
@@ -75,6 +77,7 @@
   --color-accent-ink: var(--accent-ink);
   --color-accent-2: var(--accent-2);
   --color-signal: var(--signal);
+  --color-chart-2: var(--chart-2);
 
   --color-glass: var(--glass);
   --color-glass-strong: var(--glass-strong);
@@ -321,6 +324,41 @@
   .reveal-stagger.in > *:nth-child(6) { transition-delay: 0.39s; }
   .reveal-stagger.in > *:nth-child(7) { transition-delay: 0.46s; }
   .reveal-stagger.in > *:nth-child(n+8) { transition-delay: 0.5s; }
+
+  /* ----------------------------------------------------------
+     ADMIN — Signal Deck (Phase 5a)
+     Loading never uses a spinner: a spinner says "wait" without
+     saying what for, and it reserves no space, so the layout
+     jumps when data lands. These skeletons hold the exact box.
+     ---------------------------------------------------------- */
+  @keyframes deck-shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+  .deck-skeleton {
+    position: relative; overflow: hidden;
+    border: 1px solid var(--border); background: var(--bg-elev);
+  }
+  .deck-skeleton::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--accent) 8%, transparent), transparent);
+    animation: deck-shimmer 1.2s ease-in-out infinite;
+  }
+
+  @keyframes deck-rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .deck-rise { animation: deck-rise 240ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+  @keyframes deck-row-in { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+  .deck-row-in { animation: deck-row-in 180ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+  /* Live indicator. --signal is reserved for exactly this kind of state. */
+  @keyframes deck-pulse { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 color-mix(in oklch, var(--signal) 60%, transparent); } 50% { opacity: 0.6; box-shadow: 0 0 0 6px transparent; } }
+  .deck-pulse { animation: deck-pulse 2s ease-in-out infinite; }
+
+  /* Hairline grid behind the deck — reads as an instrument panel, costs one gradient. */
+  .deck-grid {
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
 }
 
 /* ============================================================

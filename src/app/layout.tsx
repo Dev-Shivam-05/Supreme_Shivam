@@ -2,11 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Anton, Inter, JetBrains_Mono, Sacramento, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { SmoothScroll } from "@/components/providers/smooth-scroll";
-import { Nav } from "@/components/layout/nav";
-import { Footer } from "@/components/layout/footer";
-import { ScrollProgress } from "@/components/ux/scroll-progress";
-import { CommandPalette } from "@/components/ux/command-palette";
+import { Chrome } from "@/components/layout/chrome";
 import { Beacon } from "@/components/analytics/beacon";
 import { JsonLd, siteGraphLd } from "@/components/seo/json-ld";
 import { getSettings, toPublicContent } from "@/lib/content";
@@ -141,14 +137,8 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Beacon />
-          <SmoothScroll>
-            <ScrollProgress />
-            <div className="grain-overlay" aria-hidden />
-            <Nav />
-            <CommandPalette />
-            <main>{children}</main>
-            <Footer content={toPublicContent(content)} />
-          </SmoothScroll>
+          {/* Public chrome everywhere but /admin — see components/layout/chrome.tsx */}
+          <Chrome content={toPublicContent(content)}>{children}</Chrome>
         </ThemeProvider>
       </body>
     </html>

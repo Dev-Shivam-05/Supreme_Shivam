@@ -2,6 +2,13 @@
 
 ## Now
 
+**Phase 5a — Admin v2 "Signal Deck": built on `feat/phase-5a-admin-deck`, not deployed.**
+Spec `docs/spec/phase-5-admin-signal-deck.md` (approved `go` 2026-10-23). The panel now separates
+human traffic from this project's own tooling: 179 human pageviews / 149 session-days, against 257
+raw. Grouped sidebar, live event feed, command palette, provenance strip, and the duplicate-tick
+chart bug fixed. **Shivam: review the screenshots, then merge and `vercel --prod`.** 5b (Leads,
+Projects, Writing, Media, Status pages) is the next session.
+
 **Phase 4 — PageSpeed (2026-09-26): built on `perf/phase-4`, not deployed.** Accessibility 100 on
 mobile and desktop (was 96); three.js no longer loads on page load; preloader removed; AVIF portrait.
 Mobile performance stays ~85 locally, not the 95 target — the rest needs a design decision. Shivam:
@@ -36,6 +43,8 @@ says `shivam-bhadoriya-dev.vercel.app`, and the Instagram decision (add a link o
 | 3f | Off-site entity signals | **Nearly done — 2026-09-16; two hand edits left** | Verified 2026-09-16. Link back + Navsari: GitHub (`gh api user`), X, WakaTime. LinkedIn: Website field now shivambhadoriya.com (Portfolio), location Greater Surat Area (LinkedIn's metro area for Navsari). **Left, by hand:** (1) LinkedIn About ends with `Portfolio: shivam-bhadoriya-dev.vercel.app` — change to `shivambhadoriya.com`; the agent is blocked from editing the profile. (2) Instagram `__https.shivu` is a personal account with no link — add the site or drop it from `sameAs` (Shivam's call). Do not automate LinkedIn: it loads PerimeterX (`uc=scraping`) and hung the CDP session. |
 | 3g | Search visibility after the move | **Nearly done** — 2026-09-16 | Verification tag restored, 301s live, Google Change of Address confirmed, 10 URLs requested, Bing imported + sitemap. Bing Site Move pending Bing's 48h processing. |
 | 4 | Above-the-fold performance | **Built, not deployed** — 2026-09-26 | Spec `docs/spec/phase-4-pagespeed.md` (approved `GO`). A11y 96 → 100; shader deferred to first interaction; preloader gone; AVIF portrait; `template.tsx` no longer hides the page until hydration (row 11, pending OK). Mobile perf ~85 locally, target 95 not met — needs a design decision. Detail below is the older investigation. |
+| 5a | Admin v2 — Signal Deck | **Built, not deployed** — 2026-10-23 | Spec `docs/spec/phase-5-admin-signal-deck.md`, approved `go`. Visitor classification (human/untagged/bot) computed in a `$switch` so it applies to the 257 events banked before the field existed; 38 were this project's own headless Chrome. Grouped sidebar, live feed polling `/api/admin/feed` at 20s while visible, Cmd-K palette, provenance strip. `/admin` no longer renders the public nav/footer/Lenis (`components/layout/chrome.tsx`) — a nested layout cannot remove a parent's chrome. Verified against the live database and screenshotted in both themes at 1600/1100/480px. |
+| 5b | Admin v2 — remaining pages | **Open** | Leads, Projects, Writing, Media, Status redesigned to match the deck. Audience page waits on Shivam's visitor-identification requirements file. |
 | 5 | Confirm unverified facts | **Done** — 2026-09-14 | Phone, timelines, app confidentiality, Instagram and the real AI-PULSE stack (read from the GitHub API, not guessed) are all in the code. |
 
 ## Phase 2 — what shipped

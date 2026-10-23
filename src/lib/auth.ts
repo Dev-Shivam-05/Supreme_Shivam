@@ -50,4 +50,19 @@ export function checkPassword(input: string): boolean {
   return matched;
 }
 
+/**
+ * The `exp` carried by a valid token, or null. The cookie is httpOnly, so the
+ * admin UI cannot read its own expiry — the API hands it over instead, and the
+ * sidebar can count down to a sign-out that would otherwise land without warning.
+ */
+export function tokenExpiry(token?: string | null): number | null {
+  if (!verifyToken(token)) return null;
+  try {
+    const payload = JSON.parse(Buffer.from(token!.split(".")[0], "base64url").toString());
+    return typeof payload.exp === "number" ? payload.exp : null;
+  } catch {
+    return null;
+  }
+}
+
 export const cookieMaxAge = MAX_AGE;
