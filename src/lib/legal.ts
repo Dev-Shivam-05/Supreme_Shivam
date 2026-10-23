@@ -10,6 +10,8 @@ import { site } from "./site";
  *   "no cookies unless you opt in"             → components/vi/* load nothing until consent
  *   "aggregate analytics are cookieless"       → components/analytics/beacon.tsx
  *   "referrer kept as a domain only"           → app/api/collect/route.ts
+ *   "arrival as one word; region + time zone,
+ *    never city"                               → app/api/collect/route.ts (Phase 6b)
  *   "IP is keyed-hashed, never stored"         → lib/keyed-hash.ts, app/api/contact|collect/route.ts
  *   "journey records only IDs, never URLs"     → lib/vi/catalog.ts allowlists + lib/vi/engine.ts
  *   "15-day window, deleted at 22 days"        → lib/vi/policy.ts + vi_* TTL indexes
@@ -56,7 +58,9 @@ export const privacySections: LegalSection[] = [
   {
     h: "What I collect when you just read the site",
     p: [
-      "The site counts pageviews with its own analytics, built into the site rather than bought from anyone. For each page you open it records the path, the domain name of the site that linked you here (not the full address), short campaign codes if the link carried any, your country, and a general description of your device, browser and operating system.",
+      "The site counts pageviews with its own analytics, built into the site rather than bought from anyone. For each page you open it records the path, the site's own ID for that page, the domain name of the site that linked you here (not the full address), short campaign codes if the link carried any, and a general description of your device, browser and operating system.",
+      "On the first page you open it also records how you arrived, as one word from a fixed list: direct, search, AI assistant, social, developer community, email, campaign or referral. Every later page in the same visit is recorded as internal. The address you came from is never sent.",
+      "It records an approximate location: your country, your state or region, and your time zone. These are worked out by the hosting provider from your IP address, so they describe where your internet connection appears to be, which can be wrong (a VPN or a mobile network can place you in another region). Your city is not recorded in these statistics.",
       "It also records a visitor identifier, and this is the part worth being precise about: it is a keyed hash of today's date, your IP address and your browser string, made with a secret key that exists only on the server. The IP itself is never stored. Because the date is part of it, the identifier changes every day at midnight UTC, so today's visits cannot be joined to yesterday's. It is a counter, not a profile.",
       "Some of these numbers are published openly on the /stats page. Nothing there identifies anyone.",
     ],
@@ -65,7 +69,7 @@ export const privacySections: LegalSection[] = [
     h: "Visit insights — only if you say yes",
     id: "visit-insights",
     p: [
-      "After you have been on the site for a little while, a small card asks whether I may understand why you visited. Nothing described in this section happens unless you press “Allow selected”. You choose each part separately:",
+      "When you first open the site, a small card asks whether I may understand why you visited. You can ignore it and keep reading; the site works the same either way. Nothing described in this section happens unless you press “Allow selected”. You choose each part separately:",
     ],
     list: [
       "Pages and buttons. For 15 days from your first page view, the site records which of its own pages you open — as a fixed ID such as “case study — AI-PULSE”, never a URL — which of its buttons you use (for example “contact”, “email”, “GitHub profile”), how you arrived as a category (“search engine”, “AI assistant”, “social”, “direct” and similar, never the address you came from), and, if you use the Cmd-K menu, only the broad topic of what you typed (“development”, “hiring”, “collaboration” or “other”), never the words.",

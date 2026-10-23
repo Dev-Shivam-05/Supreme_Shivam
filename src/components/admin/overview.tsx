@@ -4,6 +4,8 @@ import type { ClassFilter, RangeKey, SeriesPoint } from "@/lib/analytics";
 import { BarList, BarListSkeleton, Empty, Kpi, KpiSkeleton, Panel, Segmented } from "./primitives";
 import { ChartLegend, TrendChart } from "./trend-chart";
 import { LiveFeed } from "./live-feed";
+import { CONTENT } from "@/lib/vi/catalog";
+import { entryLabel } from "./visitors";
 
 export type OverviewData = {
   configured: boolean;
@@ -16,6 +18,8 @@ export type OverviewData = {
   topPaths: { label: string; count: number }[];
   topReferrers: { label: string; count: number }[];
   topCountries: { label: string; count: number }[];
+  landingEntries: { label: string; count: number }[];
+  landingPages: { label: string; count: number }[];
   devices: { label: string; count: number }[];
   provenance: { human: number; untagged: number; bot: number; firstEvent: string | null; retentionDays: number };
 };
@@ -115,6 +119,18 @@ export function Overview({
         </Panel>
         <Panel title="Devices">
           {loading || !data ? <BarListSkeleton rows={4} /> : <BarList items={data.devices} />}
+        </Panel>
+        <Panel title="Arrival and landing — every visitor">
+          {loading || !data ? (
+            <BarListSkeleton />
+          ) : (
+            <div className="space-y-4">
+              <BarList items={data.landingEntries.map((e) => ({ label: entryLabel(e.label), count: e.count }))} />
+              <BarList
+                items={data.landingPages.map((e) => ({ label: CONTENT[e.label]?.title ?? e.label, count: e.count }))}
+              />
+            </div>
+          )}
         </Panel>
       </div>
 

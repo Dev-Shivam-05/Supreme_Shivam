@@ -2,6 +2,10 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { classifyEntry, type EntryCategory } from "@/lib/vi/catalog";
+
+/** Module-level: it describes the page load, which outlives a remount of this component. */
+let landingSent = false;
 
 /**
  * Fires a pageview beacon on every route change. Server no-ops if DB is unset.
@@ -18,9 +22,17 @@ export function Beacon() {
   const pathname = usePathname();
   useEffect(() => {
     if (!pathname || pathname.startsWith("/admin")) return;
+    // Phase 6b row 2: the same classifier as the journey tracker. Only the
+    // first view of a page load carries how the visitor arrived; a client-side
+    // navigation keeps document.referrer, so it must not repeat it.
+    const entry: EntryCategory = landingSent
+      ? "internal"
+      : classifyEntry(document.referrer, location.search, location.hostname);
+    landingSent = true;
     const payload = JSON.stringify({
       path: pathname + window.location.search,
       referrer: document.referrer,
+      entry,
     });
     try {
       if (navigator.sendBeacon) {

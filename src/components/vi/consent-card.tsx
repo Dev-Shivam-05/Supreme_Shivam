@@ -7,10 +7,6 @@ import type { Purpose } from "@/lib/vi/policy";
 import { cn } from "@/lib/utils";
 import { decline, grant, probe, readChoice, reportShown, useVI, withdraw } from "./vi-client";
 
-/** Spec §5: the card waits for either signal of real interest, whichever comes first. */
-const PROMPT_AFTER_MS = 20_000;
-const PROMPT_AT_SCROLL = 0.4;
-
 const TOGGLES: { purpose: Purpose; label: string; hint?: string }[] = [
   { purpose: "journey", label: "Pages and buttons" },
   { purpose: "linking", label: "Link to an enquiry I send", hint: "Only if you tick a box on the contact form" },
@@ -78,36 +74,23 @@ export default function ConsentCard({ openRequest }: { openRequest: number }) {
     modeRef.current = mode;
   }, [mode]);
 
-  // Arm the prompt. Only a visitor with no stored answer is ever asked, and the
-  // server is consulted only now, at the moment the card would appear.
+  // Phase 6b row 1: prompt on the first page load, so one click on "Allow"
+  // starts the journey on the landing page. VIRoot already held this chunk
+  // back until the browser was idle (capped), so it fires on mount. Only a
+  // visitor with no stored answer is ever asked, and the server is consulted
+  // only now, at the moment the card would appear.
   useEffect(() => {
     if (readChoice()) return;
-    let fired = false;
-    const fire = () => {
-      if (fired) return;
-      fired = true;
-      disarm();
-      void probe().then((s) => {
-        if (!s || !s.enabled || s.granted || readChoice() || dismissedRef.current) return;
-        if (modeRef.current !== "hidden") return;
-        setMode("prompt");
-        reportShown();
-      });
+    let live = true;
+    void probe().then((s) => {
+      if (!live || !s || !s.enabled || s.granted || readChoice() || dismissedRef.current) return;
+      if (modeRef.current !== "hidden") return;
+      setMode("prompt");
+      reportShown();
+    });
+    return () => {
+      live = false;
     };
-    const onScroll = () => {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      if (max > 0 && window.scrollY / max >= PROMPT_AT_SCROLL) fire();
-    };
-    // performance.now() counts from the start of this page load, so time spent
-    // before the card's chunk arrived still counts toward the 20 seconds.
-    const timer = setTimeout(fire, Math.max(0, PROMPT_AFTER_MS - performance.now()));
-    window.addEventListener("scroll", onScroll, { passive: true });
-    function disarm() {
-      clearTimeout(timer);
-      window.removeEventListener("scroll", onScroll);
-    }
-    onScroll();
-    return disarm;
   }, []);
 
   // The manage panel always shows the server's answer, not a stale local one.
