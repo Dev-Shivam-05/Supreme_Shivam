@@ -22,9 +22,9 @@ import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 import { Engine, Rejected, backoffMs, type Context, type EngineConfig, type Proof } from "./engine.ts";
 import { MemoryStore } from "./memory-store.ts";
-import { candidateEvaluationRule, developmentInterestRule, readerInterestRule, serviceEvaluationRule } from "./rules.ts";
-import { ALLOWED_VALUES, CONTENT, EVENT_PROPERTIES } from "./catalog.ts";
-import { EVIDENCE_STATUS, GRANT_VALIDITY_MS, SOURCES } from "./policy.ts";
+import { developmentInterestRule } from "./rules.ts";
+import { buildProdConfig } from "./config.ts";
+import { EVIDENCE_STATUS, GRANT_VALIDITY_MS } from "./policy.ts";
 
 const REF_DIR = fileURLToPath(new URL("../../../visitor_intelligence_reference/", import.meta.url));
 
@@ -470,19 +470,8 @@ describe("Additional invariants", () => {
 
 /* ------------------------------------------------ production catalog */
 
-const PROD_CONFIG: EngineConfig = {
-  sources: SOURCES,
-  properties: EVENT_PROPERTIES,
-  allowedValues: ALLOWED_VALUES,
-  contents: CONTENT,
-  rules: [
-    developmentInterestRule(["start_project", "enquiry_submitted"]),
-    serviceEvaluationRule(["start_project", "email", "phone", "enquiry_submitted"], Object.fromEntries(Object.entries(CONTENT).map(([k, v]) => [k, v.title]))),
-    candidateEvaluationRule(["social_linkedin", "social_github"]),
-    readerInterestRule(Object.fromEntries(Object.entries(CONTENT).map(([k, v]) => [k, v.topic]))),
-  ],
-  scopeHash,
-};
+/** Exactly the configuration production runs (config.ts). */
+const PROD_CONFIG: EngineConfig = buildProdConfig(scopeHash);
 
 const pv = (n: number, content_id: string, entry = "internal") => event(n, "page_view", { content_id, entry });
 const cta = (n: number, cta_id: string) => event(n, "cta_click", { cta_id });
