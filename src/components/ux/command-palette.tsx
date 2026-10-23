@@ -35,6 +35,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EMAIL_MASKED, emailAddress, emailHref } from "@/lib/email";
 import { nav, site } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { searchTopic } from "@/lib/vi/catalog";
+import { trackSearch } from "@/components/vi/vi-client";
 
 type Item = {
   id: string;
@@ -156,6 +158,13 @@ export function CommandPalette() {
     if (open) setTimeout(() => inputRef.current?.focus(), 40);
   }, [open]);
 
+  // A palette query is the site's only search (spec D11). It is reduced to a
+  // topic here, in the browser; the words themselves are never sent.
+  const runItem = (it: Item) => {
+    if (query.trim()) trackSearch(searchTopic(query));
+    it.run();
+  };
+
   const onListKey = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -165,7 +174,8 @@ export function CommandPalette() {
       setActive((a) => Math.max(a - 1, 0));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      filtered[active]?.run();
+      const it = filtered[active];
+      if (it) runItem(it);
     }
   };
 
@@ -222,7 +232,7 @@ export function CommandPalette() {
                 <li key={it.id}>
                   <button
                     onMouseEnter={() => setActive(i)}
-                    onClick={() => it.run()}
+                    onClick={() => runItem(it)}
                     className={cn(
                       "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors",
                       i === active ? "bg-glass-strong text-fg" : "text-fg-muted",
