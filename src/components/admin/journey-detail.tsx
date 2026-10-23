@@ -115,8 +115,18 @@ export function JourneyDetail({
             {data.timeline.map((t, i) => (
               <li key={`${t.at}-${i}`} className="flex flex-wrap items-center gap-x-3 gap-y-1 bg-bg px-3 py-2 text-sm">
                 <span className="w-[8.5rem] shrink-0 font-mono text-[0.68rem] text-fg-faint">{stamp(t.at)}</span>
+                <span className="w-16 shrink-0 font-mono text-[0.6rem] text-fg-faint" title="Session">s·{t.sessionHint}</span>
                 <span className="min-w-0 flex-1 truncate text-fg">{t.label}</span>
                 {t.detail && <span className="font-mono text-[0.68rem] text-fg-muted">{t.detail}</span>}
+                {/* The identity of a linked enquiry reaches these events and no others. */}
+                {t.inLink && (
+                  <span
+                    title="Inside the linked enquiry's scope"
+                    className="border border-chart-2 px-1.5 py-0.5 font-mono text-[0.6rem] uppercase leading-none tracking-wider text-chart-2"
+                  >
+                    linked
+                  </span>
+                )}
                 <EvidenceBadge status={t.evidenceStatus} />
               </li>
             ))}
@@ -328,6 +338,10 @@ function LinkedBlock({
               linked {stamp(link.validFrom)} · {link.eventIds.length} events in scope · until {stamp(link.validUntil)}
             </p>
           )}
+          <p className="mt-1 max-w-md text-xs leading-relaxed text-fg-muted">
+            This enquiry covers the {linked.eventIds.length} events marked “linked” in session {linked.sessionHint} — the
+            pages the visitor chose to attach. It says nothing about the rest of the journey or the network lookup.
+          </p>
         </div>
         {!open && (
           <button

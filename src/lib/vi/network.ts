@@ -156,7 +156,7 @@ async function lookupOwner(
       kind: (hit.kind as NetworkKind) ?? "unknown",
       matchedRule: (hit.matchedRule as string) ?? "unknown:no_rule",
       registry: (hit.registry as string) ?? "",
-      handle: (hit.handle as string) ?? null,
+      handle: null,
       networkName: (hit.networkName as string) ?? null,
       country: (hit.country as string) ?? null,
       fetchedAt: hit.fetchedAt as Date,
@@ -187,7 +187,7 @@ async function lookupOwner(
         owner: facts.owner,
         kind,
         registry,
-        handle: facts.handle,
+        // No handle: APNIC and RIPE handles spell out the address range itself.
         networkName: facts.networkName,
         country: facts.country,
         matchedRule,
@@ -202,7 +202,7 @@ async function lookupOwner(
     kind,
     matchedRule,
     registry,
-    handle: facts.handle,
+    handle: null,
     networkName: facts.networkName,
     country: facts.country,
     fetchedAt,
@@ -319,7 +319,8 @@ export async function recordNetworkEvidence(input: NetworkEvidenceInput): Promis
         registry: result.registry,
         country: result.country,
       },
-      sourceRecordId: result.handle,
+      // The registry handle would identify the address block; the registry host is enough provenance.
+      sourceRecordId: null,
       evidenceStatus: "inferred",
       unknownReason: null,
       uncertainty: {

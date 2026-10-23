@@ -39,7 +39,9 @@ const schema = z.strictObject({
 /** POST /api/vi/grant — mints a browser epoch and its grant. The only place either is created. */
 export async function POST(req: NextRequest) {
   const ip = clientIp(req);
-  if (!rateLimit(`vi-grant:${ip ?? "unknown"}`, 10, 60_000).ok) {
+  // Per address, and a ceiling for the whole instance: rotating IPv6 addresses
+  // defeats the first, and every grant is a database write.
+  if (!rateLimit(`vi-grant:${ip ?? "unknown"}`, 10, 60_000).ok || !rateLimit("vi-grant:*", 120, 60_000).ok) {
     await logRejection("rate_limited");
     return json({ ok: false, error: "rate_limited" }, 429);
   }

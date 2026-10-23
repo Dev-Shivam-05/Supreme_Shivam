@@ -323,3 +323,16 @@ describe("describeNetwork", () => {
     assert.match(describeNetwork("corporate", null), /an unnamed registrant/);
   });
 });
+
+describe("parseRdap — private persons (security review 2026-10-23)", () => {
+  test("a registrant whose vCard kind is individual is never the owner", () => {
+    const facts = parseRdap({
+      name: "HOME-NET",
+      entities: [
+        { roles: ["registrant"], vcardArray: ["vcard", [["fn", {}, "text", "A Private Person"], ["kind", {}, "text", "individual"]]] },
+      ],
+    });
+    assert.notEqual(facts.owner, "A Private Person");
+    assert.equal(facts.owner, "HOME-NET");
+  });
+});

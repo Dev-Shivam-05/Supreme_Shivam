@@ -17,6 +17,8 @@ import {
   type Tombstone,
 } from "./engine.ts";
 import { RETENTION } from "./policy.ts";
+import { scopeHash } from "./cookies.ts";
+import { Lead } from "../../models/lead.ts";
 import {
   VIDeletionJob,
   VIEvent,
@@ -44,6 +46,7 @@ const toGrant = (d: Doc): Grant => ({
   sources: (d.sources as string[]) ?? [],
   revokedAt: (d.revokedAt as Date) ?? null,
   state: d.state as Grant["state"],
+  erased: d.erased === true,
   basis: (d.basis as string) ?? "consent",
   policyVersion: (d.policyVersion as string) ?? "",
   proofRef: (d.proofRef as string) ?? "",
@@ -107,6 +110,14 @@ const toJob = (d: Doc): DeletionJob => ({
   errorCode: (d.errorCode as string) ?? null,
 });
 
+/**
+ * A window document outlives its `expiresAt` by one day so the daily sweep
+ * sees it, writes the "expired" tombstone and erases with an audit row. The
+ * journey data itself still goes at `expiresAt` through its own TTL indexes;
+ * only these dates linger, and only for that day.
+ */
+const purgeAt = (w: ObservationWindow) => new Date(w.expiresAt.getTime() + 24 * 3_600_000);
+
 export class MongoStore implements Store {
   async getGrant(grantId: string) {
     const d = await VIGrant.findById(grantId).lean<Doc>();
@@ -119,7 +130,8 @@ export class MongoStore implements Store {
       {
         $set: {
           siteId: g.siteId,
-          epochId: g.epochId,
+          // Never write a plain epoch id back over a record that erasure pseudonymised.
+          ...(g.erased ? {} : { epochId: g.epochId }),
           startsAt: g.startsAt,
           validUntil: g.expiresAt,
           purposes: g.purposes,
@@ -152,7 +164,7 @@ export class MongoStore implements Store {
 
   async getOrCreateWindow(w: ObservationWindow) {
     try {
-      await VIWindow.create({ _id: w.windowId, ...w });
+      await VIWindow.create({ _id: w.windowId, ...w, purgeAt: purgeAt(w) });
       return w;
     } catch (err) {
       // Two first page views raced; the unique (siteId, epochId) index picked a winner.
@@ -164,7 +176,7 @@ export class MongoStore implements Store {
   }
 
   async saveWindow(w: ObservationWindow) {
-    await VIWindow.updateOne({ _id: w.windowId }, { $set: { ...w } }, { upsert: true });
+    await VIWindow.updateOne({ _id: w.windowId }, { $set: { ...w, purgeAt: purgeAt(w) } }, { upsert: true });
   }
 
   async listOpenWindows() {
@@ -205,6 +217,14 @@ export class MongoStore implements Store {
     return docs.map(toEvent);
   }
 
+  async countEvents(siteId: string, epochId: string) {
+    return VIEvent.countDocuments({ siteId, epochId });
+  }
+
+  async countSessions(siteId: string, epochId: string) {
+    return VISession.countDocuments({ siteId, epochId });
+  }
+
   async getProof(proofId: string) {
     const d = await VIProof.findById(proofId).lean<Doc>();
     return d ? toProof(d) : null;
@@ -243,19 +263,40 @@ export class MongoStore implements Store {
     );
   }
 
+  /**
+   * Everything of one epoch goes, except two things kept on purpose: the
+   * tombstone (keyed hash only) and the consent record, whose plain epoch id is
+   * replaced with that same keyed hash so it can no longer be joined to
+   * anything. The window goes too — the reference keeps it with a state for
+   * inspection; production keeps the tombstone instead. A lead that pointed at
+   * one of this epoch's links loses the pointer: the link no longer exists.
+   */
   async eraseEpochData(siteId: string, epochId: string, grantIds: string[]) {
+    const linkIds = (await VILink.find({ siteId, epochId }).select("_id").lean<Doc[]>()).map((d) => d._id as string);
+    const hmac = scopeHash(siteId, epochId);
     await Promise.all([
       VIEvent.deleteMany({ siteId, epochId }),
       VIInsight.deleteMany({ siteId, entityId: epochId }),
       VILink.deleteMany({ siteId, epochId }),
       VISession.deleteMany({ siteId, epochId }),
       VIEvidence.deleteMany({ siteId, epochId }),
+      VIWindow.deleteMany({ siteId, epochId }),
       grantIds.length ? VIProof.deleteMany({ siteId, grantId: { $in: grantIds } }) : Promise.resolve(),
+      linkIds.length ? Lead.updateMany({ visitLinkId: { $in: linkIds } }, { $set: { visitLinkId: "" } }) : Promise.resolve(),
+      grantIds.length
+        ? VIGrant.updateMany(
+            { _id: { $in: grantIds } },
+            { $set: { epochId: `erased:${hmac}`, scopeHmac: hmac, erased: true } },
+          )
+        : Promise.resolve(),
     ]);
   }
 
   async grantIdsForEpoch(siteId: string, epochId: string) {
-    const docs = await VIGrant.find({ siteId, epochId }).select("_id").lean<Doc[]>();
+    // Matches pseudonymised records too, so a retried erase still finds their proofs.
+    const docs = await VIGrant.find({ siteId, $or: [{ epochId }, { scopeHmac: scopeHash(siteId, epochId) }] })
+      .select("_id")
+      .lean<Doc[]>();
     return docs.map((d) => d._id as string);
   }
 

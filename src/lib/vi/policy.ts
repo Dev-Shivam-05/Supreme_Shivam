@@ -43,6 +43,15 @@ export const RETENTION = {
 
 export const MAX_PAYLOAD_BYTES = 8192;
 
+/**
+ * Hard ceilings per browser epoch. A real visit is a few dozen events over a
+ * handful of sessions; without a ceiling one free grant could write millions
+ * of rows over 15 days, and dropping the session cookie on every request
+ * would mint a session (and a registry lookup) per event.
+ */
+export const MAX_EVENTS_PER_EPOCH = 500;
+export const MAX_SESSIONS_PER_EPOCH = 50;
+
 export const PURPOSES = ["journey", "linking", "organization"] as const;
 export type Purpose = (typeof PURPOSES)[number];
 

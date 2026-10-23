@@ -24,7 +24,7 @@ import { Engine, Rejected, backoffMs, type Context, type EngineConfig, type Proo
 import { MemoryStore } from "./memory-store.ts";
 import { developmentInterestRule } from "./rules.ts";
 import { buildProdConfig } from "./config.ts";
-import { EVIDENCE_STATUS, GRANT_VALIDITY_MS } from "./policy.ts";
+import { EVIDENCE_STATUS, GRANT_VALIDITY_MS, MAX_EVENTS_PER_EPOCH, MAX_SESSIONS_PER_EPOCH } from "./policy.ts";
 
 const REF_DIR = fileURLToPath(new URL("../../../visitor_intelligence_reference/", import.meta.url));
 
@@ -564,5 +564,88 @@ describe("Production catalog", () => {
       assert.match(i.permittedNextAction, /do not initiate outreach/);
       assert.ok(i.alternatives.length > 0 && i.unknowns.length > 0);
     }
+  });
+});
+
+/* ------------------------------------------- security review, 2026-10-23 */
+
+describe("Review fixes", () => {
+  beforeEach(() => setUp());
+
+  test("event_cap_per_epoch", async () => {
+    await start();
+    for (let n = 2; n <= MAX_EVENTS_PER_EPOCH; n++) {
+      await e.ingest(event(n, "page_view", { content_id: "about" }), c, at(n * 1000));
+    }
+    assert.equal(store.events.size, MAX_EVENTS_PER_EPOCH);
+    await rejects(e.ingest(event(MAX_EVENTS_PER_EPOCH + 1, "page_view", { content_id: "about" }), c, at(DAY)), "epoch_event_cap");
+    // A replay of an accepted event is still settled as a duplicate, not refused by the cap.
+    assert.equal(await e.ingest(event(1), c, at(DAY)), "duplicate");
+  });
+
+  test("session_cap_per_epoch", async () => {
+    await start();
+    for (let n = 1; n < MAX_SESSIONS_PER_EPOCH; n++) {
+      await e.ingest(event(100 + n, "page_view", { content_id: "about" }), { ...c, sessionId: `s${n}` }, at(n * 1000));
+    }
+    await rejects(
+      e.ingest(event(999, "page_view", { content_id: "about" }), { ...c, sessionId: "one-too-many" }, at(DAY)),
+      "epoch_session_cap",
+    );
+    // An existing session keeps working.
+    assert.equal(await e.ingest(event(998, "page_view", { content_id: "about" }), c, at(DAY)), "accepted");
+  });
+
+  test("event_landing_after_withdrawal_is_removed_at_once", async () => {
+    await start();
+    // Simulate the race: the tombstone lands between the grant check and the write.
+    const real = store.insertEvent.bind(store);
+    store.insertEvent = async (ev) => {
+      const r = await real(ev);
+      await store.addTombstone({
+        siteId: "site_demo",
+        auditId: "race",
+        action: "withdrawn",
+        actorRole: "visitor",
+        scopeHmac: scopeHash("site_demo", "epoch_A"),
+        policyVersion: "test",
+        recordedAt: at(HOUR),
+        expiresAt: at(90 * DAY),
+      });
+      return r;
+    };
+    await rejects(e.ingest(event(2, "page_view", { content_id: "about" }), c, at(HOUR)), "permission_denied");
+    assert.equal(store.events.size, 0);
+  });
+
+  test("tombstone_precedes_revocation", async () => {
+    await start();
+    // If the tombstone write fails, the grant must still be unrevoked so a retry erases.
+    const real = store.addTombstone.bind(store);
+    store.addTombstone = async () => {
+      throw new Error("db down");
+    };
+    await assert.rejects(e.withdraw(c, at(DAY)));
+    assert.equal(store.grants.get("grant_A")!.revokedAt, null);
+    assert.equal(store.events.size, 1);
+    store.addTombstone = real;
+    await e.withdraw(c, at(DAY + HOUR));
+    assert.equal(store.events.size, 0);
+    assert.notEqual(store.grants.get("grant_A")!.revokedAt, null);
+  });
+
+  test("withdraw_is_idempotent_and_writes_one_erasing_tombstone", async () => {
+    await start();
+    await e.withdraw(c, at(DAY));
+    await e.withdraw(c, at(DAY + 1));
+    assert.equal(store.tombstones.filter((t) => t.action === "withdrawn").length, 1);
+  });
+
+  test("expiry_does_not_revoke_but_erases", async () => {
+    await start();
+    await e.expire(at(22 * DAY));
+    assert.equal(store.grants.get("grant_A")!.revokedAt, null);
+    assert.equal(store.events.size, 0);
+    assert.ok(store.tombstones.some((t) => t.action === "expired" && t.actorRole === "system"));
   });
 });

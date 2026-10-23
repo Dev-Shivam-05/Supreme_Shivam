@@ -32,7 +32,9 @@ export async function POST(req: NextRequest) {
     );
   }
   // An unknown id would still write a tombstone; refuse it so the audit trail stays meaningful.
-  if (!(await engine.store.getWindow(SITE_ID, parsed.data.epochId))) {
+  // "Known" means a grant exists — an epoch with network evidence but no page
+  // view in the catalogue has no window, and must still be erasable.
+  if ((await engine.store.grantIdsForEpoch(SITE_ID, parsed.data.epochId)).length === 0) {
     return NextResponse.json({ ok: false, error: "Journey not found" }, { status: 404, headers: NO_STORE });
   }
   await engine.adminErase(SITE_ID, parsed.data.epochId, new Date());

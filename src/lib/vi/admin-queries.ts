@@ -73,6 +73,11 @@ export type VISummary = {
   };
 };
 
+/**
+ * The enquiry a visitor linked, and exactly what it covers. A link is
+ * event-scoped (reference.py `link_session_to_contact`): the identity applies
+ * to `eventIds` in one session, never to the rest of the journey.
+ */
 export type LinkedLead = {
   linkId: string;
   leadId: string;
@@ -81,7 +86,12 @@ export type LinkedLead = {
   enquiringAs: string;
   organization: string;
   topic: string;
+  sessionHint: string;
+  eventIds: string[];
 };
+
+/** What the list carries: that a link exists, never who it names. */
+export type LinkedRef = { linkId: string; leadId: string; eventCount: number };
 
 export type NetworkSummary = { owner: string; kind: string; status: EvidenceStatus; reason: string | null };
 
@@ -102,17 +112,21 @@ export type JourneyListItem = {
   pages: string[];
   ctas: string[];
   purposes: string[];
-  linked: LinkedLead | null;
+  linked: LinkedRef | null;
   network: NetworkSummary[];
   insights: { ruleVersion: string; hypothesis: string }[];
 };
 
 export type TimelineRow = {
   at: string;
+  eventId: string;
+  sessionHint: string;
   eventName: string;
   label: string;
   detail: string;
   evidenceStatus: EvidenceStatus;
+  /** Inside the linked enquiry's scope — the only events the identity applies to. */
+  inLink: boolean;
 };
 
 export type InsightView = Omit<Insight, "computedAt" | "expiresAt"> & { computedAt: string; expiresAt: string };
@@ -152,7 +166,9 @@ export type Dimension = {
   caveat: string;
 };
 
-export type JourneyDetail = Omit<JourneyListItem, "insights"> & {
+export type JourneyDetail = Omit<JourneyListItem, "insights" | "linked"> & {
+  /** The full identity, scoped — see LinkedLead. Only the detail view carries it. */
+  linked: LinkedLead | null;
   timeline: TimelineRow[];
   insights: InsightView[];
   evidence: EvidenceRow[];
@@ -207,6 +223,17 @@ async function tombstonedScopes(): Promise<Set<string>> {
 
 const isHidden = (dead: Set<string>, epochId: string) => dead.has(scopeHash(SITE_ID, epochId));
 
+/**
+ * Epochs whose grant was revoked. Erasure writes the tombstone before it
+ * revokes, so this should always be a subset of the tombstoned set — it is a
+ * second fence, so a withdrawal interrupted on some older path can never leave
+ * a journey readable (R08, R17).
+ */
+async function revokedEpochs(): Promise<Set<string>> {
+  const rows = await VIGrant.find({ siteId: SITE_ID, revokedAt: { $ne: null } }).select("epochId").lean<Doc[]>();
+  return new Set(rows.map((r) => String(r.epochId)));
+}
+
 /** A window whose 15 days have run out is closed whether or not the sweep has marked it yet. */
 function effectiveState(w: Doc, now: Date): JourneyState {
   return w.state === "active" && now.getTime() < (w.endsAt as Date).getTime() ? "active" : "closed";
@@ -229,15 +256,17 @@ function networkOf(ev: Doc): NetworkSummary {
   };
 }
 
-function leadView(linkId: string, l: Doc): LinkedLead {
+function leadView(link: Doc, l: Doc): LinkedLead {
   return {
-    linkId,
+    linkId: String(link._id),
     leadId: String(l._id),
     name: str(l.name),
     email: str(l.email),
     enquiringAs: str(l.enquiringAs),
     organization: str(l.organization),
     topic: str(l.topic),
+    sessionHint: str(link.sessionId).slice(0, 8),
+    eventIds: ((link.eventIds as string[]) ?? []).map(String),
   };
 }
 
@@ -280,8 +309,15 @@ export async function getVISummary(now = new Date()): Promise<VISummary> {
   const since30 = new Date(now.getTime() - 30 * DAY).toISOString().slice(0, 10);
   const since7 = new Date(now.getTime() - 7 * DAY);
 
-  const [dead, windows, stats, linkedEnquiries, rejections, jobs] = await Promise.all([
+  const [dead, revoked, erasures, windows, stats, linkedEnquiries, rejections, jobs] = await Promise.all([
     tombstonedScopes(),
+    revokedEpochs(),
+    // Erased journeys leave no window behind (mongo-store eraseEpochData), so
+    // "withdrawn" and "expired" are counted from the 90-day tombstones instead.
+    VITombstone.aggregate<{ _id: string; count: number }>([
+      { $match: { siteId: SITE_ID, action: { $in: ERASING_ACTIONS } } },
+      { $group: { _id: "$action", count: { $sum: 1 } } },
+    ]),
     VIWindow.find({ siteId: SITE_ID }).select("epochId state endsAt").lean<Doc[]>(),
     // Day keys are YYYY-MM-DD, so a string comparison is a date comparison.
     VIConsentStat.find({ _id: { $gte: since30 } }).lean<Doc[]>(),
@@ -298,18 +334,17 @@ export async function getVISummary(now = new Date()): Promise<VISummary> {
   ]);
 
   const journeys = { active: 0, closed: 0, withdrawn: 0, expired: 0 };
+  for (const t of erasures) {
+    if (t._id === "expired") journeys.expired += t.count;
+    else journeys.withdrawn += t.count; // withdrawn by the visitor, or erased by the admin
+  }
   const live: string[] = [];
   for (const w of windows) {
     const epochId = w.epochId as string;
-    if (w.state === "withdrawn" || w.state === "expired") {
-      journeys[w.state]++;
-    } else if (isHidden(dead, epochId)) {
-      // Tombstone landed but the window was not re-marked (interrupted erase): it is gone.
-      journeys.withdrawn++;
-    } else {
-      journeys[effectiveState(w, now)]++;
-      live.push(epochId);
-    }
+    if (w.state === "withdrawn" || w.state === "expired") continue;
+    if (isHidden(dead, epochId) || revoked.has(epochId)) continue;
+    journeys[effectiveState(w, now)]++;
+    live.push(epochId);
   }
 
   const c = { shown: 0, declined: 0, granted: 0, grantedLinking: 0, grantedOrganization: 0, withdrawn: 0 };
@@ -396,7 +431,7 @@ async function loadBatch(epochIds: string[], now: Date): Promise<Batch> {
   for (const l of links) {
     const epochId = String(l.epochId);
     const lead = leadById.get(String(l.contactId));
-    if (lead && !linked.has(epochId)) linked.set(epochId, leadView(String(l._id), lead));
+    if (lead && !linked.has(epochId)) linked.set(epochId, leadView(l, lead));
   }
 
   return {
@@ -407,6 +442,9 @@ async function loadBatch(epochIds: string[], now: Date): Promise<Batch> {
     insights: group(insights, "entityId"),
   };
 }
+
+const refOf = (l: LinkedLead | null): LinkedRef | null =>
+  l ? { linkId: l.linkId, leadId: l.leadId, eventCount: l.eventIds.length } : null;
 
 function toItem(w: Doc, b: Batch, now: Date): JourneyListItem {
   const epochId = w.epochId as string;
@@ -452,7 +490,7 @@ function toItem(w: Doc, b: Batch, now: Date): JourneyListItem {
     pages: contentIds.slice(0, 5).map((id) => CONTENT[id]?.title ?? id),
     ctas,
     purposes,
-    linked: b.linked.get(epochId) ?? null,
+    linked: refOf(b.linked.get(epochId) ?? null),
     network,
     insights: (b.insights.get(epochId) ?? []).map((i) => {
       const r = (i.record ?? {}) as Doc;
@@ -467,16 +505,19 @@ export async function listJourneys(filter: JourneyFilter = "all", now = new Date
   if (!viEnabled()) return [];
   await connect();
 
-  const [dead, windows] = await Promise.all([
+  const [dead, revoked, windows] = await Promise.all([
     tombstonedScopes(),
+    revokedEpochs(),
     // Withdrawn and expired windows hold no data any more; only these two can be shown.
+    // Bounded: grants are free to mint, so windows can pile up. Newest first.
     VIWindow.find({ siteId: SITE_ID, state: { $in: ["active", "closed"] } })
       .sort({ startsAt: -1 })
+      .limit(LIST_LIMIT * 20)
       .lean<Doc[]>(),
   ]);
 
   const visible = windows
-    .filter((w) => !isHidden(dead, w.epochId as string))
+    .filter((w) => !isHidden(dead, w.epochId as string) && !revoked.has(w.epochId as string))
     .filter((w) => filter === "all" || effectiveState(w, now) === filter)
     .slice(0, LIST_LIMIT);
   if (visible.length === 0) return [];
@@ -490,7 +531,7 @@ export async function listJourneys(filter: JourneyFilter = "all", now = new Date
 
 /* ---------------------------------------------------------------- detail */
 
-function timelineOf(events: Doc[]): TimelineRow[] {
+function timelineOf(events: Doc[], linkedIds: Set<string>): TimelineRow[] {
   return events.map((e) => {
     const p = (e.properties ?? {}) as Record<string, string>;
     const name = String(e.eventName);
@@ -507,10 +548,13 @@ function timelineOf(events: Doc[]): TimelineRow[] {
     }
     return {
       at: iso(e.occurredAt),
+      eventId: str(e.eventId),
+      sessionHint: str(e.sessionId).slice(0, 8),
       eventName: name,
       label,
       detail,
       evidenceStatus: (e.evidenceStatus as EvidenceStatus) ?? "observed",
+      inLink: linkedIds.has(str(e.eventId)),
     };
   });
 }
@@ -541,6 +585,10 @@ function evidenceRow(d: Doc): EvidenceRow {
 const sourceOf = (e: EvidenceRow) => [e.sourceId, e.sourceKind].filter(Boolean).join(" · ") || "registry";
 
 const SELF_REPORTED_CAVEAT = "Typed by the visitor; not verified.";
+
+/** Every row that comes from the linked enquiry says how far it reaches. */
+const scopeNote = (l: LinkedLead) =>
+  ` Applies only to the ${l.eventIds.length} linked events of session ${l.sessionHint}, not to the rest of this journey.`;
 
 /**
  * R02: one row per dimension per source. Nothing here combines two claims into
@@ -575,7 +623,7 @@ function dimensionsOf(linked: LinkedLead | null, network: EvidenceRow[], insight
           value: `${linked.name} <${linked.email}>`,
           evidenceStatus: "self_reported",
           source: "contact form",
-          caveat: SELF_REPORTED_CAVEAT,
+          caveat: SELF_REPORTED_CAVEAT + scopeNote(linked),
         }
       : {
           dimension: "Identification",
@@ -593,7 +641,7 @@ function dimensionsOf(linked: LinkedLead | null, network: EvidenceRow[], insight
       value: [linked.enquiringAs, linked.organization].filter(Boolean).join(" — "),
       evidenceStatus: "self_reported",
       source: "contact form",
-      caveat: SELF_REPORTED_CAVEAT,
+      caveat: SELF_REPORTED_CAVEAT + scopeNote(linked),
     });
   }
   for (const e of network) {
@@ -644,7 +692,7 @@ function dimensionsOf(linked: LinkedLead | null, network: EvidenceRow[], insight
       value: linked.topic,
       evidenceStatus: "self_reported",
       source: "contact form",
-      caveat: SELF_REPORTED_CAVEAT,
+      caveat: SELF_REPORTED_CAVEAT + scopeNote(linked),
     });
   }
   for (const i of insights) {
@@ -695,6 +743,7 @@ export async function getJourney(epochId: string, now = new Date()): Promise<Jou
     throw new Error("Database unreachable.");
   }
   if (await engine.store.isTombstoned(SITE_ID, scopeHash(SITE_ID, epochId))) return null;
+  if (await VIGrant.exists({ siteId: SITE_ID, epochId, revokedAt: { $ne: null } })) return null;
 
   const w = await VIWindow.findOne({ siteId: SITE_ID, epochId, state: { $in: ["active", "closed"] } }).lean<Doc>();
   if (!w) return null;
@@ -709,6 +758,7 @@ export async function getJourney(epochId: string, now = new Date()): Promise<Jou
   ]);
 
   const item = toItem(w, batch, now);
+  const linked = batch.linked.get(epochId) ?? null;
   const insightViews = insights.map(
     (i): InsightView => ({ ...i, computedAt: iso(i.computedAt), expiresAt: iso(i.expiresAt) }),
   );
@@ -716,12 +766,13 @@ export async function getJourney(epochId: string, now = new Date()): Promise<Jou
 
   return {
     ...item,
-    timeline: timelineOf(batch.events.get(epochId) ?? []),
+    linked,
+    timeline: timelineOf(batch.events.get(epochId) ?? [], new Set(linked?.eventIds ?? [])),
     insights: insightViews,
     evidence,
     links: linkDocs.map((d) => linkView(toLink(d))),
     dimensions: dimensionsOf(
-      item.linked,
+      linked,
       evidence.filter((e) => e.fieldId === "network_owner"),
       insightViews,
     ),

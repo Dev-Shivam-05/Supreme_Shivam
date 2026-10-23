@@ -20,7 +20,9 @@ import {
   FINALIZATION_MS,
   GRANT_VALIDITY_MS,
   LATE_MS,
+  MAX_EVENTS_PER_EPOCH,
   MAX_PAYLOAD_BYTES,
+  MAX_SESSIONS_PER_EPOCH,
   POLICY_VERSION,
   PROOF_KINDS,
   RETENTION,
@@ -57,6 +59,8 @@ export type Grant = {
   sources: string[];
   revokedAt: Date | null;
   state: GrantState;
+  /** True once the epoch was erased and `epochId` on the stored record was replaced by its hash. */
+  erased?: boolean;
   basis: string;
   policyVersion: string;
   proofRef: string;
@@ -229,6 +233,8 @@ export interface Store {
   /** "duplicate" when the unique (siteId, sourceId, sourceEventId) already exists. */
   insertEvent(e: StoredEvent): Promise<"inserted" | "duplicate">;
   listEvents(siteId: string, epochId: string): Promise<StoredEvent[]>;
+  countEvents(siteId: string, epochId: string): Promise<number>;
+  countSessions(siteId: string, epochId: string): Promise<number>;
 
   getProof(proofId: string): Promise<Proof | null>;
   saveProof(p: Proof): Promise<void>;
@@ -433,6 +439,9 @@ export class Engine {
 
     const knownEpoch = await this.store.getSessionEpoch(c.siteId, c.sessionId);
     if ((knownEpoch ?? c.epochId) !== c.epochId) throw new Rejected("session_epoch_conflict");
+    if (knownEpoch === null && (await this.store.countSessions(c.siteId, c.epochId)) >= MAX_SESSIONS_PER_EPOCH) {
+      throw new Rejected("epoch_session_cap");
+    }
 
     // Fingerprint only the event envelope for idempotency, never the visitor.
     const canonical = {
@@ -448,6 +457,10 @@ export class Engine {
     if (prior) {
       if (prior.payloadDigest !== digest) throw new Rejected("idempotency_conflict");
       return "duplicate";
+    }
+
+    if ((await this.store.countEvents(c.siteId, c.epochId)) >= MAX_EVENTS_PER_EPOCH) {
+      throw new Rejected("epoch_event_cap");
     }
 
     let w = await this.store.getWindow(c.siteId, c.epochId);
@@ -518,6 +531,13 @@ export class Engine {
       const winner = await this.store.getEvent(c.siteId, c.sourceId, eventId);
       if (winner && winner.payloadDigest !== digest) throw new Rejected("idempotency_conflict");
       return "duplicate";
+    }
+    // A withdrawal can land between the grant check above and this write. The
+    // tombstone already hides the row; deleting the epoch's data again here
+    // means the late event is gone now rather than at the next sweep (R09).
+    if (await this.store.isTombstoned(c.siteId, this.config.scopeHash(c.siteId, c.epochId))) {
+      await this.store.eraseEpochData(c.siteId, c.epochId, await this.store.grantIdsForEpoch(c.siteId, c.epochId));
+      throw new Rejected("permission_denied");
     }
     return "accepted";
   }
@@ -633,29 +653,25 @@ export class Engine {
     return out;
   }
 
-  /** reference.py `withdraw`. */
+  /**
+   * reference.py `withdraw`. Idempotent: a retry after a failure part-way
+   * through erases again rather than reporting success over surviving data.
+   * The revocation happens inside eraseEpoch, AFTER the tombstone — revoking
+   * first would let a failed tombstone write leave a revoked-but-visible epoch
+   * that no later retry or sweep would ever touch.
+   */
   async withdraw(c: Context, nowInput: Date): Promise<void> {
     const now = aware(nowInput);
     const g = await this.store.getGrant(c.grantId);
-    if (!g || g.siteId !== c.siteId || g.epochId !== c.epochId) throw new Rejected("withdrawal_scope_invalid");
-    g.revokedAt = now;
-    g.state = "withdrawn";
-    await this.store.saveGrant(g);
+    if (!g || g.siteId !== c.siteId || (g.epochId !== c.epochId && !g.erased)) {
+      throw new Rejected("withdrawal_scope_invalid");
+    }
     await this.eraseEpoch(c.siteId, c.epochId, now, "withdrawn", "visitor");
   }
 
   /** Erasure requested by the site owner on a visitor's behalf. Same scope as withdrawal. */
   async adminErase(siteId: string, epochId: string, nowInput: Date): Promise<void> {
-    const now = aware(nowInput);
-    for (const gid of await this.store.grantIdsForEpoch(siteId, epochId)) {
-      const g = await this.store.getGrant(gid);
-      if (g && g.revokedAt === null) {
-        g.revokedAt = now;
-        g.state = "withdrawn";
-        await this.store.saveGrant(g);
-      }
-    }
-    await this.eraseEpoch(siteId, epochId, now, "admin_erased", "admin");
+    await this.eraseEpoch(siteId, epochId, aware(nowInput), "admin_erased", "admin");
   }
 
   /**
@@ -672,13 +688,29 @@ export class Engine {
     actorRole: Tombstone["actorRole"],
   ): Promise<void> {
     const now = aware(nowInput);
-    await this.audit(siteId, epochId, state, actorRole, now);
+    // 1. Tombstone — hides everything below from this instant, even if a later step fails.
+    if (!(await this.store.isTombstoned(siteId, this.config.scopeHash(siteId, epochId)))) {
+      await this.audit(siteId, epochId, state, actorRole, now);
+    }
+    const grantIds = await this.store.grantIdsForEpoch(siteId, epochId);
+    // 2. Revoke (withdrawal and admin erasure; an expiring grant simply lapses).
+    if (state !== "expired") {
+      for (const gid of grantIds) {
+        const g = await this.store.getGrant(gid);
+        if (g && g.revokedAt === null) {
+          g.revokedAt = now;
+          g.state = "withdrawn";
+          await this.store.saveGrant(g);
+        }
+      }
+    }
     const w = await this.store.getWindow(siteId, epochId);
     if (w) {
       w.state = state === "admin_erased" ? "withdrawn" : state;
       await this.store.saveWindow(w);
     }
-    const grantIds = await this.store.grantIdsForEpoch(siteId, epochId);
+    // 3. Delete. The production store also drops the window and replaces the
+    // epoch id on the consent record with its keyed hash.
     await this.store.eraseEpochData(siteId, epochId, grantIds);
     for (const x of await this.store.listExports(siteId, epochId)) {
       await this.store.upsertDeletionJob({

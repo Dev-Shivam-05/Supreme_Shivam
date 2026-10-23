@@ -10,7 +10,7 @@ import { site } from "./site";
  *   "no cookies unless you opt in"             → components/vi/* load nothing until consent
  *   "aggregate analytics are cookieless"       → components/analytics/beacon.tsx
  *   "referrer kept as a domain only"           → app/api/collect/route.ts
- *   "IP is hashed, never stored"               → app/api/contact/route.ts, models/lead.ts
+ *   "IP is keyed-hashed, never stored"         → lib/keyed-hash.ts, app/api/contact|collect/route.ts
  *   "journey records only IDs, never URLs"     → lib/vi/catalog.ts allowlists + lib/vi/engine.ts
  *   "15-day window, deleted at 22 days"        → lib/vi/policy.ts + vi_* TTL indexes
  *   "withdrawal erases immediately"            → lib/vi/engine.ts withdraw()
@@ -49,7 +49,7 @@ export const privacySections: LegalSection[] = [
     p: [
       "If you send an enquiry, I receive exactly what you type: your name, your email address, the subject if you fill one in, and your message. It is emailed to me and stored so I can reply and keep a record of the conversation.",
       "Three more fields are optional: whether you are enquiring as an individual, for an organisation, as a recruiter or as an agency; the name of your organisation; and the topic. They are stored exactly as you choose them and are never checked against anything.",
-      "Alongside it I store your browser's user-agent string and a one-way cryptographic hash of your IP address. The hash exists only so a repeat spammer can be recognised. Your actual IP address is not written down anywhere I control, and the hash cannot be turned back into it.",
+      "Alongside it I store your browser's user-agent string and a keyed one-way hash of your IP address, made with a secret key that exists only on the server. The hash exists only so a repeat spammer can be recognised. Your actual IP address is not written down anywhere I control, and without that key the hash cannot be turned back into it.",
       "The form works the same whether or not you allowed visit insights.",
     ],
   },
@@ -57,7 +57,7 @@ export const privacySections: LegalSection[] = [
     h: "What I collect when you just read the site",
     p: [
       "The site counts pageviews with its own analytics, built into the site rather than bought from anyone. For each page you open it records the path, the domain name of the site that linked you here (not the full address), short campaign codes if the link carried any, your country, and a general description of your device, browser and operating system.",
-      "It also records a visitor identifier, and this is the part worth being precise about: it is a cryptographic hash of a daily-rotating secret, your IP address and your browser string. The IP itself is never stored. The hash changes every day at midnight UTC, so today's visits cannot be joined to yesterday's. It is a counter, not a profile.",
+      "It also records a visitor identifier, and this is the part worth being precise about: it is a keyed hash of today's date, your IP address and your browser string, made with a secret key that exists only on the server. The IP itself is never stored. Because the date is part of it, the identifier changes every day at midnight UTC, so today's visits cannot be joined to yesterday's. It is a counter, not a profile.",
       "Some of these numbers are published openly on the /stats page. Nothing there identifies anyone.",
     ],
   },
@@ -112,7 +112,7 @@ export const privacySections: LegalSection[] = [
     p: [
       "Enquiries are deleted automatically 24 months after you send them. That is enforced by the database, not by me remembering.",
       "Pageview records are deleted automatically after 180 days, also enforced by the database.",
-      "Visit-insight records — pages, buttons, the link to an enquiry, the organisation lookup and the hypotheses — are deleted 22 days after your first page view at the latest: the 15-day window plus a 7-day period for late records. The answer a registry gave about a network is cached for 30 days so the same network is not looked up twice; it contains nothing about you.",
+      "Visit-insight records — pages, buttons, the link to an enquiry, the organisation lookup and the hypotheses — are deleted 22 days after your first page view at the latest: the 15-day window plus a 7-day period for late records. A bare record of the window's start and end dates is removed within one further day, so the daily clean-up can log the deletion. The answer a registry gave about a network is cached for 30 days so the same network is not looked up twice; it contains nothing about you.",
       "A record that you agreed, and to what, is kept for 90 days. When visit-insight data is erased, a one-way marker is kept for 90 days so it cannot reappear from a backup; it cannot be traced back to you. Rejected requests to the site's endpoints are logged as an error code only, with no address and no content, for 7 days. Daily totals of how often the card was shown, accepted or declined are kept for 180 days.",
       "If you want your enquiry deleted sooner, ask and it is gone.",
     ],

@@ -1,4 +1,5 @@
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
+import { keyedHash } from "@/lib/keyed-hash";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { dbConnect } from "@/lib/db";
@@ -40,8 +41,9 @@ async function linkVisitToLead(req: NextRequest, contactId: string): Promise<str
 
   const { ctx } = resolved;
   const now = new Date();
-  const grant = await engine.store.getGrant(ctx.grantId);
-  if (!grant?.purposes.includes("linking")) return null;
+  // Full grant check (revoked, expired, tombstoned, purpose) BEFORE any write:
+  // a proof names the lead, so it must never exist for a journey that is gone.
+  await engine.checkGrant(ctx, now, "linking");
 
   const eventIds = (await engine.store.listEvents(ctx.siteId, ctx.epochId))
     .filter((e) => e.sessionId === ctx.sessionId && e.expiresAt.getTime() > now.getTime())
@@ -94,11 +96,9 @@ export async function POST(req: NextRequest) {
   const conn = await dbConnect();
   if (conn) {
     try {
-      // Hash rather than store the address — see the note on the model.
-      const ipHash = createHash("sha256")
-        .update(`${process.env.ANALYTICS_SALT || "sb-portfolio"}|${ip}`)
-        .digest("hex")
-        .slice(0, 32);
+      // A keyed hash rather than the address — see the note on the model. With
+      // no server secret there is nothing to key with, so nothing is stored.
+      const ipHash = keyedHash("contact-ip", ip) ?? "";
       const doc = await Lead.create({ ...lead, ipHash, userAgent: req.headers.get("user-agent") || "" });
       leadId = String(doc._id);
       stored = true;

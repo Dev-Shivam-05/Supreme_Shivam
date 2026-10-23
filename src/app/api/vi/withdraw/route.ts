@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { rateLimit } from "@/lib/ratelimit";
 import { Rejected, type Context } from "@/lib/vi/engine";
+import { scopeHash } from "@/lib/vi/cookies";
 import {
   bumpConsentStat,
   clearContextCookies,
@@ -38,9 +39,14 @@ export async function POST(req: NextRequest) {
       if (!engine) return json({ ok: false, error: "unavailable" }, 503);
       const { siteId, epochId, grantId } = resolved.epoch;
       const grant = await engine.store.getGrant(grantId);
-      // An already-revoked grant was withdrawn or erased before; its tombstone
-      // exists and the sweep finishes any leftover delete. Nothing new to do.
-      if (grant && grant.revokedAt === null) {
+      // Withdraw is idempotent in the engine: a retry after a failure part-way
+      // erases again instead of reporting success over surviving data. Only a
+      // grant that is already revoked AND tombstoned has nothing left to do.
+      const alreadyGone =
+        !!grant &&
+        grant.revokedAt !== null &&
+        (await engine.store.isTombstoned(siteId, scopeHash(siteId, epochId)));
+      if (grant && !alreadyGone) {
         const ctx: Context = {
           siteId,
           epochId,

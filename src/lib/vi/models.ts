@@ -27,6 +27,9 @@ const GrantSchema = new Schema(
     sources: [String],
     revokedAt: { type: Date, default: null },
     state: { type: String, enum: ["granted", "denied", "withdrawn", "expired"], required: true },
+    /** Set on erasure, when `epochId` is replaced by `erased:<scopeHmac>`. */
+    erased: { type: Boolean, default: false },
+    scopeHmac: { type: String, default: null, index: true },
     basis: String,
     policyVersion: String,
     proofRef: String,
@@ -48,13 +51,15 @@ const WindowSchema = new Schema(
     acceptUntil: Date,
     expiresAt: { type: Date, required: true },
     state: { type: String, enum: ["active", "closed", "withdrawn", "expired"], required: true },
+    /** expiresAt + 1 day — see `purgeAt` in mongo-store.ts. */
+    purgeAt: { type: Date, required: true },
   },
   { versionKey: false },
 );
 // One window per browser epoch (schema.sql UNIQUE(site_id, browser_epoch_id)).
 WindowSchema.index({ siteId: 1, epochId: 1 }, { unique: true });
 WindowSchema.index({ state: 1 });
-WindowSchema.index({ expiresAt: 1 }, ttl);
+WindowSchema.index({ purgeAt: 1 }, ttl);
 export const VIWindow = model("VIWindow", "vi_windows", WindowSchema);
 
 const SessionSchema = new Schema(

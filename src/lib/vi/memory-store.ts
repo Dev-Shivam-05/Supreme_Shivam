@@ -82,6 +82,14 @@ export class MemoryStore implements Store {
   async listEvents(siteId: string, epochId: string) {
     return [...this.events.values()].filter((e) => e.siteId === siteId && e.epochId === epochId).map(clone);
   }
+  async countEvents(siteId: string, epochId: string) {
+    return (await this.listEvents(siteId, epochId)).length;
+  }
+  async countSessions(siteId: string, epochId: string) {
+    let n = 0;
+    for (const [k, v] of this.sessions) if (k.startsWith(siteId + "\u0000") && v === epochId) n++;
+    return n;
+  }
   async getProof(id: string) {
     const p = this.proofs.get(id);
     return p ? clone(p) : null;

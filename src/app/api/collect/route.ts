@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { keyedHash } from "@/lib/keyed-hash";
 import { NextResponse, type NextRequest } from "next/server";
 import { UAParser } from "ua-parser-js";
 import { dbConnect } from "@/lib/db";
@@ -10,17 +11,20 @@ export const runtime = "nodejs";
 /**
  * A session identifier that never touches the visitor's device.
  *
- * sha256(salt | UTC date | ip | user-agent), truncated. The raw IP is never
- * stored — only this digest is — and the date component rotates it at UTC
- * midnight, so yesterday's id cannot be joined to today's. That makes it a
- * per-day visitor counter rather than a tracker, which is what lets the site
- * run without a consent banner. Set ANALYTICS_SALT to a long random string in
- * production so the digest cannot be brute-forced back to an IP.
+ * HMAC(server key, UTC date | ip | user-agent), truncated (lib/keyed-hash.ts).
+ * The raw IP is never stored — only this digest is — and the date component
+ * rotates it at UTC midnight, so yesterday's id cannot be joined to today's.
+ * That makes it a per-day visitor counter rather than a tracker, which is what
+ * lets this tier run without consent. Keyed, because a plain salted sha256 of
+ * an IPv4 address can be reversed by brute force in minutes.
  */
 function dailySessionId(ip: string, ua: string) {
-  const salt = process.env.ANALYTICS_SALT || "sb-portfolio";
   const day = new Date().toISOString().slice(0, 10);
-  return createHash("sha256").update(`${salt}|${day}|${ip}|${ua}`).digest("hex").slice(0, 32);
+  const keyed = keyedHash("daily-session", `${day}|${ip}|${ua}`);
+  if (keyed) return keyed;
+  // No secret configured (a bare local checkout): counting still works, but
+  // this digest is NOT protected — production always has ADMIN_SECRET.
+  return createHash("sha256").update(`sb-portfolio|${day}|${ip}|${ua}`).digest("hex").slice(0, 32);
 }
 
 /**

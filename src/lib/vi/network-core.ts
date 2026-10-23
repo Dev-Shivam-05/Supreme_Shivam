@@ -328,7 +328,9 @@ export function parseRdap(json: unknown): RdapFacts {
     : "";
   const networkName = clean(o.name);
   const owner =
-    findEntityFn(o.entities, "registrant", false) ?? findEntityFn(o.entities, "administrative", true) ?? networkName;
+    // `kind: individual` is skipped for the registrant too: a network registered
+    // to a private person must not put that person's name into the admin.
+    findEntityFn(o.entities, "registrant", true) ?? findEntityFn(o.entities, "administrative", true) ?? networkName;
   return {
     owner,
     networkName,
