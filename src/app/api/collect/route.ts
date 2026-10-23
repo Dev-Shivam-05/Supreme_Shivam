@@ -5,6 +5,7 @@ import { UAParser } from "ua-parser-js";
 import { dbConnect } from "@/lib/db";
 import { Event } from "@/models/event";
 import { rateLimit } from "@/lib/ratelimit";
+import { contentIdForPath, ENTRY_CATEGORIES } from "@/lib/vi/catalog";
 
 export const runtime = "nodejs";
 
@@ -49,6 +50,20 @@ function utmCode(value: string | null) {
   return value && UTM_CODE_RE.test(value) ? value.toLowerCase() : "";
 }
 
+/**
+ * Phase 6b rows 2–4: arrival category, landing content ID and coarse network
+ * location for every visitor, with no consent and no identifier beyond the
+ * daily hash. Each is a closed code or a strictly shaped header value, so free
+ * text can never ride in on them. City is deliberately not read: city + daily
+ * hash + device narrows to one person in a small town.
+ */
+const ENTRY_SET: ReadonlySet<string> = new Set(ENTRY_CATEGORIES);
+const REGION_RE = /^[A-Z0-9]{1,3}$/i; // ISO 3166-2 subdivision code, e.g. "GJ"
+const TIMEZONE_RE = /^[A-Za-z]+(?:\/[A-Za-z0-9_+-]+){0,2}$/; // IANA name, e.g. "Asia/Kolkata"
+function headerCode(value: string | null, re: RegExp, max: number) {
+  return value && value.length <= max && re.test(value) ? value : "Unknown";
+}
+
 /** Analytics beacon. Never throws to the client — always returns 204. */
 export async function POST(req: NextRequest) {
   try {
@@ -88,6 +103,11 @@ export async function POST(req: NextRequest) {
       utmMedium: utmCode(qs.get("utm_medium")),
       utmCampaign: utmCode(qs.get("utm_campaign")),
       country,
+      region: headerCode(req.headers.get("x-vercel-ip-country-region"), REGION_RE, 3),
+      timezone: headerCode(req.headers.get("x-vercel-ip-timezone"), TIMEZONE_RE, 40),
+      // Derived here, never taken from the body: the browser only supplies the path.
+      contentId: contentIdForPath(rawPath) ?? "unlisted",
+      entry: ENTRY_SET.has(body.entry) ? body.entry : "unknown",
       device: parsed.device?.type || "desktop",
       browser,
       os,

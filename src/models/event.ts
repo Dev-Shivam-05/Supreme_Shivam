@@ -11,6 +11,18 @@ const EventSchema = new Schema(
     utmMedium: { type: String, default: "" },
     utmCampaign: { type: String, default: "" },
     country: { type: String, default: "Unknown", index: true },
+    /**
+     * Phase 6b. `region` and `timezone` come from Vercel's IP headers and,
+     * like `country`, locate the visitor's network, not the visitor — hence
+     * `geoSource`. `entry` is a lib/vi/catalog.ts ENTRY_CATEGORIES code or
+     * "unknown"; `contentId` a catalog ID or "unlisted". Rows written before
+     * Phase 6b have none of these.
+     */
+    region: { type: String, default: "Unknown" },
+    timezone: { type: String, default: "Unknown" },
+    geoSource: { type: String, enum: ["ip_network"], default: "ip_network" },
+    entry: { type: String, default: "unknown" },
+    contentId: { type: String, default: "unlisted" },
     device: { type: String, default: "desktop" },
     browser: { type: String, default: "" },
     os: { type: String, default: "" },

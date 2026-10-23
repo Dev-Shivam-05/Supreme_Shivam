@@ -27,7 +27,7 @@ const ENTRY_LABEL: Record<string, string> = {
   referral: "Referral",
   unknown: "Unknown",
 };
-const entryLabel = (code: string | null) => (code ? (ENTRY_LABEL[code] ?? code) : "Unknown");
+export const entryLabel = (code: string | null) => (code ? (ENTRY_LABEL[code] ?? code) : "Unknown");
 
 function ago(iso: string) {
   const s = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 1000));

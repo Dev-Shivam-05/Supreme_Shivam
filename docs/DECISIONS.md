@@ -236,3 +236,21 @@ added to the anonymous aggregate tier for every visitor. Aggregate network-kind 
 consent are a grey area and go to Shivam as an explicit question. Per-visitor collection before
 consent is not built by default; if Shivam reaffirms it after hearing the conflict, that is his
 decision to record here, and the privacy policy must then say exactly what is collected.
+
+## 2026-10-23 — Phase 6b: first-load consent card is compact; the aggregate tier gains arrival, landing page and region
+
+Approved `go` (spec `docs/spec/phase-6b-first-click.md`). The consent card now prompts on the first
+page load (idle, capped at 1200 ms) so one click on Allow starts the journey at the landing page.
+Shown at full size there, it covered both hero CTAs at 1440 and 390, against Phase 6 D4, so the
+first-load card is compact (row 8, approved `go`): bottom-right from 640 px, a 150 px strip below
+that, Allow granting `journey` only, Choose opening the full card in place.
+
+Every pageview in the cookieless tier now carries `entry` (a closed category), `contentId`
+(derived on the server from the path), `region` and `timezone` (Vercel IP headers, shape-checked)
+and `geoSource: "ip_network"`. City is deliberately not stored there: city + daily hash + device
+narrows to one person in a small town; it waits for consent (Phase 6d). Aggregate network-kind
+counts were not built (no `yes 7`).
+
+The master "Visitor Radar" prompt of the same day is split into phases 6b–6g on the board. Its
+"60–70% collection without consent" figure is not adopted as a target; measured coverage is
+(Phase 6f). Per-visitor 30/60-day forecasts are not possible while journeys are erased at day 22.

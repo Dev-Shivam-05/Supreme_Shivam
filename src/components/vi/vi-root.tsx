@@ -13,6 +13,15 @@ import { refreshState } from "./vi-client";
  */
 const ConsentCard = dynamic(() => import("./consent-card"), { ssr: false });
 
+/**
+ * Phase 6b row 1: the card prompts on the first page load. Idle first, so it
+ * never competes with the hero for the LCP — but on a busy page (shader, GSAP)
+ * the browser may not go idle for seconds, and the card must be visible within
+ * 2 s, so the wait is capped here. The same cap stands in where there is no
+ * requestIdleCallback (Safari).
+ */
+const CARD_IDLE_TIMEOUT_MS = 1200;
+
 type IdleWindow = Window & {
   requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
   cancelIdleCallback?: (id: number) => void;
@@ -34,10 +43,10 @@ export function VIRoot() {
   useEffect(() => {
     const w = window as IdleWindow;
     if (w.requestIdleCallback) {
-      const id = w.requestIdleCallback(() => setLoadCard(true));
+      const id = w.requestIdleCallback(() => setLoadCard(true), { timeout: CARD_IDLE_TIMEOUT_MS });
       return () => w.cancelIdleCallback?.(id);
     }
-    const t = setTimeout(() => setLoadCard(true), 2000);
+    const t = setTimeout(() => setLoadCard(true), CARD_IDLE_TIMEOUT_MS);
     return () => clearTimeout(t);
   }, []);
 

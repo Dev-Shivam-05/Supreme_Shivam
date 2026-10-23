@@ -117,6 +117,23 @@ async function topBy(field: string, range: RangeKey, klass: ClassFilter, limit =
   return rows.map((r: { _id: string | null; count: number }) => ({ label: r._id || "—", count: r.count }));
 }
 
+/**
+ * Phase 6b: how visitors arrived and where they landed, counted on landing
+ * views only (the first view of a page load). Rows written before Phase 6b
+ * have no `entry` and are left out rather than counted as unknown.
+ */
+async function topLanding(field: "entry" | "contentId", range: RangeKey, klass: ClassFilter, limit = 6) {
+  const rows = await Event.aggregate([
+    { $match: { ...rangeMatch(range), entry: { $exists: true, $ne: "internal" } } },
+    WITH_CLASS,
+    { $match: classMatch(klass) },
+    { $group: { _id: `$${field}`, count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: limit },
+  ]);
+  return rows.map((r: { _id: string | null; count: number }) => ({ label: r._id || "—", count: r.count }));
+}
+
 /** How many events fall in each class — the provenance strip reads this. */
 async function classBreakdown(range: RangeKey) {
   const rows = await Event.aggregate([
@@ -171,6 +188,8 @@ const EMPTY_ADMIN = {
   topPaths: [] as { label: string; count: number }[],
   topReferrers: [] as { label: string; count: number }[],
   topCountries: [] as { label: string; count: number }[],
+  landingEntries: [] as { label: string; count: number }[],
+  landingPages: [] as { label: string; count: number }[],
   devices: [] as { label: string; count: number }[],
   provenance: { human: 0, untagged: 0, bot: 0, firstEvent: null as string | null, retentionDays: 180 },
   leads: [] as unknown[],
@@ -180,7 +199,7 @@ export async function getAdminStats(range: RangeKey = "all", klass: ClassFilter 
   const conn = await dbConnect();
   if (!conn) return { ...EMPTY_ADMIN, range, klass };
 
-  const [pageviews, sessions, series, topPaths, topReferrers, topCountries, devices, provenance, firstEvent, leadCount, newLeads, leads] =
+  const [pageviews, sessions, series, topPaths, topReferrers, topCountries, landingEntries, landingPages, devices, provenance, firstEvent, leadCount, newLeads, leads] =
     await Promise.all([
       pageviewCount(range, klass),
       sessionStats(range, klass),
@@ -188,6 +207,8 @@ export async function getAdminStats(range: RangeKey = "all", klass: ClassFilter 
       topBy("path", range, klass),
       topBy("referrerHost", range, klass),
       topBy("country", range, klass),
+      topLanding("entry", range, klass),
+      topLanding("contentId", range, klass),
       topBy("device", range, klass, 4),
       classBreakdown(range),
       Event.findOne({}).sort({ createdAt: 1 }).select("createdAt").lean(),
@@ -209,6 +230,8 @@ export async function getAdminStats(range: RangeKey = "all", klass: ClassFilter 
     topPaths,
     topReferrers,
     topCountries,
+    landingEntries,
+    landingPages,
     devices,
     provenance: {
       ...provenance,
