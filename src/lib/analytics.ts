@@ -223,6 +223,11 @@ export async function getAdminStats(range: RangeKey = "all", klass: ClassFilter 
       message: l.message,
       status: l.status,
       createdAt: l.createdAt,
+      // Phase 6: self-reported on the contact form, and the journey link if the visitor ticked it.
+      enquiringAs: l.enquiringAs ?? "",
+      organization: l.organization ?? "",
+      topic: l.topic ?? "",
+      visitLinkId: l.visitLinkId ?? "",
     })),
   };
 }

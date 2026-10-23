@@ -80,6 +80,12 @@ Shivam's own account. Profile edits there are done by hand. GitHub profile field
 - **`curl -w "...
 "` in Git Bash** prints `/n`, which reads like a double-slash redirect.
   Use single quotes for `-w` formats.
+- **Heredocs containing an apostrophe fail in the agent's Bash tool** ("unexpected EOF while
+  looking for matching `'`"), even with a quoted delimiter. Write the script or document with the
+  Write tool and run the file instead.
+- **A script outside the repo cannot `import "mongoose"`** — bare specifiers resolve from the
+  script's own folder. Import `file:///D:/Projects/Supreme_Shivam/node_modules/<pkg>/index.js`, or
+  the project module that imports it.
 - **Local DNS caching lies during a migration.** `curl` can hit the old IP long after the
   authoritative record has changed. Check with `nslookup <host> 1.1.1.1` and the authoritative
   nameserver before believing a failure, and `ipconfig /flushdns` between tests.
@@ -100,6 +106,25 @@ test: human + untagged + bot must equal the ALL pageview count.
 
 `/admin` is excluded from the analytics beacon, so driving it with a browser costs nothing. Loading
 a **public** page to test the live feed does write a real row to the production database.
+
+## Visitor intelligence (Phase 6)
+
+The engine in `src/lib/vi/` is a port of `visitor_intelligence_reference/reference.py`, and
+`npm run test:vi` runs the reference's 32 tests against it. A change to an invariant that breaks
+one of those tests is a change to Shivam's written policy, not a refactor — update the spec and
+`/privacy-policy` with it, or don't make it.
+
+- **`src/lib/vi/` uses relative imports with `.ts` extensions and `import type` for types**, so
+  `node --test` can run it with no build step (`allowImportingTsExtensions` is on). An `@/` import
+  or a value-import of a type there breaks the test run, not the Next build.
+- **`node --test src/lib/vi/` finds no `.ts` files.** Pass a glob: `node --test "src/lib/vi/*.test.ts"`.
+- **Never test against the production database.** Point a copy of the URI at
+  `shivambhadoriya_vi_test`, check `mongoose.connection.name` before writing, drop it afterwards.
+- **To exercise the RDAP path locally**, send `x-forwarded-for` with a public address — localhost
+  resolves to a private range and is deliberately never looked up.
+- The visitor-identity key is `VI_SECRET`, or a labelled subkey of `ADMIN_SECRET`. Rotating
+  `ADMIN_SECRET` without setting `VI_SECRET` invalidates every consent cookie (visitors are simply
+  asked again) and orphans existing tombstone hashes for their 90 days.
 
 ## Recharts
 

@@ -6,6 +6,7 @@ import { Nav } from "@/components/layout/nav";
 import { Footer } from "@/components/layout/footer";
 import { ScrollProgress } from "@/components/ux/scroll-progress";
 import { CommandPalette } from "@/components/ux/command-palette";
+import { VIRoot } from "@/components/vi/vi-root";
 
 /**
  * Public chrome, everywhere except /admin.
@@ -42,6 +43,7 @@ export function Chrome({
       <CommandPalette />
       <main>{children}</main>
       <Footer content={content} />
+      <VIRoot />
     </SmoothScroll>
   );
 }

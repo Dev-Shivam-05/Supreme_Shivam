@@ -51,3 +51,7 @@ Extra/
 .browser-profile/
 .browser-profile-cdp/
 .browser-shots/
+
+# Visitor-intelligence reference: the zip duplicates the extracted files byte for byte
+visitor_intelligence_reference/*.zip
+visitor_intelligence_reference/__pycache__/

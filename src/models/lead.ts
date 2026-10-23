@@ -14,12 +14,33 @@ const LeadSchema = new Schema(
     },
     source: { type: String, default: "portfolio" },
     /**
-     * A salted hash of the sender's IP, never the address itself. It exists only
-     * to recognise a repeat spammer; nothing in the app reads it back, and a
-     * hash serves that purpose without retaining an identifier.
+     * A keyed hash (HMAC under a server-only secret, lib/keyed-hash.ts) of the
+     * sender's IP, never the address itself. It exists only to recognise a
+     * repeat spammer; nothing in the app reads it back. Without the key it
+     * cannot be reversed; with it, an IPv4 address could be recovered by brute
+     * force — which is why the policy says exactly that.
      */
     ipHash: { type: String, default: "" },
     userAgent: { type: String, default: "" },
+    /**
+     * Self-reported by the visitor on the contact form and never verified: "an
+     * organisation" here is what they typed, not a confirmed affiliation. Stored
+     * as part of the enquiry, so it follows the enquiry's 24-month retention
+     * (spec D2), not the visitor-intelligence windows.
+     */
+    enquiringAs: {
+      type: String,
+      enum: ["", "individual", "organization", "recruiter", "agency", "other"],
+      default: "",
+    },
+    organization: { type: String, trim: true, maxlength: 120, default: "" },
+    topic: { type: String, enum: ["", "development", "hiring", "collaboration", "other"], default: "" },
+    /**
+     * The `vi_links` id when the visitor ticked "link this visit". A pointer
+     * only: the journey stays in `vi_*` under its own shorter retention and can
+     * be erased or reversed without touching this enquiry (R10).
+     */
+    visitLinkId: { type: String, default: "" },
   },
   { timestamps: true },
 );

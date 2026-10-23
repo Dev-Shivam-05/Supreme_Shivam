@@ -1,99 +1,78 @@
-# HANDOFF — Supreme_Shivam — Phase 5a (Admin v2 "Signal Deck") — 2026-10-23
+# HANDOFF — Supreme_Shivam — Phase 6 (Visitor intelligence) — 2026-10-23
 
-Branch `feat/phase-5a-admin-deck`, pushed, **not deployed**. Two commits:
-`a325aff` (the deck) and `1630864` (palette height). Spec:
-`docs/spec/phase-5-admin-signal-deck.md`, approved `go`.
+Branch `feat/phase-6-visitor-intelligence` (on top of the unmerged `feat/phase-5a-admin-deck`),
+pushed, **not deployed**. Spec: `docs/spec/phase-6-visitor-intelligence.md`. Contract:
+`visitor_intelligence_reference/`.
 
 ## Done
 
-- **The panel's numbers are now honest.** Every event is labelled `human | untagged | bot` by a
-  `$switch` in the aggregation, so the rule applies to the 257 events banked before the field
-  existed. Default view is HUMAN: **179 pageviews, 149 session-days, 16 of them reading a second
-  page**. ALL shows 258 / 162. A provenance strip prints the whole split and the four counts sum
-  to the total.
-- **What the old numbers were hiding, now visible:** 38 events are this project's own headless
-  Chrome (Lighthouse, `scripts/cdp.mjs`); 2026-09-26 alone logged 53 views across 7 sessions,
-  which was Phase 4 PageSpeed day. 40 more carried no `x-vercel-ip-country` header. `sessionId`
-  rotates at UTC midnight, so "unique visitors" was always counting session-days, and the KPI now
-  says so on its face. 85% of human views land on `/` and stop. `utmSource` has never once been
-  populated.
-- **The one lead is a test record.** `Kimberly Morrow`, created 34 seconds after the first pageview
-  in the database. Left in place — deleting it is Shivam's call.
-- **Login card no longer names `ADMIN_PASSWORDS` / `ADMIN_SECRET`** to anonymous visitors.
-  Verified by reading the rendered form text, not by eye.
-- **Grouped sidebar**, each group stating what it answers. 264px rail at >=1280px, 68px icon rail
-  1024–1279, drawer below 1024. Session expiry counts down in the user card.
-- **Live feed** polling `/api/admin/feed` every 20s, only while the tab is visible. Verified: a
-  pageview on `/services` appeared in the feed in **12 seconds** and the live dot fired.
-- **Cmd-K palette** — 8 pages plus Refresh and Sign out; Enter navigates, Esc closes and returns
-  focus to the trigger.
-- **Trend chart** stacked by class, with the duplicate-tick bug fixed. It now reads
-  `53 · 42 · 28 · 14 · 0` where it used to read `4 · 3 · 2 · 3 · 3`.
-- **Verified, not assumed:** `npm run build` clean, 0 ESLint errors (10 pre-existing warnings),
-  light-theme contrast measured at **4.96** and **6.93** on the sidebar, no page errors in console.
-  Ten screenshots in `.browser-shots/phase-5a/` at 1600, 1100 and 480px in both themes.
+- `visitor_intelligence_reference/` implemented: engine ported from `reference.py`, its 32 tests
+  passing under their original names; `npm run test:vi` → 101/101.
+- Consent card (three separate opt-ins) → journey events as content/CTA IDs, arrival category,
+  contact-form linking, RDAP network owner by /24 or /48, four abstaining rules, withdrawal that
+  erases at once, admin → Visitors with every claim labelled.
+- Independent security review: 9 findings, all fixed. End-to-end 50/50 on an isolated database.
+- Gender is not inferred anywhere — the reference forbids it.
 
-## Files changed
+## What happens when a visitor opens the site today — read this first
 
-- `src/lib/analytics.ts` — rewritten. `$switch` classifier, range + class filters, stacked daily
-  series with zero-filled gaps, session/engagement stats, provenance, `getLiveFeed`.
-- `src/models/event.ts` — `visitorClass` field, indexed.
-- `src/app/api/collect/route.ts` — classifies at write time with the same rule.
-- `src/app/api/admin/data/route.ts` — `range` and `class` params, allowlisted; returns session expiry.
-- `src/app/api/admin/feed/route.ts` — **new.** 25 newest events.
-- `src/lib/auth.ts` — `tokenExpiry()`, because the cookie is httpOnly and the UI cannot read it.
-- `src/components/layout/chrome.tsx` — **new.** Public nav/footer/Lenis everywhere except `/admin`.
-- `src/app/layout.tsx` — routes the chrome through it.
-- `src/app/admin/page.tsx` — dropped `pt-28`; the deck owns the viewport.
-- `src/components/admin/` — `admin-app.tsx` rewritten; **new**: `sidebar.tsx`, `nav.ts`,
-  `overview.tsx`, `live-feed.tsx`, `trend-chart.tsx`, `primitives.tsx`, `command-palette.tsx`,
-  `leads.tsx`.
-- `src/app/globals.css` — `--chart-2` in both themes, `deck-*` utilities (shimmer, rise, row-in,
-  pulse, grid).
-- `docs/spec/phase-5-admin-signal-deck.md` — **new**, the contract.
+Shivam's stated goal (2026-10-23): **gather data from the moment a visitor opens the site with one
+click.** Today that is only partly true:
+
+| Moment | What is collected | Consent needed |
+|---|---|---|
+| First page load, every visitor | Path, referrer **host**, campaign codes, country, device, browser, OS, a keyed daily visitor hash (the Phase 2 aggregate tier) | No |
+| After 20 s or 40 % scroll | The consent card appears | — |
+| After "Allow selected" | Journey: content IDs, CTA IDs, arrival category, optional link and network owner, hypotheses | **Yes** |
+
+So journey data starts at the click on "Allow", which today cannot happen before 20 s / 40 %
+scroll. Pages viewed before that are never recorded at journey level.
+
+**The reference itself forbids collecting journey data before consent.** README: "Default deny
+individual-journey collection until explicitly authorized" and "Start at the first accepted,
+permitted page-view report, not the first HTTP hit". `reference.py` rejects events outside the
+grant. Organisation enrichment is a separate purpose that needs its own authorization. India's DPDP
+Act 2023 and the GDPR point the same way. Phase 6b must close the gap **inside** those rules.
+
+## Files changed this session
+
+See `git log main..feat/phase-6-visitor-intelligence`: core in `src/lib/vi/`, public endpoints in
+`src/app/api/vi/`, admin endpoints in `src/app/api/admin/vi/`, client in `src/components/vi/`,
+admin UI in `src/components/admin/{visitors,journey-detail,evidence-badge}.tsx`, contact form
+and lead model, `src/lib/keyed-hash.ts`, the privacy policy, `vercel.json`.
 
 ## Decisions made
 
-- **Classification runs in the aggregation, not off the stored field.** 257 rows predate the field;
-  a number that only counts rows written after the fix is worse than no number. `collect` stores
-  the same label too, so one rule governs both — change one, change the other.
-- **`country: "Unknown"` is its own `untagged` class, never "self-traffic".** The absent header is
-  provable; "it was localhost" is not.
-- **Bot rows are classified at read time, never deleted.** Deleting evidence to make a chart look
-  better is how the panel got untrustworthy in the first place.
-- **`/admin` drops the public chrome.** Lenis's transformed wrapper breaks `position: sticky`
-  inside it, the fixed nav and footer eat ~220px, and the public Cmd-K binding would fight the
-  deck's own palette. A nested layout cannot remove a parent layout's chrome in the App Router,
-  so the split is one client component.
-- **Default range is ALL, not 30d** as row 7 first said. With 40 days of data, 30d would have
-  contradicted the acceptance criteria in the same spec. Noted here rather than silently changed.
-- **No enrichment, no cookies, no fingerprinting.** `/privacy-policy`'s cookieless claim is
-  currently true and nothing in this phase makes it false.
+- Gender never inferred; RDAP by prefix, no vendor; MongoDB; enquiries 24 months (deviation);
+  tombstone → revoke → delete; every IP-derived hash keyed. Full list in `docs/DECISIONS.md`.
+- **2026-10-23 (end of session):** the "data from the first click" goal goes to Phase 6b, built
+  within the reference, with the one grey-area item put to Shivam as an explicit decision.
 
 ## Known broken / deliberately skipped
 
-- **Audience and Status pages are placeholders.** Phase 5b. Audience waits on Shivam's
-  visitor-identification requirements file.
-- **Leads, Projects, Writing and Media still use the Phase 3b components.** They work and are
-  mounted in the new shell, but they have not been redesigned. Phase 5b.
-- **`getPublicStats()` still counts bots**, so `/stats` shows 258 while `/admin` shows 179. The
-  spec put public pages out of scope. One-line fix in 5b, but it needs a decision: the public
-  number going down is a visible change.
-- **Verifying the feed wrote one real event** to the production database — a headless hit on
-  `/services`. It classified as `bot`, so HUMAN stayed at 179 / 149 while ALL moved to 258 / 162.
-  Left in place, correctly labelled.
-- **10 pre-existing ESLint warnings** (`react-hooks/set-state-in-effect`), 4 of them in new files,
-  the same rule the Phase 3b admin tabs already trip. 0 errors.
-- **Not deployed.** Phase 4's `perf/phase-4` is also still unmerged; decide the order before
-  running `vercel --prod`.
+- Not deployed. `CRON_SECRET` not set in Vercel (the TTL indexes still delete on schedule).
+- Journey collection starts at "Allow", not at page open — Phase 6b below.
+- 18 ESLint warnings (`set-state-in-effect`), 0 errors. `/stats` still counts bots.
 
 ## Next session starts here
 
-- **Phase 5b:** redesign Leads, Projects, Writing, Media and Status to match the deck, and build
-  the Audience page from Shivam's requirements file once it arrives.
-- **First command:** `git checkout feat/phase-5a-admin-deck && npm run build`
-- **Watch out for:** the classifier lives in **two** places — the `$switch` in
-  `src/lib/analytics.ts` and `classify()` in `src/app/api/collect/route.ts`. They must stay
-  identical or new rows will disagree with old ones and the provenance strip will stop summing to
-  the total. That strip is the regression test: if human + untagged + bot does not equal the ALL
-  pageview count, the two rules have drifted.
+- **Phase 6b — data from the first click, within the reference.** Run `/spec-lock` first and put
+  this exact table to Shivam; build only the rows he approves:
+
+  | # | Change | Reference status | Default |
+  |---|---|---|---|
+  | 1 | Consent card on the **first page load** (0 s, no scroll trigger), still non-modal with equal buttons, so one click on "Allow" starts the journey on the landing page | Allowed | Build |
+  | 2 | Add the arrival **category** and the landing **content ID** to the cookieless aggregate event, so "how they came" and "where they landed" are known for 100 % of visitors from the first hit, with no identifier and no profile | Allowed (aggregate statistics) | Build |
+  | 3 | Aggregate **network-kind counts** for every visitor without consent: RDAP by prefix on first hit, kept only as daily counters (e.g. "mobile carrier: 12, corporate network: 3") with no link to any visit, address never stored | **Grey area** — README makes organisation enrichment a separate authorized purpose | Ask Shivam explicitly; do not build without a yes |
+  | 4 | Any per-visitor journey, link, network owner or hypothesis **before** consent; buffering pre-consent pages in the browser and sending them after "Allow"; gender | **Forbidden** by the reference (default deny; browser time never authorizes historical collection) and a DPDP/GDPR risk | Not built by default. State the conflict in one line; if Shivam reaffirms after hearing it, that is his call — record it in DECISIONS and make the privacy policy say exactly what is collected |
+
+  Acceptance for rows 1–2: the card visible within 2 s of first load at 1440 and 390 widths
+  without hurting Phase 4 PageSpeed; `/api/collect` rows carry `entry` and `content_id`; privacy
+  policy updated to match; `npm run test:vi` green; end-to-end re-run on the test database.
+
+- **Before or alongside 6b:** merge and deploy (Shivam). Merge order: `feat/phase-5a-admin-deck`,
+  then `feat/phase-6-visitor-intelligence`. Set `CRON_SECRET` in Vercel.
+- **First command:** `git checkout feat/phase-6-visitor-intelligence && git pull && npm run test:vi`
+- **Watch out for:** row 4. "Collect on open" is the goal, but per-visitor collection before
+  consent is exactly what Shivam's own reference forbids. Say so in one line, offer rows 1–3, and
+  never let the privacy policy claim less than the code collects.

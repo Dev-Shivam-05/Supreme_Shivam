@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { EvidenceBadge } from "./evidence-badge";
 import { Empty } from "./primitives";
 
 export type Lead = {
@@ -11,6 +12,12 @@ export type Lead = {
   message: string;
   status: string;
   createdAt: string;
+  /** Phase 6, optional on the form: what the sender typed about themselves. Never verified. */
+  enquiringAs?: string;
+  organization?: string;
+  topic?: string;
+  /** Set when the sender ticked "link my visit"; cleared if the link is reversed. */
+  visitLinkId?: string;
 };
 
 const STATUSES = ["new", "read", "replied", "archived"];
@@ -46,6 +53,7 @@ export function Leads({ leads, onStatus }: { leads: Lead[]; onStatus: (id: strin
                 <a href={`mailto:${l.email}`} className="font-mono text-xs text-accent hover:underline">
                   {l.email}
                 </a>
+                <SelfReported lead={l} />
               </td>
               <td className="max-w-md p-3 text-fg-muted">
                 {l.subject && <div className="mb-1 text-xs text-fg-faint">{l.subject}</div>}
@@ -76,6 +84,33 @@ export function Leads({ leads, onStatus }: { leads: Lead[]; onStatus: (id: strin
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+/**
+ * What the sender said about themselves, labelled as exactly that. An
+ * organisation typed here is a claim, not an affiliation anyone checked.
+ */
+function SelfReported({ lead }: { lead: Lead }) {
+  const facts = [lead.enquiringAs, lead.organization, lead.topic].filter(Boolean);
+  if (facts.length === 0 && !lead.visitLinkId) return null;
+  return (
+    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+      {facts.length > 0 && (
+        <>
+          <span className="text-xs text-fg-muted">{facts.join(" · ")}</span>
+          <EvidenceBadge status="self_reported" />
+        </>
+      )}
+      {lead.visitLinkId && (
+        <span
+          title="The sender linked this enquiry to their consented visit — see Visitors"
+          className="inline-flex items-center border border-accent px-1.5 py-0.5 font-mono text-[0.6rem] uppercase leading-none tracking-wider text-fg"
+        >
+          visit linked
+        </span>
+      )}
     </div>
   );
 }

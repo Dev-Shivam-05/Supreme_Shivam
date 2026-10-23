@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { keyedHash } from "@/lib/keyed-hash";
 import { NextResponse, type NextRequest } from "next/server";
 import { UAParser } from "ua-parser-js";
 import { dbConnect } from "@/lib/db";
@@ -10,17 +11,20 @@ export const runtime = "nodejs";
 /**
  * A session identifier that never touches the visitor's device.
  *
- * sha256(salt | UTC date | ip | user-agent), truncated. The raw IP is never
- * stored — only this digest is — and the date component rotates it at UTC
- * midnight, so yesterday's id cannot be joined to today's. That makes it a
- * per-day visitor counter rather than a tracker, which is what lets the site
- * run without a consent banner. Set ANALYTICS_SALT to a long random string in
- * production so the digest cannot be brute-forced back to an IP.
+ * HMAC(server key, UTC date | ip | user-agent), truncated (lib/keyed-hash.ts).
+ * The raw IP is never stored — only this digest is — and the date component
+ * rotates it at UTC midnight, so yesterday's id cannot be joined to today's.
+ * That makes it a per-day visitor counter rather than a tracker, which is what
+ * lets this tier run without consent. Keyed, because a plain salted sha256 of
+ * an IPv4 address can be reversed by brute force in minutes.
  */
 function dailySessionId(ip: string, ua: string) {
-  const salt = process.env.ANALYTICS_SALT || "sb-portfolio";
   const day = new Date().toISOString().slice(0, 10);
-  return createHash("sha256").update(`${salt}|${day}|${ip}|${ua}`).digest("hex").slice(0, 32);
+  const keyed = keyedHash("daily-session", `${day}|${ip}|${ua}`);
+  if (keyed) return keyed;
+  // No secret configured (a bare local checkout): counting still works, but
+  // this digest is NOT protected — production always has ADMIN_SECRET.
+  return createHash("sha256").update(`sb-portfolio|${day}|${ip}|${ua}`).digest("hex").slice(0, 32);
 }
 
 /**
@@ -32,6 +36,17 @@ function classify(browser: string, os: string, country: string) {
   if (!browser || browser === "Chrome Headless" || !os) return "bot";
   if (country === "Unknown") return "untagged";
   return "human";
+}
+
+/**
+ * README "Redact … secret URL parameters": this tier keeps only what an
+ * aggregate needs. A full referrer path can be someone's profile URL, and a UTM
+ * value is free text that can carry an email address — so the referrer is cut
+ * to its host and a UTM value survives only as a short campaign-code token.
+ */
+const UTM_CODE_RE = /^[a-z0-9][a-z0-9._-]{0,39}$/i;
+function utmCode(value: string | null) {
+  return value && UTM_CODE_RE.test(value) ? value.toLowerCase() : "";
 }
 
 /** Analytics beacon. Never throws to the client — always returns 204. */
@@ -66,11 +81,12 @@ export async function POST(req: NextRequest) {
     await Event.create({
       type: "pageview",
       path: rawPath.split("?")[0],
-      referrer,
+      // The full URL is read above only to derive the host; it is never written.
+      referrer: "",
       referrerHost,
-      utmSource: qs.get("utm_source") || "",
-      utmMedium: qs.get("utm_medium") || "",
-      utmCampaign: qs.get("utm_campaign") || "",
+      utmSource: utmCode(qs.get("utm_source")),
+      utmMedium: utmCode(qs.get("utm_medium")),
+      utmCampaign: utmCode(qs.get("utm_campaign")),
       country,
       device: parsed.device?.type || "desktop",
       browser,

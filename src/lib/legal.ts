@@ -1,14 +1,21 @@
 import { site } from "./site";
 
 /**
- * Privacy policy and terms content — DEV-HANDOVER task 10.
+ * Privacy policy and terms content — DEV-HANDOVER task 10, rewritten for Phase 6.
  *
  * Written from what this codebase actually does, not from a template. If the
  * data handling changes, this text has to change with it. The specific claims it
  * makes and where they are enforced:
  *
- *   "no cookies, nothing stored for analytics" → components/analytics/beacon.tsx
- *   "IP is hashed, never stored"               → app/api/contact/route.ts, models/lead.ts
+ *   "no cookies unless you opt in"             → components/vi/* load nothing until consent
+ *   "aggregate analytics are cookieless"       → components/analytics/beacon.tsx
+ *   "referrer kept as a domain only"           → app/api/collect/route.ts
+ *   "IP is keyed-hashed, never stored"         → lib/keyed-hash.ts, app/api/contact|collect/route.ts
+ *   "journey records only IDs, never URLs"     → lib/vi/catalog.ts allowlists + lib/vi/engine.ts
+ *   "15-day window, deleted at 22 days"        → lib/vi/policy.ts + vi_* TTL indexes
+ *   "withdrawal erases immediately"            → lib/vi/engine.ts withdraw()
+ *   "registry sees the network block only"     → lib/vi/network-core.ts networkPrefix()
+ *   "no gender or sensitive traits"            → engine exact-key allowlist; no such form field
  *   "enquiries deleted after 24 months"        → models/lead.ts TTL index
  *   "analytics deleted after 180 days"         → models/event.ts TTL index
  *
@@ -17,9 +24,9 @@ import { site } from "./site";
  * points below is normally sufficient.
  */
 
-export const LEGAL_UPDATED = "14 September 2026";
+export const LEGAL_UPDATED = "23 October 2026";
 
-export type LegalSection = { h: string; p?: string[]; list?: string[] };
+export type LegalSection = { h: string; id?: string; p?: string[]; list?: string[] };
 
 export const privacySections: LegalSection[] = [
   {
@@ -30,25 +37,51 @@ export const privacySections: LegalSection[] = [
     ],
   },
   {
-    h: "This site sets no cookies",
+    h: "No cookies unless you turn on visit insights",
     p: [
-      "No advertising cookies, no tracking pixels, no Google Analytics, no Meta pixel, no third-party trackers of any kind. That is why you are not being asked to dismiss a consent banner — there is nothing to consent to.",
-      "Two things are stored in your own browser and never sent anywhere: your light or dark theme choice, and a flag recording that you have already seen the opening animation once this session. Both exist purely so the site behaves the way you left it. Clearing your browser data removes both, and nothing breaks.",
+      "No advertising cookies, no tracking pixels, no Google Analytics, no Meta pixel, no third-party trackers of any kind. If you never press “Allow selected” on the visit-insights card, this site sets no cookies at all.",
+      "Two things are stored in your own browser and never sent anywhere: your light or dark theme choice, and your answer to the visit-insights card, so you are not asked again. A “No thanks” is remembered for 180 days and then forgotten. Clearing your browser data removes both, and nothing breaks.",
+      "If you do allow visit insights, two cookies are set: sb_vi, a random identifier for this browser that lasts at most 22 days, and sb_vi_s, which ends when you close the browser. Page scripts cannot read either one, and neither contains anything about you.",
     ],
   },
   {
     h: "What I collect when you use the contact form",
     p: [
       "If you send an enquiry, I receive exactly what you type: your name, your email address, the subject if you fill one in, and your message. It is emailed to me and stored so I can reply and keep a record of the conversation.",
-      "Alongside it I store your browser's user-agent string and a one-way cryptographic hash of your IP address. The hash exists only so a repeat spammer can be recognised. Your actual IP address is not written down anywhere I control, and the hash cannot be turned back into it.",
+      "Three more fields are optional: whether you are enquiring as an individual, for an organisation, as a recruiter or as an agency; the name of your organisation; and the topic. They are stored exactly as you choose them and are never checked against anything.",
+      "Alongside it I store your browser's user-agent string and a keyed one-way hash of your IP address, made with a secret key that exists only on the server. The hash exists only so a repeat spammer can be recognised. Your actual IP address is not written down anywhere I control, and without that key the hash cannot be turned back into it.",
+      "The form works the same whether or not you allowed visit insights.",
     ],
   },
   {
     h: "What I collect when you just read the site",
     p: [
-      "The site counts pageviews with its own analytics, built into the site rather than bought from anyone. For each page you open it records the path, the referring site, any campaign tags in the link, your country, and a general description of your device, browser and operating system.",
-      "It also records a visitor identifier, and this is the part worth being precise about: it is a cryptographic hash of a daily-rotating secret, your IP address and your browser string. The IP itself is never stored. The hash changes every day at midnight UTC, so today's visits cannot be joined to yesterday's. It is a counter, not a profile.",
+      "The site counts pageviews with its own analytics, built into the site rather than bought from anyone. For each page you open it records the path, the domain name of the site that linked you here (not the full address), short campaign codes if the link carried any, your country, and a general description of your device, browser and operating system.",
+      "It also records a visitor identifier, and this is the part worth being precise about: it is a keyed hash of today's date, your IP address and your browser string, made with a secret key that exists only on the server. The IP itself is never stored. Because the date is part of it, the identifier changes every day at midnight UTC, so today's visits cannot be joined to yesterday's. It is a counter, not a profile.",
       "Some of these numbers are published openly on the /stats page. Nothing there identifies anyone.",
+    ],
+  },
+  {
+    h: "Visit insights — only if you say yes",
+    id: "visit-insights",
+    p: [
+      "After you have been on the site for a little while, a small card asks whether I may understand why you visited. Nothing described in this section happens unless you press “Allow selected”. You choose each part separately:",
+    ],
+    list: [
+      "Pages and buttons. For 15 days from your first page view, the site records which of its own pages you open — as a fixed ID such as “case study — AI-PULSE”, never a URL — which of its buttons you use (for example “contact”, “email”, “GitHub profile”), how you arrived as a category (“search engine”, “AI assistant”, “social”, “direct” and similar, never the address you came from), and, if you use the Cmd-K menu, only the broad topic of what you typed (“development”, “hiring”, “collaboration” or “other”), never the words.",
+      "Link to an enquiry. Only if you also tick the box on the contact form, the pages you viewed in that browser session are attached to your enquiry, so I can see what you read. Nothing else is attached.",
+      "Organisation lookup. The site asks the public internet registry responsible for your network who that network is registered to — usually an internet provider, a mobile carrier, a university or a company. It sends the registry the network block only (for example 49.36.0.0/24), never your full address, and your address is not stored. The answer describes the network, not you: being on a company's network does not mean you work there, and I never treat it as if it did.",
+    ],
+  },
+  {
+    h: "What visit insights are used for, and what they are not",
+    p: [
+      "From those records the site forms a small number of written hypotheses — for example “possible interest in development work” — each shown to me with the exact pages and buttons behind it, the other explanations that fit just as well, and what remains unknown. None of them is a score or a probability, and none of them ever triggers a message to you.",
+    ],
+    list: [
+      "Never collected: gender, age, or any other personal or sensitive trait. There is no field for them and the system rejects them.",
+      "Never done: device fingerprinting, tracking you on other sites, reconstructing your search history, buying contact details, or trying to work out who you are from your connection.",
+      "Never sent: the text you type into any field you have not submitted, keystrokes, or the full address of any page.",
     ],
   },
   {
@@ -56,7 +89,8 @@ export const privacySections: LegalSection[] = [
     list: [
       "To read and reply to your enquiry, and to keep a record of what was agreed.",
       "To know which pages people actually read, so the site can be improved.",
-      "To stop the contact form being abused by bots.",
+      "If you allow it, to understand why people visit — which work they look at and what brings them here.",
+      "To stop the contact form and the site's own endpoints being abused by bots.",
       "Nothing is used for advertising, sold, rented, or shared for anyone else's marketing. Ever.",
     ],
   },
@@ -64,8 +98,9 @@ export const privacySections: LegalSection[] = [
     h: "Who else touches it",
     list: [
       "Vercel — hosts the site and serves the pages. Like every web host it keeps short-lived server request logs, which are outside my control.",
-      "MongoDB Atlas — the database where enquiries and pageview counts are stored.",
+      "MongoDB Atlas — the database where enquiries, pageview counts and visit-insight records are stored.",
       "An SMTP email provider — delivers your enquiry to my inbox. It handles the message in transit.",
+      "Only if you allow organisation lookup: IANA, which publishes the directory of registries, and the one regional internet registry responsible for your network (ARIN, RIPE NCC, APNIC, LACNIC or AFRINIC). The registry receives the network block described above, from this site's server, not from your browser.",
       "Google Fonts files are self-hosted on this domain, so your browser does not contact Google to load them.",
     ],
     p: [
@@ -77,6 +112,8 @@ export const privacySections: LegalSection[] = [
     p: [
       "Enquiries are deleted automatically 24 months after you send them. That is enforced by the database, not by me remembering.",
       "Pageview records are deleted automatically after 180 days, also enforced by the database.",
+      "Visit-insight records — pages, buttons, the link to an enquiry, the organisation lookup and the hypotheses — are deleted 22 days after your first page view at the latest: the 15-day window plus a 7-day period for late records. A bare record of the window's start and end dates is removed within one further day, so the daily clean-up can log the deletion. The answer a registry gave about a network is cached for 30 days so the same network is not looked up twice; it contains nothing about you.",
+      "A record that you agreed, and to what, is kept for 90 days. When visit-insight data is erased, a one-way marker is kept for 90 days so it cannot reappear from a backup; it cannot be traced back to you. Rejected requests to the site's endpoints are logged as an error code only, with no address and no content, for 7 days. Daily totals of how often the card was shown, accepted or declined are kept for 180 days.",
       "If you want your enquiry deleted sooner, ask and it is gone.",
     ],
   },
@@ -92,6 +129,12 @@ export const privacySections: LegalSection[] = [
       "Stop using it, and withdraw any consent you previously gave.",
       "Send you a copy of it.",
       "Complain to a regulator if you are not satisfied with how I handled your request.",
+    ],
+  },
+  {
+    h: "Withdrawing visit insights",
+    p: [
+      "Use “Privacy choices” at the bottom of any page and press “Withdraw and erase”. Everything recorded about that visit is deleted at once — pages, buttons, any link to an enquiry, the organisation lookup and every hypothesis — the cookies are removed, and anything still in flight from your browser is refused. Your enquiry itself is not deleted by this; ask me if you want that too.",
     ],
   },
   {

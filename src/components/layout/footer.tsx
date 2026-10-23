@@ -147,6 +147,14 @@ export function Footer({ content }: { content: PublicContent }) {
                     {l.label}
                   </Link>
                 ))}
+              {/* Opens the visit-insights panel (components/vi) — consent must be as easy to change as to give. */}
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new Event("vi:open"))}
+                className="font-mono text-xs text-fg-faint hover:text-fg"
+              >
+                Privacy choices
+              </button>
               <p className="font-mono text-xs text-fg-faint">{content.location} · {content.availability}</p>
             </div>
           </div>

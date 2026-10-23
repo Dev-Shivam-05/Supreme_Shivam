@@ -15,6 +15,7 @@ import { Sidebar } from "./sidebar";
 import { TabContent } from "./tab-content";
 import { TabMedia } from "./tab-media";
 import { TabProjects } from "./tab-projects";
+import { Visitors } from "./visitors";
 
 type AdminData = OverviewData & {
   sessionExpiresAt: number | null;
@@ -158,12 +159,7 @@ export function AdminApp() {
                   <LiveFeed />
                 </Panel>
               )}
-              {page === "audience" && (
-                <ComingSoon
-                  title="Audience — Phase 5b"
-                  note="Who the visitors are rather than where they connected from. Waiting on the requirements file."
-                />
-              )}
+              {page === "audience" && <Visitors />}
               {page === "leads" && <Leads leads={data?.leads ?? []} onStatus={setLeadStatus} />}
               {page === "projects" && <TabProjects />}
               {page === "writing" && <TabContent />}

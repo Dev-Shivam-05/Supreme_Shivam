@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-23",
+  "reference_version": "0.1",
+  "python": "3.13.5",
+  "sqlite": "3.46.1",
+  "environment": "Linux",
+  "synthetic_tests": 32,
+  "failed": 0,
+  "live_integration_tests": 0,
+  "real_visitor_tests": 0,
+  "production_deployment": false,
+  "notes": "Updated core and rerun; see test-results.txt. SQL integrity check is for freshly created reference schema, not a populated production database."
+}

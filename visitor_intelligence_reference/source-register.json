@@ -1,0 +1,402 @@
+{
+  "research_date": "2026-10-23",
+  "notes": "Dates are published/modified/version labels where available; retrieval alone is not proof of empirical accuracy. Pricing may change. No account or integration tests performed.",
+  "sources": [
+    {
+      "id": "S01",
+      "title": "MDN Referrer-Policy",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Referrer-Policy",
+      "source_date_or_version": "2026-09-04",
+      "accessed": "2026-10-23",
+      "supports": "Cross-origin referrer limits",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S02",
+      "title": "MDN NavigationHistoryEntry",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/NavigationHistoryEntry",
+      "source_date_or_version": "2025-12-11",
+      "accessed": "2026-10-23",
+      "supports": "Same-origin navigation entries, not cross-site history",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S03",
+      "title": "MDN History API",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/History_API",
+      "source_date_or_version": "2024-07-26",
+      "accessed": "2026-10-23",
+      "supports": "Session-history manipulation",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S04",
+      "title": "MDN same-origin policy",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Same-origin_policy",
+      "source_date_or_version": "2026-09-17",
+      "accessed": "2026-10-23",
+      "supports": "Cross-origin read boundaries",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S05",
+      "title": "Chrome history extension API",
+      "url": "https://developer.chrome.com/docs/extensions/reference/api/history",
+      "source_date_or_version": "2026-09-11",
+      "accessed": "2026-10-23",
+      "supports": "Extension permissions are a different access model",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S06",
+      "title": "Google Search Analytics query",
+      "url": "https://developers.google.com/webmaster-tools/v1/searchanalytics/query",
+      "source_date_or_version": "2026-08-11",
+      "accessed": "2026-10-23",
+      "supports": "Authorized property aggregates; not all rows returned",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S07",
+      "title": "Search Console dimensions",
+      "url": "https://support.google.com/webmasters/answer/17011259?hl=en",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Anonymized queries are omitted",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S08",
+      "title": "Google Ads ValueTrack mapping",
+      "url": "https://developers.google.com/google-ads/api/docs/reporting/valuetrack-mapping",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Click identifiers and campaign report rows",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S09",
+      "title": "Cloudflare HTTP headers",
+      "url": "https://developers.cloudflare.com/fundamentals/reference/http-headers/",
+      "source_date_or_version": "2026-10-09",
+      "accessed": "2026-10-23",
+      "supports": "Trusted proxy metadata and source limitations",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S10",
+      "title": "MDN Navigator userAgentData",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userAgentData",
+      "source_date_or_version": "2025-03-24",
+      "accessed": "2026-10-23",
+      "supports": "Limited browser availability",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S11",
+      "title": "WebKit tracking prevention",
+      "url": "https://webkit.org/tracking-prevention/",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Storage lifetime restrictions",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S12",
+      "title": "MDN sendBeacon",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon",
+      "source_date_or_version": "2026-10-11",
+      "accessed": "2026-10-23",
+      "supports": "Queued is not application receipt",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S13",
+      "title": "MDN visibilitychange",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event",
+      "source_date_or_version": "2026-02-20",
+      "accessed": "2026-10-23",
+      "supports": "Page visibility transitions",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S14",
+      "title": "ICO storage/access exceptions",
+      "url": "https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guidance-on-the-use-of-storage-and-access-technologies/what-are-the-exceptions/",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "UK statistical exception does not cover individual profiling",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S15",
+      "title": "ICO guidance overview",
+      "url": "https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guidance-on-the-use-of-storage-and-access-technologies/",
+      "source_date_or_version": "2026-04-29",
+      "accessed": "2026-10-23",
+      "supports": "Current UK guidance context",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S16",
+      "title": "European Commission GDPR principles",
+      "url": "https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/principles-gdpr_en",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Purpose, minimization, retention",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S17",
+      "title": "Plausible data policy",
+      "url": "https://plausible.io/data-policy",
+      "source_date_or_version": "2026-09",
+      "accessed": "2026-10-23",
+      "supports": "Daily rotating identifiers, vendor policy",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S18",
+      "title": "Plausible pricing",
+      "url": "https://plausible.io/",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Displayed Starter price at 10k volume",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S19",
+      "title": "Plausible subscriptions",
+      "url": "https://plausible.io/docs/subscription-plans",
+      "source_date_or_version": "2026-09-29",
+      "accessed": "2026-10-23",
+      "supports": "Plan and billing details",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S20",
+      "title": "Plausible raw exports",
+      "url": "https://plausible.io/docs/raw-data-export",
+      "source_date_or_version": "2026-09-22",
+      "accessed": "2026-10-23",
+      "supports": "Enterprise raw export vs aggregate standard exports",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S21",
+      "title": "Plausible site deletion",
+      "url": "https://plausible.io/docs/sites-api",
+      "source_date_or_version": "2026-09-29",
+      "accessed": "2026-10-23",
+      "supports": "Site-level deletion API",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S22",
+      "title": "PostHog pricing",
+      "url": "https://posthog.com/pricing",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Free events and long default retention",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S23",
+      "title": "PostHog identify",
+      "url": "https://posthog.com/docs/product-analytics/identify",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Identity processing documentation",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S24",
+      "title": "PostHog data storage",
+      "url": "https://posthog.com/docs/privacy/data-storage",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Asynchronous deletion and status checks",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S25",
+      "title": "PostHog exports",
+      "url": "https://posthog.com/docs/getting-started/data-import-export",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Batch, query and real-time export options",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S26",
+      "title": "Cookiebot pricing",
+      "url": "https://www.cookiebot.com/en/pricing/",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Free domain/page limit; paid quote not fixed here",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S27",
+      "title": "Cookiebot SDK",
+      "url": "https://www.cookiebot.com/en/developer/",
+      "source_date_or_version": "2022-05-25",
+      "accessed": "2026-10-23",
+      "supports": "Consent events and state; page publication date",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S28",
+      "title": "Cookiebot terms",
+      "url": "https://www.cookiebot.com/en/terms-of-service/",
+      "source_date_or_version": "2026-06-25",
+      "accessed": "2026-10-23",
+      "supports": "Consent logs and data export",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S29",
+      "title": "IPinfo API overview",
+      "url": "https://ipinfo.io/developers/ipinfo-api",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Country/ASN vs other products",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S30",
+      "title": "IPinfo company API",
+      "url": "https://ipinfo.io/developers/company-api",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Network owner/operator, shared-network limitations",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S31",
+      "title": "IPinfo pricing",
+      "url": "https://ipinfo.io/pricing",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Lite free; company custom service quote unknown",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S32",
+      "title": "IPinfo downloads",
+      "url": "https://ipinfo.io/developers/database-download",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Database delivery and formats; schedule not freshness guarantee",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S33",
+      "title": "Leadfeeder pricing",
+      "url": "https://www.leadfeeder.com/pricing/",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Discover starting EUR79/month billed annually",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S34",
+      "title": "Leadfeeder API",
+      "url": "https://docs.leadfeeder.com/api/public/leadfeeder-api-354545m0",
+      "source_date_or_version": "2026-06-24",
+      "accessed": "2026-10-23",
+      "supports": "Visit/company export capabilities",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S35",
+      "title": "Leadfeeder company hiding",
+      "url": "https://help.leadfeeder.com/en/articles/13922242-hiding-and-unhiding-companies",
+      "source_date_or_version": "2026-10-14",
+      "accessed": "2026-10-23",
+      "supports": "Company-level removal, not proof of per-person cross-sink erasure",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S36",
+      "title": "HubSpot current version",
+      "url": "https://developers.hubspot.com/docs/api-reference/latest/overview",
+      "source_date_or_version": "2026-09",
+      "accessed": "2026-10-23",
+      "supports": "Latest date-version reference retrieved",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S37",
+      "title": "HubSpot legacy webhooks",
+      "url": "https://developers.hubspot.com/docs/api-reference/legacy/webhooks/guide",
+      "source_date_or_version": "2026-07-15",
+      "accessed": "2026-10-23",
+      "supports": "Legacy/project app distinction, scopes, retries, privacy deletions",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S38",
+      "title": "HubSpot legacy GDPR delete",
+      "url": "https://developers.hubspot.com/docs/api-reference/legacy/crm/objects/contacts/gdpr/gdpr-delete-contact",
+      "source_date_or_version": "2026-03-30",
+      "accessed": "2026-10-23",
+      "supports": "Permanent contact deletion capability in legacy API",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S39",
+      "title": "HubSpot contacts guide",
+      "url": "https://developers.hubspot.com/docs/api-reference/legacy/crm/objects/contacts/guide",
+      "source_date_or_version": "2026-09-03",
+      "accessed": "2026-10-23",
+      "supports": "Contact record retrieval and synchronization",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S40",
+      "title": "Bombora Company Surge",
+      "url": "https://bombora.com/intent/",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Vendor company-level intent description",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S41",
+      "title": "Bombora Outreach integration",
+      "url": "https://customers.bombora.com/crc-brand/outreach",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Weekly update and licensed portability",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S42",
+      "title": "Companies House API",
+      "url": "https://developer.company-information.service.gov.uk/",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "Live registered company information",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S43",
+      "title": "Companies House authentication",
+      "url": "https://developer-specs.company-information.service.gov.uk/guides/authorisation",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "API key required",
+      "source_type": "primary_documentation_or_official_guidance"
+    },
+    {
+      "id": "S44",
+      "title": "Companies House rate limits",
+      "url": "https://developer-specs.company-information.service.gov.uk/guides/rateLimiting",
+      "source_date_or_version": null,
+      "accessed": "2026-10-23",
+      "supports": "600 requests per five minutes",
+      "source_type": "primary_documentation_or_official_guidance"
+    }
+  ]
+}

@@ -1,12 +1,14 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ArrowUpRight, Check, Copy, Loader2 } from "lucide-react";
+import { ArrowUpRight, Check, ChevronDown, Copy, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Magnetic } from "@/components/ux/magnetic";
 import { EMAIL_MASKED, emailAddress, emailHref } from "@/lib/email";
 import { site } from "@/lib/site";
+import { cn } from "@/lib/utils";
+import { trackCta, useVI } from "@/components/vi/vi-client";
 
 /** Everything except the address — that one is assembled after hydration. */
 const channels = [
@@ -18,6 +20,27 @@ const channels = [
 
 type Status = "idle" | "sending" | "ok" | "error";
 
+/*
+ * Self-reported context (spec §2: person or organisation is asked, never
+ * inferred about the person). Values match the /api/contact enums exactly.
+ */
+const ENQUIRING_AS = [
+  { value: "individual", label: "An individual" },
+  { value: "organization", label: "On behalf of an organisation" },
+  { value: "recruiter", label: "A recruiter" },
+  { value: "agency", label: "An agency" },
+  { value: "other", label: "Something else" },
+] as const;
+
+const TOPICS = [
+  { value: "development", label: "Project" },
+  { value: "hiring", label: "Hiring" },
+  { value: "collaboration", label: "Collaboration" },
+  { value: "other", label: "Other" },
+] as const;
+
+type Topic = (typeof TOPICS)[number]["value"];
+
 export function Contact() {
   const [copied, setCopied] = useState(false);
   // null until hydration, so the address never ships in the server HTML.
@@ -26,6 +49,14 @@ export function Contact() {
   const [status, setStatus] = useState<Status>("idle");
   const [msg, setMsg] = useState("");
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "", website: "" });
+  const [enquiringAs, setEnquiringAs] = useState("");
+  const [organization, setOrganization] = useState("");
+  const [topic, setTopic] = useState<Topic | null>(null);
+  const [linkVisit, setLinkVisit] = useState(false);
+  // The link box exists only for a visitor who granted "linking" on the consent
+  // card — sending an enquiry never requires any analytics permission (R06).
+  const vi = useVI();
+  const canLink = vi.granted && vi.purposes.includes("linking");
 
   const copy = () => {
     navigator.clipboard?.writeText(emailAddress());
@@ -49,13 +80,26 @@ export function Contact() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        // Empty optional fields are left out (undefined drops from JSON) rather
+        // than sent as "", so the server's enums never see a blank.
+        body: JSON.stringify({
+          ...form,
+          enquiringAs: enquiringAs || undefined,
+          organization: organization.trim() || undefined,
+          topic: topic ?? undefined,
+          linkVisit: canLink && linkVisit ? true : undefined,
+        }),
       });
       const data = await res.json();
       if (res.ok && data.ok) {
         setStatus("ok");
         setMsg("Message received — I'll reply within 24 hours.");
         setForm({ name: "", email: "", subject: "", message: "", website: "" });
+        setEnquiringAs("");
+        setOrganization("");
+        setTopic(null);
+        setLinkVisit(false);
+        trackCta("enquiry_submitted");
       } else {
         setStatus("error");
         setMsg(data.error || "Something went wrong. Opening your mail client…");
@@ -111,6 +155,7 @@ export function Contact() {
             ))}
             <button
               onClick={copy}
+              data-vi-cta="copy_email"
               className="flex w-full items-center justify-between bg-bg-elev px-6 py-5 text-left transition-colors hover:bg-surface"
             >
               <div>
@@ -145,8 +190,72 @@ export function Contact() {
             <input required aria-label="Your name" placeholder="Your name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={field} />
             <input required type="email" aria-label="Your email address" placeholder="you@company.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={field} />
           </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="enquiring-as" className="hud mb-2 block">I&apos;m enquiring as</label>
+              <div className="relative">
+                <select
+                  id="enquiring-as"
+                  value={enquiringAs}
+                  onChange={(e) => setEnquiringAs(e.target.value)}
+                  className={cn(field, "appearance-none pr-10", !enquiringAs && "text-fg-faint")}
+                >
+                  <option value="" className="bg-bg-elev">Choose…</option>
+                  {ENQUIRING_AS.map((o) => (
+                    <option key={o.value} value={o.value} className="bg-bg-elev text-fg">
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-faint" />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="organization" className="hud mb-2 block">Organisation (optional)</label>
+              <input id="organization" maxLength={120} value={organization} onChange={(e) => setOrganization(e.target.value)} className={field} />
+            </div>
+          </div>
+          <div>
+            <p id="topic-label" className="hud mb-2">Topic</p>
+            <div role="group" aria-labelledby="topic-label" className="flex flex-wrap gap-2">
+              {TOPICS.map((t) => {
+                const on = topic === t.value;
+                return (
+                  <button
+                    key={t.value}
+                    type="button"
+                    aria-pressed={on}
+                    // Single choice, but pressing the chosen one again clears it — it is optional.
+                    onClick={() => setTopic(on ? null : t.value)}
+                    className={cn(
+                      "border px-4 py-2 text-sm transition-colors",
+                      on ? "border-accent bg-accent text-accent-ink" : "border-border text-fg-muted hover:border-border-strong hover:text-fg",
+                    )}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           <input aria-label="Subject" placeholder="Subject" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className={field} />
           <textarea required aria-label="Your message" rows={6} placeholder="What are you building?" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={`${field} resize-none`} />
+          {canLink && (
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                checked={linkVisit}
+                onChange={(e) => setLinkVisit(e.target.checked)}
+                className="mt-1 h-4 w-4 shrink-0 accent-accent"
+              />
+              <span>
+                <span className="block text-sm text-fg">Attach the pages I viewed this session to this enquiry</span>
+                <span className="mt-0.5 block font-mono text-[0.65rem] leading-relaxed text-fg-faint">
+                  So I can see what you read. Nothing else is attached.
+                </span>
+              </span>
+            </label>
+          )}
 
           <Magnetic>
             <button
