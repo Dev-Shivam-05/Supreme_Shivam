@@ -218,3 +218,21 @@ form's spam hash and the aggregate tier's daily visitor id are now HMACs under A
 labelled subkey of ADMIN_SECRET. The contact form stores no hash at all when neither exists. The
 privacy policy now says "without the server's key it cannot be turned back", which is true,
 instead of "cannot be turned back", which was not.
+
+
+## 2026-10-23 — "Data from the first click" goes to Phase 6b, inside the reference
+
+At the end of Phase 6 Shivam restated the goal: gather data from the moment a visitor opens the
+site with one click, and said the reference file was written for that. The reference says the
+opposite for per-visitor data — "Default deny individual-journey collection until explicitly
+authorized", "Start at the first accepted, permitted page-view report, not the first HTTP hit" —
+and makes organisation enrichment a separately authorized purpose. What is already collected for
+every visitor on the first hit is the cookieless aggregate tier (path, referrer host, campaign
+codes, country, device, browser, OS, a keyed daily hash).
+
+Phase 6b closes the gap within those rules: the consent card on the first page load so one click on
+"Allow" starts the journey at the landing page, and the arrival category plus landing content ID
+added to the anonymous aggregate tier for every visitor. Aggregate network-kind counts without
+consent are a grey area and go to Shivam as an explicit question. Per-visitor collection before
+consent is not built by default; if Shivam reaffirms it after hearing the conflict, that is his
+decision to record here, and the privacy policy must then say exactly what is collected.

@@ -1,92 +1,78 @@
 # HANDOFF — Supreme_Shivam — Phase 6 (Visitor intelligence) — 2026-10-23
 
-Branch `feat/phase-6-visitor-intelligence` (branched from the unmerged `feat/phase-5a-admin-deck`),
+Branch `feat/phase-6-visitor-intelligence` (on top of the unmerged `feat/phase-5a-admin-deck`),
 pushed, **not deployed**. Spec: `docs/spec/phase-6-visitor-intelligence.md`. Contract:
-`visitor_intelligence_reference/` (now committed, minus the zip, which is byte-identical).
+`visitor_intelligence_reference/`.
 
 ## Done
 
-- **Shivam's reference package implemented in full.** Every requirement in the README, every
-  invariant in `reference.py`, every table in `schema.sql` and every shape in `examples.json` is
-  mapped in spec §3 to where it lives and how it is checked.
-- **The engine is a port of `reference.py`.** Its 32 tests run under their original names against
-  the production engine — the two schema tests execute the reference `schema.sql` in Node's
-  built-in SQLite. `npm run test:vi`: **101 tests, 101 pass.**
-- **Nothing journey-level happens without consent.** A card appears after 20 s or 40 % scroll with
-  three separate opt-ins (pages and buttons; link to an enquiry; organisation lookup) and equal-
-  weight "No thanks" / "Allow selected". Verified end-to-end: no cookie, no event, no state request
-  before consent; a decline sets no cookie and is not asked again.
-- **Only IDs cross the wire.** Pages as content IDs, buttons as CTA IDs, arrival as a category,
-  palette searches as a topic. Gender, email and URL-shaped values are rejected with a code.
-- **Person or organisation, honestly.** Self-reported on the contact form, and the public registry
-  owner of the visitor's network from RDAP — queried by /24 or /48, never the address. Live:
-  Reliance Jio → mobile carrier, Google LLC → hosting. Shown as `possible_network_association`.
-- **Why, without pretending.** Four abstaining rules with evidence, alternatives, unknowns,
-  confidence `null`, and a next action that never contacts anyone.
-- **Withdrawal erases at once.** Footer "Privacy choices" → tombstone, revoke, delete; the lead
-  itself is kept; a replayed event is refused. Verified: only the tombstone remains.
-- **Admin → Visitors.** Journey list, journey detail with the six independent dimensions (gender
-  shown as "not collected — policy"), insight cards, network evidence, scoped linked enquiry,
-  Reverse link, Erase, Run sweep, and panels for rejections, consent counts, arrivals, network
-  kinds, deletion jobs and retention.
-- **Independent security review: 9 findings, all fixed** (spec §10), including a high-severity
-  scope leak of a linked enquiry's identity.
-- **End-to-end 50/50** against `next start` on an isolated Atlas database, dropped afterwards. The
-  production database was read (counts, referrer shapes) and never written.
+- `visitor_intelligence_reference/` implemented: engine ported from `reference.py`, its 32 tests
+  passing under their original names; `npm run test:vi` → 101/101.
+- Consent card (three separate opt-ins) → journey events as content/CTA IDs, arrival category,
+  contact-form linking, RDAP network owner by /24 or /48, four abstaining rules, withdrawal that
+  erases at once, admin → Visitors with every claim labelled.
+- Independent security review: 9 findings, all fixed. End-to-end 50/50 on an isolated database.
+- Gender is not inferred anywhere — the reference forbids it.
 
-## Files changed
+## What happens when a visitor opens the site today — read this first
 
-- `src/lib/vi/` — `engine.ts`, `policy.ts`, `catalog.ts`, `rules.ts`, `config.ts`, `cookies.ts`,
-  `server.ts`, `models.ts`, `mongo-store.ts`, `memory-store.ts`, `network-core.ts`, `network.ts`,
-  `sweep.ts`, `admin-queries.ts`, three `*.test.ts`, `node-sqlite.d.ts`.
-- `src/app/api/vi/{grant,event,withdraw,state,consent-stat,sweep}/route.ts` — public endpoints.
-- `src/app/api/admin/vi/{summary,journeys,journeys/[epochId],erase,reverse-link,sweep}/route.ts`.
-- `src/components/vi/{vi-client,tracker,consent-card,vi-root}` — consent and tracking.
-- `src/components/admin/{visitors,journey-detail,evidence-badge}.tsx`; `admin-app.tsx`, `nav.ts`,
-  `leads.tsx` updated.
-- `src/app/api/contact/route.ts`, `src/models/lead.ts`, `src/lib/mail.ts`,
-  `src/components/sections/contact.tsx` — self-reported fields and visit linking.
-- `src/app/api/collect/route.ts` — referrer host only, token-shaped UTM, keyed visitor hash.
-- `src/lib/keyed-hash.ts` — HMAC for every IP-derived hash.
-- `src/lib/legal.ts`, `src/components/legal/legal-page.tsx`, `src/app/privacy-policy/page.tsx` —
-  policy rewritten against the code, with a `#visit-insights` anchor.
-- `src/components/layout/{chrome,footer}.tsx`, `src/components/ux/command-palette.tsx`.
-- `vercel.json` (daily sweep cron), `tsconfig.json` (`allowImportingTsExtensions`), `package.json`
-  (`test:vi`), `.gitignore`.
+Shivam's stated goal (2026-10-23): **gather data from the moment a visitor opens the site with one
+click.** Today that is only partly true:
+
+| Moment | What is collected | Consent needed |
+|---|---|---|
+| First page load, every visitor | Path, referrer **host**, campaign codes, country, device, browser, OS, a keyed daily visitor hash (the Phase 2 aggregate tier) | No |
+| After 20 s or 40 % scroll | The consent card appears | — |
+| After "Allow selected" | Journey: content IDs, CTA IDs, arrival category, optional link and network owner, hypotheses | **Yes** |
+
+So journey data starts at the click on "Allow", which today cannot happen before 20 s / 40 %
+scroll. Pages viewed before that are never recorded at journey level.
+
+**The reference itself forbids collecting journey data before consent.** README: "Default deny
+individual-journey collection until explicitly authorized" and "Start at the first accepted,
+permitted page-view report, not the first HTTP hit". `reference.py` rejects events outside the
+grant. Organisation enrichment is a separate purpose that needs its own authorization. India's DPDP
+Act 2023 and the GDPR point the same way. Phase 6b must close the gap **inside** those rules.
+
+## Files changed this session
+
+See `git log main..feat/phase-6-visitor-intelligence`: core in `src/lib/vi/`, public endpoints in
+`src/app/api/vi/`, admin endpoints in `src/app/api/admin/vi/`, client in `src/components/vi/`,
+admin UI in `src/components/admin/{visitors,journey-detail,evidence-badge}.tsx`, contact form
+and lead model, `src/lib/keyed-hash.ts`, the privacy policy, `vercel.json`.
 
 ## Decisions made
 
-- **Gender is never inferred.** The reference forbids it and there is no honest signal.
-- **No vendor.** RDAP by prefix instead of IPinfo/Leadfeeder/Bombora, which the reference lists as
-  unverified holds.
-- **MongoDB, not PostgreSQL** — the codebase convention; tenant keys become `siteId` everywhere.
-- **Enquiries stay at 24 months** against the reference's 90-day *suggestion* (deviation, D2).
-- **Four rules, not one**, all in the reference rule's exact shape.
-- **Tombstone → revoke → delete**, and every IP-derived hash is keyed. Full list in
-  `docs/DECISIONS.md`.
+- Gender never inferred; RDAP by prefix, no vendor; MongoDB; enquiries 24 months (deviation);
+  tombstone → revoke → delete; every IP-derived hash keyed. Full list in `docs/DECISIONS.md`.
+- **2026-10-23 (end of session):** the "data from the first click" goal goes to Phase 6b, built
+  within the reference, with the one grey-area item put to Shivam as an explicit decision.
 
 ## Known broken / deliberately skipped
 
-- **Not deployed.** Merge 5a first, then 6.
-- **`CRON_SECRET` is not set in Vercel.** Until it is, the daily sweep returns 401. TTL indexes
-  still delete everything on schedule; only the "expired" audit rows and backup reconciliation
-  wait. Set it, and Vercel sends it to the cron automatically.
-- **Coverage will be small.** Journey data exists only for visitors who say yes, and organisation
-  lookups only for those who also tick that box. This is what doing it honestly costs.
-- **No vendor integrations, no booking provider, no downloads, no site search** — the matching
-  events (`booking_confirmed`, `download_requested`) exist in the schema but can never be accepted
-  here; `search_submitted` comes from the Cmd-K palette as a topic only.
-- **18 ESLint warnings** (`set-state-in-effect`), 0 errors — the pattern the codebase already uses.
-- **Rotating `ADMIN_SECRET`** without first setting `VI_SECRET` resets every consent (visitors are
-  asked again) and orphans existing tombstone hashes for their 90 days.
-- `/stats` still counts bots (open since 5a).
+- Not deployed. `CRON_SECRET` not set in Vercel (the TTL indexes still delete on schedule).
+- Journey collection starts at "Allow", not at page open — Phase 6b below.
+- 18 ESLint warnings (`set-state-in-effect`), 0 errors. `/stats` still counts bots.
 
 ## Next session starts here
 
-- **Phase 6 deploy, then Phase 5b:** merge `feat/phase-5a-admin-deck` and
-  `feat/phase-6-visitor-intelligence`, set `CRON_SECRET` in Vercel, `vercel --prod`, then one
-  consented visit on the live site and check it in /admin → Visitors.
-- **First command:** `git checkout feat/phase-6-visitor-intelligence && npm run test:vi && npm run build`
-- **Watch out for:** `src/lib/vi/engine.ts` is Shivam's written policy in code. If a change makes
-  one of the 32 reference tests fail, it is a policy change: update the spec and `/privacy-policy`
-  with it, or don't make it.
+- **Phase 6b — data from the first click, within the reference.** Run `/spec-lock` first and put
+  this exact table to Shivam; build only the rows he approves:
+
+  | # | Change | Reference status | Default |
+  |---|---|---|---|
+  | 1 | Consent card on the **first page load** (0 s, no scroll trigger), still non-modal with equal buttons, so one click on "Allow" starts the journey on the landing page | Allowed | Build |
+  | 2 | Add the arrival **category** and the landing **content ID** to the cookieless aggregate event, so "how they came" and "where they landed" are known for 100 % of visitors from the first hit, with no identifier and no profile | Allowed (aggregate statistics) | Build |
+  | 3 | Aggregate **network-kind counts** for every visitor without consent: RDAP by prefix on first hit, kept only as daily counters (e.g. "mobile carrier: 12, corporate network: 3") with no link to any visit, address never stored | **Grey area** — README makes organisation enrichment a separate authorized purpose | Ask Shivam explicitly; do not build without a yes |
+  | 4 | Any per-visitor journey, link, network owner or hypothesis **before** consent; buffering pre-consent pages in the browser and sending them after "Allow"; gender | **Forbidden** by the reference (default deny; browser time never authorizes historical collection) and a DPDP/GDPR risk | Not built by default. State the conflict in one line; if Shivam reaffirms after hearing it, that is his call — record it in DECISIONS and make the privacy policy say exactly what is collected |
+
+  Acceptance for rows 1–2: the card visible within 2 s of first load at 1440 and 390 widths
+  without hurting Phase 4 PageSpeed; `/api/collect` rows carry `entry` and `content_id`; privacy
+  policy updated to match; `npm run test:vi` green; end-to-end re-run on the test database.
+
+- **Before or alongside 6b:** merge and deploy (Shivam). Merge order: `feat/phase-5a-admin-deck`,
+  then `feat/phase-6-visitor-intelligence`. Set `CRON_SECRET` in Vercel.
+- **First command:** `git checkout feat/phase-6-visitor-intelligence && git pull && npm run test:vi`
+- **Watch out for:** row 4. "Collect on open" is the goal, but per-visitor collection before
+  consent is exactly what Shivam's own reference forbids. Say so in one line, offer rows 1–3, and
+  never let the privacy policy claim less than the code collects.

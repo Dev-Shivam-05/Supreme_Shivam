@@ -15,15 +15,13 @@ Spec: `docs/spec/phase-6-visitor-intelligence.md`.
 
 ## Next 3
 
-1. **Deploy 5a + 6.** Merge `feat/phase-5a-admin-deck`, then `feat/phase-6-visitor-intelligence`.
-   Set `CRON_SECRET` in Vercel so the daily sweep runs (without it the TTL indexes still delete on
-   schedule; only the audit trail and backup reconciliation wait). Then `npm run verify:domain` and
-   one consented test visit on the live site.
-2. **Phase 5b — the rest of the deck.** Leads, Projects, Writing, Media, Status; and decide whether
-   `/stats` should drop bots too.
-3. **Phase 3e — mail.** The Hostinger trial deadline (2026-10-14) has passed; check what the mailbox
-   is doing, and whether SMTP is set in Vercel (it is not set locally, so local enquiries reach the
-   leads board but not the inbox).
+1. **Deploy 5a + 6 (Shivam).** Merge `feat/phase-5a-admin-deck`, then
+   `feat/phase-6-visitor-intelligence`; set `CRON_SECRET` in Vercel; `vercel --prod`; one consented
+   visit on the live site checked in /admin → Visitors.
+2. **Phase 6b — data from the first click, within the reference.** Spec-lock first. Consent card on
+   first load; arrival category + landing content ID in the anonymous aggregate tier; ask about
+   aggregate network-kind counts. Exact table in `docs/HANDOFF.md`.
+3. **Phase 5b — the rest of the deck** (Leads, Projects, Writing, Media, Status; `/stats` bots).
 
 ---
 
@@ -41,6 +39,7 @@ Spec: `docs/spec/phase-6-visitor-intelligence.md`.
 | 4 | Above-the-fold performance | **Built, not deployed** — 2026-09-26 | Spec `docs/spec/phase-4-pagespeed.md` (approved `GO`). A11y 96 → 100; shader deferred to first interaction; preloader gone; AVIF portrait; `template.tsx` no longer hides the page until hydration (row 11, pending OK). Mobile perf ~85 locally, target 95 not met — needs a design decision. Detail below is the older investigation. |
 | 5a | Admin v2 — Signal Deck | **Built, not deployed** — 2026-10-23 | Spec `docs/spec/phase-5-admin-signal-deck.md`, approved `go`. Visitor classification (human/untagged/bot) computed in a `$switch` so it applies to the 257 events banked before the field existed; 38 were this project's own headless Chrome. Grouped sidebar, live feed polling `/api/admin/feed` at 20s while visible, Cmd-K palette, provenance strip. `/admin` no longer renders the public nav/footer/Lenis (`components/layout/chrome.tsx`) — a nested layout cannot remove a parent's chrome. Verified against the live database and screenshotted in both themes at 1600/1100/480px. |
 | 6 | Visitor intelligence | **Built, not deployed** — 2026-10-23 | Implements `visitor_intelligence_reference/` (README, reference.py, schema.sql, examples.json, tests). Engine ported from reference.py; its 32 tests pass under their original names, 94 in all. Consent-gated journeys (15-day window, deleted at 22 days), contact-form linking, RDAP network owner by prefix, four abstaining rules, tombstone-first erasure, daily sweep, admin Visitors page. Independent security review: 9 findings, all fixed. 101 unit tests; 50/50 end-to-end on an isolated test database. Gender not inferred (forbidden by the reference). Enquiries kept at 24 months (deviation, see DECISIONS). |
+| 6b | Data from the first click | **Open — next session** | Shivam's goal: collect from the moment a visitor opens the site. Today journey data starts only at "Allow" (card after 20 s / 40 % scroll). Build within the reference: card on first load; entry category + landing content ID in the cookieless aggregate tier; ask about aggregate network-kind counts. Per-visitor collection before consent is forbidden by the reference — see DECISIONS 2026-10-23. |
 | 5b | Admin v2 — remaining pages | **Open** | Leads, Projects, Writing, Media, Status redesigned to match the deck. (The Audience slot became Visitors in Phase 6.) |
 | 5 | Confirm unverified facts | **Done** — 2026-09-14 | Phone, timelines, app confidentiality, Instagram and the real AI-PULSE stack (read from the GitHub API, not guessed) are all in the code. |
 
